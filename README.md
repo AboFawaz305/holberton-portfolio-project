@@ -27,7 +27,7 @@ By making a social platform to share good resources, people can share their own 
 **Problem:** ![An image describing how creative and ambitious entrepreneurs lose their interest after knowing how hard it is to make plans for their projects](./readme-images/idea2_problem.jpeg)  
 As an entrepreneur who has thought of a good and great startup idea, I lose interest in my idea after knowing how hard it is for me to create plans for my idea.
 
-**Solution:** [!An image describing how a startup management system helped an entrepreneur create plans for his idea and thus made the entrepreneur rich after the success of his idea](./readme-images/idea2_solution.jpeg)  
+**Solution:** ![An image describing how a startup management system helped an entrepreneur create plans for his idea and thus made the entrepreneur rich after the success of his idea](./readme-images/idea2_solution.jpeg)  
 By making a startup management system, entrepreneurs can now create plans and manage tasks much more easily and thus make it easier for them to execute their ideas.
 
 **Strengths:**
