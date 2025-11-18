@@ -3,7 +3,7 @@
 - Abdulaziz Almutairi
 - Ismail Rowaihy
 - Sara Ali Mareer
-- Farah Almozaini
+- Farah Almozain
 
 
 ## Ideas Explored
