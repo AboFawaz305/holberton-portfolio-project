@@ -31,14 +31,14 @@ Out-of-scope:
 - AI summary for courses
 
 ## Risks
-## High-Level Plan
-| Stage                                | Description                                              | Start Date   | End Date     | Key Deliverables                             |
-| ------------------------------------ | -------------------------------------------------------- | ------------ | ------------ | -------------------------------------------- |
-| Stage 1: Idea Development            | Team formation and idea generation                       | Oct 26, 2025 | Nov 8, 2025  | Finalized project idea                       |
-| Stage 2: Project Charter Development | Project Charter creation                                 | Nov 9, 2025  | Nov 22, 2025 | Approved Project Charter                     |
-| Stage 3: Technical Documentation     | Development of technical specifications and requirements | Nov 23, 2025 | Dec 6, 2025  | Technical documentation finalized            |
-| Finals Exams                         | —                                                        | Dec 14, 2025 | Dec 22, 2025 | —                                            |
-| Stage 4: MVP Development             | Development of minimum viable product                    | Dec 7, 2025  | Jan 3, 2026  | Working MVP                                  |
-| Stage 5: Project Closure             | Final presentation and project wrap-up                   | Jan 4, 2026  | Jan 24, 2026 | Final presentation and project documentation |
+## High-Level Plan and Deliverables
+| Stage                                | Description                                                                                     | Start Date   | End Date     | Key Deliverables                                 |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------ | ------------ | ------------------------------------------------ |
+| Stage 1: Idea Development            | Team formation and idea generation                                                              | Oct 26, 2025 | Nov 8, 2025  | Chosen Project Idea                              |
+| Stage 2: Project Charter Development | Project Charter creation                                                                        | Nov 9, 2025  | Nov 22, 2025 | Approved Project Charter                         |
+| Stage 3: Technical Documentation     | Development of technical specifications and requirements                                        | Nov 23, 2025 | Dec 6, 2025  | Activity, class, ER diagrams, and UI Prototype   |
+| Finals Exams                         | Break period due to team members’ final exams                                                   | Dec 14, 2025 | Dec 22, 2025 | —                                                |
+| Stage 4: MVP Development             | Development of minimum viable product                                                           | Dec 7, 2025  | Jan 3, 2026  | First version of the project MVP                 |
+| Stage 5: Project Closure             | Final presentation and project wrap-up                                                          | Jan 4, 2026  | Jan 24, 2026 | Project presentation, project landing page       |
 
 
