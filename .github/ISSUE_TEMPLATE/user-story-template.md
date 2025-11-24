@@ -9,8 +9,8 @@ assignees: ''
 
 ## Description
 
-As a **<Role>** I want to **<Action>** so that **<Goal>**
+As a **{ Role }** I want to **{ Perform an action }** so that **{ Achieved goal }**
 
 ## Acceptance Criteria
 
-- Given that **<Precondition>** When **<Event>** Then **<Result>**
+- Given that **{ precondition/s }** When **{ an event or an action occurs }** Then **{ expected outcome }**
