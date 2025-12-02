@@ -27,6 +27,72 @@
 
 ## High-Level Sequence Diagrams
 
+<details>
+  <summary>Login flow sequence diagram</summary>
+
+  ```mermaid
+sequenceDiagram
+    actor User
+    participant Front_end
+    participant Back_end
+    participant Data_Base
+    
+
+    User->>Front_end: Enter login details
+    Front_end->>Front_end: Validate input format
+    Front_end->>Back_end: Send login request
+    Back_end->>Data_Base: Query user record
+
+
+    alt User not found
+        Data_Base->>Back_end: User not found
+        Back_end->>Front_end: Send error message
+        Front_end->>User: Display "User not found"
+    else Wrong password
+        Data_Base->>Back_end: User record found
+        Back_end->>Back_end: Verify password hash
+        Back_end->>Front_end: Invalid Password
+        Front_end->>User: Display "Wrong password"
+    else Successful login
+        Back_end->>Back_end: Authentication successful
+        Back_end->>Back_end: Generate session token
+        Back_end->>Front_end: Return success with token
+        Front_end->>Front_end: Set auth cookies
+        Front_end->>User: Redirect to dashboard
+    end
+```
+</details>
+
+
+<details>
+  <summary>registration sequence diagram</summary>
+
+```mermaid
+sequenceDiagram
+      actor User
+      participant Front_end
+      participant Back_end
+      participant Data_Base
+
+      User->>Front_end: Enter registration details
+      Front_end->>Front_end: Validate input
+      Front_end->>Back_end: Send registration request
+      Back_end->>Data_Base: Query user record
+
+      alt User already exists
+          Data_Base->>Back_end: User already exists
+          Back_end->>Front_end: Send "User already exists" error
+          Front_end->>User: Display "User already exists"
+      else Successful registration
+          Data_Base->>Back_end: No existing user
+          Back_end->>Back_end: Hash password
+          Back_end->>Data_Base: Save new user record
+          Data_Base->>Back_end: User created
+          Back_end->>Front_end: Return success response
+          Front_end->>User: Display "Registration successful" / redirect
+      end
+```
+</details>
 
 ## External and Internal APIs
 
