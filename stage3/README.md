@@ -58,14 +58,14 @@ sequenceDiagram
         Back_end->>Back_end: Generate session token
         Back_end->>Front_end: Return success with token
         Front_end->>Front_end: Set auth cookies
-        Front_end->>User: Redirect to dashboard
+        Front_end->>User: Redirect to main page
     end
 ```
 </details>
 
 
 <details>
-  <summary>registration sequence diagram</summary>
+  <summary>Registration sequence diagram</summary>
 
 ```mermaid
 sequenceDiagram
@@ -89,7 +89,7 @@ sequenceDiagram
           Back_end->>Data_Base: Save new user record
           Data_Base->>Back_end: User created
           Back_end->>Front_end: Return success response
-          Front_end->>User: Display "Registration successful" / redirect
+          Front_end->>User: Display "Registration successful"
       end
 ```
 </details>
