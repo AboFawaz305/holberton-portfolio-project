@@ -20,8 +20,56 @@
 
 
 ## System Architecture
+<details>
+  <summary>System Architecture Diagram</summary>
 
+  ```mermaid
+architecture-beta
+    group proxy(server)[Proxy]
 
+    group webfrontend(server)[Web Frontend] in proxy
+    group appwrite(server)[Appwrite] in proxy
+    group spamdetctionmodel(server)[Spam Detection Model] in proxy
+    group core(server)[Functional Core] in proxy
+
+    %% Web Frontend Services
+    service vuejs(server)[Vue JS] in webfrontend
+    service vite(server)[Vite] in webfrontend
+
+    vite:R --> L:vuejs
+
+    vuejs:R --> L:bfuncs
+    vuejs:R --> L:db
+    vuejs:R --> L:vstore
+    vuejs:R --> L:istore
+    vuejs:R --> L:astore
+    vuejs:R --> L:auth
+
+    vuejs:R --> L:utils
+    
+    vuejs:R --> L:mapi
+
+    %% Appwrite services
+    service bfuncs(server)[Business Functions] in appwrite
+    service db(database)[Database] in appwrite
+    service vstore(disk)[Video Storage] in appwrite
+    service astore(disk)[Audio Storage] in appwrite
+    service istore(disk)[Image Storage] in appwrite
+    service auth(server)[Authentication] in appwrite
+
+    bfuncs:R --> L: utils
+    %% Spam Detection Model
+    service mapi(server)[FastAPI] in spamdetctionmodel
+    service model(server)[Model] in spamdetctionmodel
+
+    mapi:R --> L:model
+    model:R --> L:utils
+
+    %% Functional Core
+    service utils(server)[Utilities] in core
+```
+</details>
+Our architecture leverages Appwrite as the backend platform, with domain logic encapsulated in a dedicated functional core to enhance maintainability and test coverage. The frontend is implemented using Vue.js and served via Vite. All internal services operate within a private network and communicate privately, while user access is routed securely through an Nginx reverse proxy.
 ## Components, Classes, and Database Design
 
 
