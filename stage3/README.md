@@ -251,5 +251,75 @@ sequenceDiagram
 
 ## External and Internal APIs
 
+### External APIs
 
-## SCM and QA Strategies
+The system does not utilize any external APIs.
+
+### Internal APIs
+
+The system consists of two internal APIs: one for the backend and another for the spam detection model. This separation ensures that each component can be developed and maintained independently, as neither component depends directly on the other.
+
+
+### Backend API
+
+The backend exposes the following routes:
+
+1. **GET /users**  
+   Returns an array of all users.
+
+2. **GET /users/{id:int}**  
+   Returns information for the user with the specified ID.
+
+3. **POST /users**  
+   Accepts new user data in JSON format and returns the newly created user.
+
+4. **DELETE /users/{id}**  
+   Deletes the user associated with the given ID.
+
+5. **GET /groups**  
+   Returns an array of all registered groups.
+
+6. **GET /groups/{id:int}**  
+   Returns information for the group with the specified ID.
+
+7. **POST /groups**  
+   Accepts new group data in JSON format and returns the newly created group.
+
+8. **DELETE /groups/{id}**  
+   Deletes the group associated with the given ID.
+
+9. **GET /groups/{gid}/resources**  
+   Returns an array of resources belonging to the specified group.
+
+10. **GET /groups/{gid}/resources/{rid}**  
+    Returns information for the resource with the given resource ID in the specified group.
+
+11. **POST /groups/{gid}/resources**  
+    Accepts new resource data in JSON format and returns the newly created resource.
+
+12. **DELETE /groups/{gid}/resources/{rid}**  
+    Deletes the resource with the given resource ID from the specified group.
+
+
+### Spam Detection Model API
+
+The spam detection model exposes the following route:
+
+1. **GET /spam/detect**  
+   Accepts a JSON object containing the message content and returns a boolean value indicating whether the message is classified as spam.
+
+## Source Control Management and Quality Assurance Strategies
+
+The project utilizes Git as the primary source control management system, with the codebase hosted on GitHub. Project tasks and progress are managed through GitHub Projects.
+
+To maintain code quality, preserve a clear commit history, and prevent unintended changes, direct pushes to the `master` branch are strictly prohibited. All modifications must be introduced through pull requests, each of which must be reviewed by at least one team member prior to merging to ensure correctness and adherence to project standards.
+
+An automated GitHub workflow is triggered for every pull request. This workflow performs the following checks:
+
+- Code formatting compliance with the project’s style guide  
+- Compilation errors  
+- Linting issues  
+- Verification that the project remains compilable if the changes are merged  
+
+Additionally, GitHub Copilot will automatically generate a summary comment for each pull request. This summary provides an overview of the contributor’s work and suggests optional improvements.
+
