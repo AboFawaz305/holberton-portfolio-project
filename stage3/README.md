@@ -28,7 +28,45 @@
 - As an admin I want to manage learner accounts so that I can provide support when needed.
 
 ### Mockups
+<img width="1589" height="599" alt="Screenshot 2025-12-07 at 2 31 06 AM" src="https://github.com/user-attachments/assets/893dd832-e723-4350-b3f0-b628b4f965aa" />
+Landing Page (Home Page)
 
+This page introduces the platform and explains the main features in a simple and friendly way.
+It helps students quickly understand what the community offers.
+
+The page includes:
+-Live Discussions: A space for students to ask questions and talk about their courses.
+-Resource Sharing: Uploading notes, summaries, and study materials.
+-Student Community: Connecting with classmates in the same major.
+-There is also a clear button to start the journey by choosing the student’s institution.
+
+Institutions Page
+
+This page helps students find and select their university or college.
+Once the student chooses an institution, the platform becomes personalized for them.
+
+The page contains:
+-A search bar to look for the institution
+-A clean list of universities with location and number of students
+-Simple card design that makes browsing easy and organized
+<img width="1130" height="858" alt="Screenshot 2025-12-07 at 2 32 09 AM" src="https://github.com/user-attachments/assets/a021b6dd-25b9-4ddc-996d-ed2b5ec5e4ba" />
+This page acts as a complete communication hub for students inside the same university.
+It allows them to:
+-Explore their colleges
+-Join trending conversations
+-Connect with others
+-Share questions and advice easily
+<img width="1081" height="901" alt="Screenshot 2025-12-07 at 2 32 40 AM" src="https://github.com/user-attachments/assets/2881a2d4-9552-4815-8382-6e73acc79ecb" />
+This page acts as a complete community hub for the college, helping students:
+-Explore their courses
+-Access useful resources
+-Join public discussions
+-Connect with classmates in the same major
+A simple, interactive, and organized space just for their academic community.
+<img width="552" height="961" alt="Screenshot 2025-12-07 at 2 33 10 AM" src="https://github.com/user-attachments/assets/6aa5d94a-75fa-4196-8960-41aec4cc6f2f" />
+
+The page serves as a welcoming introduction to Atrab, showing the platform’s identity, goals, and values while introducing the team behind it.
+It helps students understand the purpose of the platform and encourages them to join the community.
 
 ## System Architecture
 <details>
