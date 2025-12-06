@@ -249,8 +249,6 @@ sequenceDiagram
 ```
 </details>
 
-## External and Internal APIs
-
 ### External APIs
 
 The system does not utilize any external APIs.
