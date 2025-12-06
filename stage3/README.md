@@ -25,7 +25,7 @@
 
   ```mermaid
 architecture-beta
-    group proxy(server)[Proxy]
+    group proxy(server)[System]
 
     group webfrontend(server)[Web Frontend] in proxy
     group appwrite(server)[Appwrite] in proxy
@@ -56,8 +56,10 @@ architecture-beta
     service astore(disk)[Audio Storage] in appwrite
     service istore(disk)[Image Storage] in appwrite
     service auth(server)[Authentication] in appwrite
+    service messages(server)[Email Verification] in appwrite
 
     bfuncs:R --> L: utils
+    auth:R --> L:messages
     %% Spam Detection Model
     service mapi(server)[FastAPI] in spamdetctionmodel
     service model(server)[Model] in spamdetctionmodel
