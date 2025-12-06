@@ -74,7 +74,111 @@ architecture-beta
 Our architecture leverages Appwrite as the backend platform, with domain logic encapsulated in a dedicated functional core to enhance maintainability and test coverage. The frontend is implemented using Vue.js and served via Vite. All internal services operate within a private network and communicate privately, while user access is routed securely through an Nginx reverse proxy.
 
 ## Components, Classes, and Database Design
+<details>
+  <summary>Class Diagram</summary>
+  
+  ```mermaid
+  classDiagram
+    class User {
+        -id: string
+        +name: string
+        -email: string
+        -passwordHash: string
+        -isAdmin: bool
+        -universityEmails: string[]
+        -createdAt: DateTime
 
+        +addUniversityEmail(email: string): void
+        +removeUniversityEmail(email: string): void
+        +updateProfile(User: User): void
+    }
+
+
+    class EducationOrganization {
+        -id: string
+        +name: string
+        -EmailDomain: string
+        -createdAt: DateTime
+        +chat: Chat 
+        +users: User[]
+        -bannedUsers: User[]
+
+        +validateEmail(email: string): bool
+        +banUser(userId: string): void
+    }
+
+    class Group {
+        -id: string
+        +name: string
+        +description: string
+        +chat: Chat
+        +users: User[]
+        -admins: User[]
+        +resources: Resource[]
+        +groups: Group[]
+
+        +addMember(user: User): void
+        +kickMember(user: User): void
+    }
+    
+    class Resource {
+        -id: string
+        +title: string
+        +description: string
+        +resourcetype: string
+        +location: string
+        +voteScore: int
+        -voters: UserId[]
+        +uploadedBy: User
+        +createdAt: DateTime
+
+        +vote(userId: string, isUpvote: bool): void
+        +delete(): void
+    }
+    
+    class Chat {
+        -id: string
+        +title: string
+        +createdAt: DateTime
+        +messages: Messages[]
+
+        +addMessage(message: Message): void
+    }
+    
+    class Message {
+        -id: string
+        -ChatId: string
+        +senderUser: User
+        +content: string
+        +isEdited: bool
+        +createdAt: DateTime
+        +reacts: emojis []
+
+        +editContent(newContent: string): void
+        +delete(): void
+        +react(emoji: string, userId: string): void
+        +replyTo(messageId: string): void
+    }
+
+
+    EducationOrganization "1" --> "*" User : members
+    EducationOrganization "1" --> "*" Group : contains
+    EducationOrganization --> "1" Chat : general channel
+
+    Group "0" --> "*" Resource : could have
+    Group "1"--> "*" User : members
+    Group --> "1" Chat : contains
+    Group "0"--> "*" Group : sub-groups
+    Resource --> "1" User : uploader
+    Chat "1" *-- "*" Message : contains
+    Message --> "1" User : sender
+  ```
+</details>
+
+<details>
+  <summary>ER Diagram</summary>
+  <img width="1244" height="1010" alt="image" src="https://github.com/user-attachments/assets/947d86aa-1683-4c3b-80e2-864f08ee400d" />
+</details>
 
 ## High-Level Sequence Diagrams
 
