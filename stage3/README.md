@@ -12,9 +12,20 @@
 - As a User I want to Link multiple emails to my account so that can join multiple private groups from deferent university
 - As a Admin I want Users emails to be verified so that i can trust there email ownership
 - As a Group administrator I want to restrict group access for student with access to emails with specific domains so that I keep the group access private for students of this email domain
+- As a learner I want to log in using my email and password so that I can access my personal dashboard.
+- As an admin I want to create and publish new courses so that learners can access updated content.
 #### Should have
+- As a student I want to browse all university groups so that I can find my university's group.
+- As a learner I want to search for courses by name or keyword so that I can quickly find the course I am looking for.
+- As a learner I want to download course attachments so that I can use them while practicing.
 #### Could Have
+- As a learner I want to save a course to my favorites so that I can return to it easily anytime.
 #### Won't have
+- As a learner I want to watch lessons in a short and clear format so that I can learn without spending too much time.
+- As a learner I want to see my progress in each course so that I know how much I have completed.
+- As a learner I want to rate the course after finishing it so that I can provide helpful feedback.
+- As a learner I want to receive a certificate after completing a course so that I can use it in my professional profile.
+- As an admin I want to manage learner accounts so that I can provide support when needed.
 
 ### Mockups
 
