@@ -249,11 +249,41 @@ sequenceDiagram
 ```
 </details>
 
-### External APIs
+<details>
+  <summary>Sending a massage sequence diagram</summary>
+
+  ```mermaid
+sequenceDiagram
+    actor User
+    participant Front_end
+    participant Back_end
+    participant Spam_Detection_Model
+    participant Data_Base
+
+    User->>Front_end: Type message and press "Send"
+    Front_end->>Front_end: Basic input check
+    Front_end->>Back_end: Send "Create Message" request
+
+    Back_end->>Spam_Detection_Model: Checks Massage
+    alt is Spam
+      Spam_Detection_Model->>Back_end: Massage is Spam
+      Back_end->>Front_end: Error "Spam Detected"
+      Front_end->>User: Error "Spam Detected"
+    else not Spam
+      Spam_Detection_Model->>Back_end: massage not Spam
+      Back_end->>Data_Base: Save new message
+      Data_Base->>Back_end: Message saved
+      Back_end->>Front_end: Success + message data
+      Front_end->>User: Show message in chat
+    end
+  ```
+</details>
+
+## External APIs
 
 The system does not utilize any external APIs.
 
-### Internal APIs
+## Internal APIs
 
 The system consists of two internal APIs: one for the backend and another for the spam detection model. This separation ensures that each component can be developed and maintained independently, as neither component depends directly on the other.
 
