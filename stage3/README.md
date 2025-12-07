@@ -12,20 +12,20 @@
 - As a User I want to Link multiple emails to my account so that can join multiple private groups from deferent university
 - As a Admin I want Users emails to be verified so that i can trust there email ownership
 - As a Group administrator I want to restrict group access for student with access to emails with specific domains so that I keep the group access private for students of this email domain
-- As a learner I want to log in using my email and password so that I can access my personal dashboard.
+- As a User I want to log in using my email and password so that I can access my account.
 - As an admin I want to create and publish new courses so that learners can access updated content.
 #### Should have
-- As a student I want to browse all university groups so that I can find my university's group.
-- As a learner I want to search for courses by name or keyword so that I can quickly find the course I am looking for.
-- As a learner I want to download course attachments so that I can use them while practicing.
+- As a Student I want to Browse all university groups so that I can Find my university's group.
+- As a Student I want to Search for groupes by name or keyword so that I can Quickly find the group I am looking for.
+- As a Student I want to Download course resources so that I can use them while practicing for my exam.
 #### Could Have
-- As a learner I want to save a course to my favorites so that I can return to it easily anytime.
+- As a Student I want to save a group to my favorites so that I can return to it easily anytime.
 #### Won't have
-- As a learner I want to watch lessons in a short and clear format so that I can learn without spending too much time.
-- As a learner I want to see my progress in each course so that I know how much I have completed.
-- As a learner I want to rate the course after finishing it so that I can provide helpful feedback.
-- As a learner I want to receive a certificate after completing a course so that I can use it in my professional profile.
-- As an admin I want to manage learner accounts so that I can provide support when needed.
+- As a Student I want to watch lessons in a short and clear format so that I can learn without spending too much time.
+- As a Student I want to see my progress in each course so that I know how much I have completed.
+- As a Student I want to rate the course after finishing it so that I can provide helpful feedback.
+- As a Student I want to receive a certificate after completing a course so that I can use it in my professional profile.
+- As an Admin I want to manage learner accounts so that I can provide support when needed.
 
 ### Mockups
 <img width="1589" height="599" alt="Screenshot 2025-12-07 at 2 31 06 AM" src="https://github.com/user-attachments/assets/893dd832-e723-4350-b3f0-b628b4f965aa" />
@@ -87,14 +87,14 @@ architecture-beta
 
     vite:R --> L:vuejs
 
-    vuejs:R --> L:bfuncs
-    vuejs:R --> L:db
-    vuejs:R --> L:vstore
-    vuejs:R --> L:istore
-    vuejs:R --> L:astore
-    vuejs:R --> L:auth
+    %% vuejs:R --> L:bfuncs
+    %% vuejs:R --> L:db
+    %% vuejs:R --> L:vstore
+    %% vuejs:R --> L:istore
+    %% vuejs:R --> L:astore
+    %% vuejs:R --> L:auth
 
-    vuejs:R --> L:utils
+    vuejs:R --> L:utilsa
     
     vuejs:R --> L:mapi
 
@@ -107,17 +107,20 @@ architecture-beta
     service auth(server)[Authentication] in appwrite
     service messages(server)[Email Verification] in appwrite
 
-    bfuncs:R --> L: utils
+    bfuncs:R --> L:utilsa
     auth:R --> L:messages
     %% Spam Detection Model
     service mapi(server)[FastAPI] in spamdetctionmodel
     service model(server)[Model] in spamdetctionmodel
 
     mapi:R --> L:model
-    model:R --> L:utils
+    model:R --> L:utilsa
 
     %% Functional Core
     service utils(server)[Utilities] in core
+    service utilsa(server)[FastAPI] in core
+
+    utilsa:R --> L:utils 
 ```
 </details>
 Our architecture leverages Appwrite as the backend platform, with domain logic encapsulated in a dedicated functional core to enhance maintainability and test coverage. The frontend is implemented using Vue.js and served via Vite. All internal services operate within a private network and communicate privately, while user access is routed securely through an Nginx reverse proxy.
