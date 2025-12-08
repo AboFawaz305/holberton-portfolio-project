@@ -8,11 +8,12 @@
 - As a Student I want to write messages in the group so that I can communicate with my peers
 - As a Student I want to Share a Resource with my peers so that I Help my peers with There Study
 - As a Student I want to Rate resources so that good resources appear higher in the search results
-- As a Student I want to view relevant messages in the group so that I don't see spam messages and ads in the group
+- As a Student I want to view relevant messages in the group so that I don't see repeated spam messages and ads in the group
 - As a User I want to Link multiple emails to my account so that can join multiple private groups from deferent university
-- As a Admin I want Users emails to be verified so that i can trust there email ownership
+- As a Admin I want Users emails to be verified so that I can trust there email ownership
 - As a Group administrator I want to restrict group access for student with access to emails with specific domains so that I keep the group access private for students of this email domain
 - As a User I want to log in using my email and password so that I can access my account.
+- As a User I want to register so that I can create an account.
 - As an admin I want to create and publish new courses so that learners can access updated content.
 #### Should have
 - As a Student I want to Browse all university groups so that I can Find my university's group.
