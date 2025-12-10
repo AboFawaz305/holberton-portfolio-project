@@ -80,7 +80,7 @@ architecture-beta
     group webfrontend(server)[Web Frontend] in proxy
     group appwrite(server)[Appwrite] in proxy
     group spamdetctionmodel(server)[Spam Detection Model] in proxy
-    group core(server)[Functional Core] in proxy
+    group core(server)[Backend] in proxy
 
     %% Web Frontend Services
     service vuejs(server)[Vue JS] in webfrontend
@@ -118,7 +118,7 @@ architecture-beta
     model:R --> L:utilsa
 
     %% Functional Core
-    service utils(server)[Utilities] in core
+    service utils(server)[Functional Core] in core
     service utilsa(server)[FastAPI] in core
 
     utilsa:R --> L:utils 
