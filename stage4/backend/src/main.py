@@ -4,6 +4,8 @@ from appwrite.client import Client
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
+import core
+
 load_dotenv("../../.env", verbose=True)
 
 client = Client()
