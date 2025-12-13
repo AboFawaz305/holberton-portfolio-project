@@ -1,0 +1,82 @@
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - 'stage4/frontend/**'
+  pull_request:
+    paths:
+      - 'stage4/frontend/**'
+
+jobs:
+  build-and-test:
+    name: Build, lint, test frontend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['lts/*']
+    env:
+      CI: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          # Try to base key on lockfiles (preferred). If none exist, fall back to package.json.
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-stage4-frontend-${{ hashFiles('stage4/frontend/package-lock.json') || hashFiles('stage4/frontend/yarn.lock') || hashFiles('stage4/frontend/npm-shrinkwrap.json') || hashFiles('stage4/frontend/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-stage4-frontend-
+          path: stage4/frontend/node_modules
+
+      - name: Install frontend dependencies
+        working-directory: stage4/frontend
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Check code formatting with Prettier
+        working-directory: stage4/frontend
+        run: |
+          npx prettier --version || true
+          npx prettier --check .
+
+      - name: Run ESLint
+        working-directory: stage4/frontend
+        run: |
+          npx eslint --version || true
+          npx eslint . --ext .js,.ts,.vue
+
+      - name: Build frontend
+        working-directory: stage4/frontend
+        run: |
+          if npm run | grep -q " build"; then
+            npm run build --if-present
+          else
+            npx vite build
+          fi
+
+      - name: Run unit tests with Vitest
+        working-directory: stage4/frontend
+        run: |
+          npx vitest --version || true
+          npx vitest run
+
+      - name: Install Playwright browsers
+        working-directory: stage4/frontend
+        run: |
+          npx playwright install --with-deps
+
+      - name: Run Playwright end-to-end tests
+        working-directory: stage4/frontend
+        run: |
+          npx playwright test --reporter=list
