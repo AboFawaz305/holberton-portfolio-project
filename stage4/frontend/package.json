@@ -18,6 +18,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "appwrite": "^21.5.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3"
   },

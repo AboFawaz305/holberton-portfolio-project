@@ -1,2 +1,6 @@
 fastapi[standard]
 pytest
+flake8
+pylint
+appwrite
+python-dotenv
