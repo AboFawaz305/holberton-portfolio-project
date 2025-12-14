@@ -1,0 +1,75 @@
+name: Backend Checks
+
+on:
+  push:
+    paths:
+      - 'stage4/backend/**'
+  pull_request:
+    paths:
+      - 'stage4/backend/**'
+
+jobs:
+  lint-and-test:
+    name: Lint, import-check, and test backend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.x']
+    env:
+      PYTHONUNBUFFERED: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('stage4/backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+
+      - name: Install backend dependencies
+        working-directory: stage4/backend
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install fastapi uvicorn flake8 pylint pytest
+          fi
+
+      - name: Run flake8 (style / formatting checks)
+        working-directory: stage4/backend
+        run: |
+          flake8 .
+
+      - name: Run pylint (linter)
+        working-directory: stage4/backend
+        run: |
+          if [ -d src ]; then
+            pylint src
+          else
+            # Lint python files under stage4/backend
+            PY_FILES="$(git ls-files 'stage4/backend/**/*.py' || true)"
+            if [ -n "$PY_FILES" ]; then
+              pylint $PY_FILES
+            else
+              echo "No python files found to lint"
+            fi
+          fi
+
+      - name: Quick import and app sanity-check
+        working-directory: stage4/backend
+        env:
+          PYTHONPATH: ${{ github.workspace }}/stage4/backend
+        run: python -c "import importlib,sys; m=importlib.import_module('src.main'); assert hasattr(m,'app'), 'src.main has no app'"
+
+      - name: Run backend tests (pytest)
+        working-directory: stage4/backend
+        run: |
+          pytest -q
