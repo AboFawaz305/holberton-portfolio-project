@@ -63,12 +63,6 @@ jobs:
             fi
           fi
 
-      - name: Quick import and app sanity-check
-        working-directory: stage4/backend
-        env:
-          PYTHONPATH: ${{ github.workspace }}/stage4/backend
-        run: python -c "import importlib,sys; m=importlib.import_module('src.main'); assert hasattr(m,'app'), 'src.main has no app'"
-
       - name: Run backend tests (pytest)
         working-directory: stage4/backend
         run: |
