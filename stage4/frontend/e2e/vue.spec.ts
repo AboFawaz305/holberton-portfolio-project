@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 
-// See here how to get started:
-// https://playwright.dev/docs/intro
 test('visits the app root url', async ({ page }) => {
   await page.goto('/')
-  await expect(page.locator('h1')).toHaveText('You did it!')
+  await expect(page.locator('h1')).toHaveText('Search Courses')
+  await page.getByPlaceholder('Enter a course or keyword (e.g. python, web, UX)').fill('python')
+  await page.getByRole('button', { name: 'Search' }).click()
+  await expect(page.getByText('Python for Data Analysis')).toBeVisible()
 })

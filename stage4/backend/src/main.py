@@ -1,25 +1,36 @@
-"""API router definitions of the backend
-"""
-from os import environ as env
+"""FastAPI entrypoint and routes."""
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 
-from appwrite.client import Client
-from dotenv import load_dotenv
-from fastapi import FastAPI
+from .core import search_groups
 
-load_dotenv("../../.env", verbose=True)
+app = FastAPI(title="Holberton Portfolio API", version="1.0.0")
 
-client = Client()
-client.set_endpoint(
-    f"https://{env.get('APPWRITE_REGION')}.cloud.appwrite.io/v1")
-client.set_project(env.get("APPWRITE_PROJECT_ID"))
-client.set_key(env.get("APPWRITE_API_KEY"))
-
-
-app = FastAPI()
+# Allow local development URLs to call the API from the frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
 def read_root():
-    """An example hello world route to test that the setup is working
+    """Healthcheck route used to verify the server is running."""
+    return {"status": "ok"}
+
+
+@app.get("/groups/search")
+def search_groups_route(keyword: str = Query(..., min_length=1, alias="keyword")):
     """
-    return {"Hello": "World"}
+    Search groups/courses by keyword and return matches.
+
+    This route searches in name, description, and keywords fields.
+    """
+    results = search_groups(keyword)
+    return {"results": results}
