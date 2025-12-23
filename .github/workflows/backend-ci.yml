@@ -65,5 +65,9 @@ jobs:
 
       - name: Run backend tests (pytest)
         working-directory: stage4/backend
+        env:
+          APPWRITE_REGION: ${{ secrets.APPWRITE_REGION }}
+          APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID }}
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
         run: |
           pytest -q
