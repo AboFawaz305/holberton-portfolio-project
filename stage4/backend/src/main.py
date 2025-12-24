@@ -2,17 +2,18 @@
 """
 from os import environ as env
 
-from appwrite.client import Client
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from pymongo import MongoClient
 
 load_dotenv("../../.env", verbose=True)
 
-client = Client()
-client.set_endpoint(
-    f"https://{env.get('APPWRITE_REGION')}.cloud.appwrite.io/v1")
-client.set_project(env.get("APPWRITE_PROJECT_ID"))
-client.set_key(env.get("APPWRITE_API_KEY"))
+
+def get_db_connectoin(host=env.get("MONGO_DB_HOST", "database")):
+    """Connect to the database
+    """
+
+    return MongoClient(host, 27017)
 
 
 app = FastAPI()
@@ -22,4 +23,10 @@ app = FastAPI()
 def read_root():
     """An example hello world route to test that the setup is working
     """
+    db_client = get_db_connectoin()
+    db = db_client.test
+    db.collection.insert_one({
+        "msg": "Hello World!"
+    })
+    print(db.collection.find({}))
     return {"Hello": "World"}

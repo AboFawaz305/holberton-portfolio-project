@@ -3,7 +3,12 @@ services:
     build: frontend
 
   backend:
+    depends_on:
+      - database
     build: backend
+
+  database:
+    build: database
 
   proxy:
     depends_on:
