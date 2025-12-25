@@ -4,7 +4,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from main import app, get_db_connectoin
+from main import app, get_engine_db
 
 client = TestClient(app)
 
@@ -22,11 +22,11 @@ class TestRegisteration:
     def setup_assure_empty_database(self):
         """Assure the database is empty before testing the registeration
         """
-        db = get_db_connectoin()
-        db.atrab.users.delete_many({})
+        db = get_engine_db()
+        db.users.delete_many({})
 
-    def register(self, first_name="ali", last_name="redmon", username="ali", email="ali@gmail.com",
-                 password="ali12345"):
+    def register(self, first_name="ali", last_name="redmon", username="ali",
+                 email="ali@gmail.com", password="ali12345"):
         """Make a registeration request
         """
         return client.post("/register", json={

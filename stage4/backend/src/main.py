@@ -50,7 +50,10 @@ def register_endpoint(user: NewUser):
     """
     db = get_engine_db()
     is_found = db.users.find_one(
-        {"$or": [{"username": {"$eq": user.username}}, {"email": {"$eq": user.email}}]})
+        {"$or": [
+            {"username": {"$eq": user.username}},
+            {"email": {"$eq": user.email}}
+        ]})
     if is_found:
         raise HTTPException(status_code=422, detail="User Already Exists.")
     current_time = datetime.now(timezone.utc)
