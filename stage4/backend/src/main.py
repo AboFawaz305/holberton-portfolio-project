@@ -28,7 +28,11 @@ def get_current_user(token : Annotated[str, Depends(oauth2_scheme)]):
     user_id = payload.get("user_id")
     if not user_id:
         raise HTTPException(status_code=401, detail="token missing user_id")
-    return db.users.find_one({"_id":user_id})
+    found = db.users.find_one({"_id":user_id})
+    if not found:
+        raise HTTPException(status_code=401, detail="user not in Database")
+    return found
+
 
 authuser = Annotated[User, Depends(get_current_user)]
 
