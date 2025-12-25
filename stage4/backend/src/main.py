@@ -27,7 +27,7 @@ def get_engine_db():
     return get_db_connectoin().engine
 
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
 
 
