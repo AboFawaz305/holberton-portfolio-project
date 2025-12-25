@@ -5,6 +5,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app, get_engine_db
+import jwt
+
+SECRET_KEY = "wow_secret_KEY"
+ALGORITHM = "HS256"
 
 client = TestClient(app)
 
@@ -54,3 +58,49 @@ class TestRegisteration:
         """Test uniqueness validation of users accounts
         """
         assert self.register().status_code == 422
+
+
+class TestLogin:
+
+    @pytest.fixture(scope="class", autouse=True)
+    def setup_assure_empty_database(self):
+        """Assure the database is empty before testing the registeration
+        """
+        db = get_engine_db()
+        db.users.delete_many({})
+        self.register()
+
+    def register(self, first_name="ali", last_name="redmon", username="ali", email="ali@gmail.com",
+                 password="ali12345"):
+        """Make a registeration request
+        """
+        return client.post("/register", json={
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+            "username": username
+        })
+
+    def login(self,username="ali",password="ali12345"):
+        return client.post("/login",data={"username": username,"password": password}
+        )
+
+    def test_empty_login(self):
+        assert self.login(username="").status_code == 422
+        assert self.login(password="").status_code == 422
+
+    def test_invalid_login_info(self):
+        assert self.login(username="allll").status_code == 401
+        assert self.login(password="12344444").status_code == 401
+
+    def test_valid_login_info(self):
+        data = self.login(username="ali",password="ali12345")
+        assert data.status_code == 200
+
+        
+
+
+
+
+        

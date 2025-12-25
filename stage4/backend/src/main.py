@@ -2,17 +2,35 @@
 """
 from datetime import datetime, timezone
 from os import environ as env
+from typing import Annotated
 
+import jwt
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.exceptions import HTTPException
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser
+from core import NewUser, LoginUser, User
+
 
 load_dotenv("../../.env", verbose=True)
 
+SECRET_KEY = "wow_secret_KEY"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_current_user(token : Annotated[str, Depends(oauth2_scheme)]):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="token missing user_id")
+    return db.users.find_one({"_id":user_id})
+
+authuser = Annotated[User, Depends(get_current_user)]
 
 def get_db_connectoin(host=env.get("MONGO_DB_HOST", "database")):
     """Connect to the database
@@ -66,3 +84,23 @@ def register_endpoint(user: NewUser):
         "_created_at": current_time,
         "_updated_at": current_time
     })
+
+@app.post("/login")
+def login_endpoint(user : Annotated[OAuth2PasswordRequestForm, Depends()],):
+    """Login endpoint
+    """
+
+    db = get_engine_db()
+
+    found =  db.users.find_one({"username":user.username})
+    if not found:
+        raise HTTPException(status_code=401, detail="invalid username")
+    if not password_hash.verify(user.password, found["password"]):
+        raise HTTPException(status_code=401, detail="invalid password")
+    
+    return {"token": jwt.encode({"user_id":str(found["_id"])},SECRET_KEY,algorithm=ALGORITHM)}
+
+@app.get("/me")
+def me_endpoint(user: authuser)-> User:
+    return user
+    
