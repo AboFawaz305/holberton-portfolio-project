@@ -1,6 +1,6 @@
 <script>
 import { Form, Field, ErrorMessage } from 'vee-validate'
-import { object, string, ref as yupRef } from 'yup'
+import { object, string } from 'yup'
 export default {
   data() {
     return {
@@ -19,13 +19,13 @@ export default {
   },
   methods: {
     async onSubmit(values) {
-        const formData = new FormData()
-        formData.append("username",values.username)
-        formData.append("password",values.password)
+      const formData = new FormData()
+      formData.append('username', values.username)
+      formData.append('password', values.password)
 
       const response = await fetch('/api/login', {
         method: 'POST',
-        body: formData
+        body: formData,
       })
 
       if (!response.ok) {
@@ -36,8 +36,8 @@ export default {
       }
 
       const token = await response.json()
-      
-      localStorage.setItem("token", token.access_token)
+
+      localStorage.setItem('token', token.access_token)
       this.loginErrorMessage = ''
       this.loginSucccessMessage = 'Login done sucessfully'
       this.$router.push('/')
@@ -55,7 +55,7 @@ export default {
     <ErrorMessage name="username" />
 
     <label for="password">Password</label>
-    <Field name="password" type="password"/>
+    <Field name="password" type="password" />
     <ErrorMessage name="password" />
     <button type="submit">Login</button>
   </Form>

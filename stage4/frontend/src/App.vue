@@ -6,7 +6,6 @@
   <nav>
     <RouterLink to="/register">Go to Register</RouterLink>
     <RouterLink to="/login">Go to Login</RouterLink>
-    
   </nav>
   <main>
     <RouterView />
