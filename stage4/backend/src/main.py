@@ -6,6 +6,7 @@ from os import environ as env
 from typing import Annotated
 
 import jwt
+from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -14,7 +15,7 @@ from pwdlib import PasswordHash
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-from core import NewUser, LoginUser, User
+from core import NewUser, User
 
 
 load_dotenv("../../.env", verbose=True)
@@ -27,13 +28,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    """token check"""
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="token expired")
-    except PyJWTError:
-        raise HTTPException(status_code=401, detail="invalid token")
+    except ExpiredSignatureError as es:
+        raise HTTPException(status_code=401, detail="token expired") from es
+    except PyJWTError as je:
+        raise HTTPException(status_code=401, detail="invalid token") from je
 
     user_id = payload.get("user_id")
     if not user_id:
@@ -41,8 +43,10 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
     try:
         object_id = ObjectId(user_id)
-    except Exception:
-        raise HTTPException(status_code=401, detail="invalid user_id format")
+    except Exception as ex:
+        raise HTTPException(
+            status_code=401, detail="invalid user_id format"
+            ) from ex
 
     db = get_engine_db()
     found = db.users.find_one({"_id": object_id})
@@ -52,7 +56,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return found
 
 
-authuser = Annotated[User, Depends(get_current_user)]
+AuthUser = Annotated[User, Depends(get_current_user)]
 
 
 def get_db_connectoin(host=env.get("MONGO_DB_HOST", "database")):
@@ -85,7 +89,8 @@ def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
     is_found = db.users.find_one(
-        {"$or": [{"username": {"$eq": user.username}}, {"email": {"$eq": user.email}}]}
+        {"$or": [{"username": {"$eq": user.username}},
+                 {"email": {"$eq": user.email}}]}
     )
     if is_found:
         raise HTTPException(status_code=422, detail="User Already Exists.")
@@ -117,11 +122,18 @@ def login_endpoint(
     if not password_hash.verify(user.password, found["password"]):
         raise HTTPException(status_code=401, detail="invalid password")
 
-    exp_time = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = jwt.encode({"user_id": str(found["_id"]), "exp": exp_time}, SECRET_KEY, algorithm=ALGORITHM)
+    exp_time = datetime.now(timezone.utc) + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    token = jwt.encode(
+        {"user_id": str(found["_id"]), "exp": exp_time},
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
     return {"access_token": token, "token_type": "bearer"}
 
 
 @app.get("/me")
-def me_endpoint(user: authuser) -> User:
+def me_endpoint(user: AuthUser) -> User:
+    """route to return user info"""
     return user

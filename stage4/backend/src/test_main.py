@@ -5,7 +5,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app, get_engine_db
-import jwt
 
 SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
@@ -61,6 +60,8 @@ class TestRegisteration:
 
 
 class TestLogin:
+    """login unit tests definitions
+    """
 
     @pytest.fixture(scope="class", autouse=True)
     def setup_assure_empty_database(self):
@@ -83,24 +84,25 @@ class TestLogin:
         })
 
     def login(self,username="ali",password="ali12345"):
+        """make loging request 
+        """
         return client.post("/login",data={"username": username,"password": password}
         )
 
     def test_empty_login(self):
+        """empty input test
+        """
         assert self.login(username="").status_code == 422
         assert self.login(password="").status_code == 422
 
     def test_invalid_login_info(self):
+        """wrong input test
+        """
         assert self.login(username="allll").status_code == 401
         assert self.login(password="12344444").status_code == 401
 
     def test_valid_login_info(self):
+        """valid input test
+        """
         data = self.login(username="ali",password="ali12345")
         assert data.status_code == 200
-
-        
-
-
-
-
-        
