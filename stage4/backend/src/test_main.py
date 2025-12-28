@@ -71,8 +71,8 @@ class TestLogin:
         db.users.delete_many({})
         self.register()
 
-    def register(self, first_name="ali", last_name="redmon", username="ali", email="ali@gmail.com",
-                 password="ali12345"):
+    def register(self, first_name="ali", last_name="redmon", username="ali",
+                 email="ali@gmail.com", password="ali12345"):
         """Make a registeration request
         """
         return client.post("/register", json={
@@ -83,11 +83,12 @@ class TestLogin:
             "username": username
         })
 
-    def login(self,username="ali",password="ali12345"):
-        """make loging request 
+    def login(self, username="ali", password="ali12345"):
+        """make loging request
         """
-        return client.post("/login",data={"username": username,"password": password}
-        )
+        return client.post("/login",
+                           data={"username": username, "password": password}
+                           )
 
     def test_empty_login(self):
         """empty input test
@@ -104,5 +105,5 @@ class TestLogin:
     def test_valid_login_info(self):
         """valid input test
         """
-        data = self.login(username="ali",password="ali12345")
+        data = self.login(username="ali", password="ali12345")
         assert data.status_code == 200
