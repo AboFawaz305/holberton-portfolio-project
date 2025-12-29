@@ -24,7 +24,7 @@ class User(BaseModel):
     first_name: str = Field(min_length=3, max_length=25)
     last_name: str = Field(min_length=3, max_length=25)
     username: str = Field(min_length=3, max_length=25)
-    email: EmailStr
+    email: list[EmailStr]
     _created_at: PastDatetime
     _updated_at: PastDatetime
 

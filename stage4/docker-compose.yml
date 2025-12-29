@@ -5,6 +5,8 @@ services:
   backend:
     depends_on:
       - database
+    environment:
+      MONGO_DB_HOST: "database"
     build: backend
 
   database:

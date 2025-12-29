@@ -58,7 +58,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 AuthUser = Annotated[User, Depends(get_current_user)]
 
 
-def get_db_connectoin(host=env.get("MONGO_DB_HOST", "database")):
+def get_db_connectoin(host=env.get("MONGO_DB_HOST", "localhost")):
     """Connect to the database"""
 
     return MongoClient(host, 27017)

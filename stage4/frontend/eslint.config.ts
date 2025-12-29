@@ -20,6 +20,11 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
+  {
+    rules: {
+      'vue/block-lang': 'off',
+    },
+  },
 
   {
     ...pluginVitest.configs.recommended,

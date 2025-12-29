@@ -6,22 +6,22 @@ export default {
     return {
       loginFormSchema: object({
         username: string()
-        .required("هذا الحقل الزامي")
-        .min(3 ,"لا يمكن  ان يكون اقل من 3 احرف")
-        .max(25,"يجب ان لا يكون اكثر من 25 حرفا"),
+          .required('هذا الحقل الزامي')
+          .min(3, 'لا يمكن  ان يكون اقل من 3 احرف')
+          .max(25, 'يجب ان لا يكون اكثر من 25 حرفا'),
         password: string()
-        .required("هذا الحقل الزامي")
-        .min(8 ," لا يمكن ان يكون اقل من 8 احرف")
-        .max(50,"يجب ان لا يكون اكثر من 50 حرفا"),
+          .required('هذا الحقل الزامي')
+          .min(8, ' لا يمكن ان يكون اقل من 8 احرف')
+          .max(50, 'يجب ان لا يكون اكثر من 50 حرفا'),
       }),
       loginErrorMessage: '',
       loginSucccessMessage: '',
     }
   },
   components: {
-    Form,
-    Field,
-    ErrorMessage,
+    'V-Form': Form,
+    'V-Field': Field,
+    'V-ErrorMessage': ErrorMessage,
   },
   methods: {
     async onSubmit(values) {
@@ -35,9 +35,8 @@ export default {
       })
 
       if (!response.ok) {
-        const error = await response.json()
         this.loginSucccessMessage = ''
-        this.loginErrorMessage = "خطا يا"
+        this.loginErrorMessage = 'خطا يا'
         return
       }
 
@@ -53,63 +52,58 @@ export default {
 </script>
 <template>
   <div class="contanor">
-  <Form @submit="onSubmit" :validation-schema="loginFormSchema">
+    <V-Form @submit="onSubmit" :validation-schema="loginFormSchema">
+      <h1>تسجيل الدخول</h1>
+      <p v-if="loginErrorMessage.length" class="error">{{ loginErrorMessage }}</p>
+      <p v-if="loginSucccessMessage.length">{{ loginSucccessMessage }}</p>
 
-  <h1>تسجيل الدخول</h1>
-  <p v-if="loginErrorMessage.length" class="error">{{ loginErrorMessage }}</p>
-  <p v-if="loginSucccessMessage.length">{{ loginSucccessMessage }}</p>
-  
-  <label for="username"> اسم المستخدم </label>
-  <ErrorMessage class='error' name="username" />
-  <Field name="username" />
-  
-  
-  <label for="password">كلمة المرور</label>
-  <ErrorMessage class='error' name="password" />
-  <Field name="password" type="password" />
-  <div class='forgot' >
-    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> هل نسيت كلمة المرور؟ </a>
-  </div>
-  
-  
-  <button type="submit">تسيجل الدخول</button>
+      <label for="username"> اسم المستخدم </label>
+      <V-ErrorMessage class="error" name="username" />
+      <V-Field name="username" />
 
-  <div class="noAccount">
-    <RouterLink  to="/register">ليس لديك حساب ؟ أنشاء حساب</RouterLink>
-  </div>
+      <label for="password">كلمة المرور</label>
+      <V-ErrorMessage class="error" name="password" />
+      <V-Field name="password" type="password" />
+      <div class="forgot">
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> هل نسيت كلمة المرور؟ </a>
+      </div>
 
-  </Form>
+      <button type="submit">تسيجل الدخول</button>
+
+      <div class="noAccount">
+        <RouterLink to="/register">ليس لديك حساب ؟ أنشاء حساب</RouterLink>
+      </div>
+    </V-Form>
   </div>
 </template>
 <style scoped>
-.contanor{
+.contanor {
   min-height: 100%;
   background-color: #5dadbb;
 }
 
-.forgot{
+.forgot {
   display: flex;
-  justify-content:flex-end;
+  justify-content: flex-end;
 }
-.noAccount{
+.noAccount {
   font-weight: bolder;
   display: flex;
   justify-content: center;
 }
-h1{
+h1 {
   text-align: center;
 }
-.error{
+.error {
   color: red;
 }
-form{
-  
+form {
   display: flex;
-  justify-content:flex-end;
+  justify-content: flex-end;
   flex-direction: column;
   max-width: 400px;
   margin: auto;
-  gap:20px;
+  gap: 20px;
   border-radius: 15px;
   border: 2px solid #5dadbb;
   padding: 5em;
@@ -120,7 +114,6 @@ label {
   font-weight: bolder;
 }
 input {
-
   margin-bottom: 2em;
   padding: 0.5em;
   border-radius: 5px;
@@ -128,14 +121,12 @@ input {
 }
 
 form button {
-  color:white;
+  color: white;
   font-size: 1.25em;
   margin-top: 2rem;
   margin-inline: 12.5%;
   border-radius: 5px;
   border: 2px solid #5dadbb;
-  background-image: linear-gradient(to right, #5dadbb, #294f58)
+  background-image: linear-gradient(to right, #5dadbb, #294f58);
 }
-
-
 </style>

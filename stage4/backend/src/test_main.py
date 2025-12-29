@@ -116,7 +116,7 @@ class TestLogin:
 
         response = client.get(
             "/me", headers={"Authorization": f"Bearer {token}"}
-            )
+        )
 
         assert response.status_code == 200
 
@@ -124,7 +124,7 @@ class TestLogin:
         assert body["username"] == "ali"
         assert body["first_name"] == "ali"
         assert body["last_name"] == "redmon"
-        assert body["email"] == "ali@gmail.com"
+        assert body["email"][0] == "ali@gmail.com"
 
     def test_sending_invalid_token(self):
         """ testing sending invalid token to route /me
@@ -132,8 +132,8 @@ class TestLogin:
         data = self.login(username="ali", password="ali12345")
         token = data.json()["access_token"]
         response = client.get(
-            "/me", headers={"Authorization": f"Bearer {token + "SS"}"}
-            )
+            "/me", headers={"Authorization": f"Bearer {token + 'SS'}"}
+        )
 
         assert response.status_code == 401
         assert response.json()["detail"] == "invalid token"

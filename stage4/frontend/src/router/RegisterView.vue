@@ -34,9 +34,9 @@ export default {
     }
   },
   components: {
-    Form,
-    Field,
-    ErrorMessage,
+    'V-Form': Form,
+    'V-Field': Field,
+    'V-ErrorMessage': ErrorMessage,
   },
   methods: {
     async onSubmit(values) {
@@ -68,28 +68,28 @@ export default {
 </script>
 <template>
   <div class="container">
-    <Form @submit="onSubmit" :validation-schema="registerationFormSchema">
+    <V-Form @submit="onSubmit" :validation-schema="registerationFormSchema">
       <h2>إنشاء حساب جديد</h2>
       <p v-if="registerationErrorMessage.length">{{ registerationErrorMessage }}</p>
       <p v-if="registerationSucccessMessage.length">{{ registerationSucccessMessage }}</p>
       <label for="firstname">الإسم الأول</label>
-      <ErrorMessage name="firstname" />
-      <Field id="firstname" name="firstname" />
+      <V-ErrorMessage name="firstname" />
+      <V-Field id="firstname" name="firstname" />
       <label for="lastname">الإسم الأخير</label>
-      <ErrorMessage name="lastname" />
-      <Field id="lastname" name="lastname" />
+      <V-ErrorMessage name="lastname" />
+      <V-Field id="lastname" name="lastname" />
       <label for="username">إسم المستخدم</label>
-      <ErrorMessage name="username" />
-      <Field id="username" name="username" />
+      <V-ErrorMessage name="username" />
+      <V-Field id="username" name="username" />
       <label for="email">الإيميل</label>
-      <ErrorMessage name="email" />
-      <Field id="email" name="email" />
+      <V-ErrorMessage name="email" />
+      <V-Field id="email" name="email" />
       <label for="password">كلمة السر</label>
-      <ErrorMessage name="password" />
-      <Field id="password" name="password" type="password" />
+      <V-ErrorMessage name="password" />
+      <V-Field id="password" name="password" type="password" />
       <label for="repeatPassword">أعد كتابة كلمة السر</label>
-      <ErrorMessage name="repeatPassword" />
-      <Field id="repeatPassword" name="repeatPassword" type="password" />
+      <V-ErrorMessage name="repeatPassword" />
+      <V-Field id="repeatPassword" name="repeatPassword" type="password" />
       <label for="termsAndConditions">
         <input
           id="termsAndConditions"
@@ -100,7 +100,7 @@ export default {
         أنا أوافق على الشروط والأحكام
       </label>
       <button :disabled="!isTheUserAgreeToTermsAndConditions" type="submit">إنشاء حساب</button>
-    </Form>
+    </V-Form>
   </div>
 </template>
 <style scoped lang="scss">
