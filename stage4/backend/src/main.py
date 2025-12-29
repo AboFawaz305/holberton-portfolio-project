@@ -1,22 +1,21 @@
 """API router definitions of the backend
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from os import environ as env
 from typing import Annotated
 
 import jwt
-from jwt.exceptions import ExpiredSignatureError, PyJWTError
+from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, FastAPI
 from fastapi.exceptions import HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 
 from core import NewUser, User
-
 
 load_dotenv("../../.env", verbose=True)
 
@@ -46,7 +45,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except Exception as ex:
         raise HTTPException(
             status_code=401, detail="invalid user_id format"
-            ) from ex
+        ) from ex
 
     db = get_engine_db()
     found = db.users.find_one({"_id": object_id})
@@ -98,7 +97,7 @@ def register_endpoint(user: NewUser):
     db.users.insert_one(
         {
             "username": user.username,
-            "email": user.email,
+            "email": [user.email],
             "password": password_hash.hash(user.password),
             "first_name": user.first_name,
             "last_name": user.last_name,

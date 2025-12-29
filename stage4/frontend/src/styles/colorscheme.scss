@@ -1,0 +1,17 @@
+// Colors Palette
+$background: #FFFFFF;
+$foreground: #101828;
+$red: #F16715;
+$green: #24BF5B;
+$blue: #06B6D4;
+$yellow: #F2B90C;
+
+// Assign defaule colors
+:root {
+  background-color: $background;
+  color: $foreground;
+}
+
+* {
+  color: inherit;
+}
