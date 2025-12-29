@@ -18,6 +18,7 @@ export default {
       }),
       registerationErrorMessage: '',
       registerationSucccessMessage: '',
+      isTheUserAgreeToTermsAndConditions: false,
     }
   },
   components: {
@@ -55,26 +56,80 @@ export default {
 </script>
 <template>
   <Form @submit="onSubmit" :validation-schema="registerationFormSchema">
+    <h2>New Account Registeration</h2>
     <p v-if="registerationErrorMessage.length">{{ registerationErrorMessage }}</p>
     <p v-if="registerationSucccessMessage.length">{{ registerationSucccessMessage }}</p>
     <label for="firstname">First Name</label>
-    <Field name="firstname" />
     <ErrorMessage name="firstname" />
+    <Field id="firstname" name="firstname" />
     <label for="lastname">Last Name</label>
-    <Field name="lastname" />
     <ErrorMessage name="lastname" />
+    <Field id="lastname" name="lastname" />
     <label for="username"> Username</label>
-    <Field name="username" />
     <ErrorMessage name="username" />
+    <Field id="username" name="username" />
     <label for="email">Email</label>
-    <Field name="email" />
     <ErrorMessage name="email" />
+    <Field id="email" name="email" />
     <label for="password">Password</label>
-    <Field name="password" />
     <ErrorMessage name="password" />
+    <Field id="password" name="password" type="password" />
     <label for="repeatPassword">Repeat Password</label>
-    <Field name="repeatPassword" />
     <ErrorMessage name="repeatPassword" />
-    <button type="submit">Register</button>
+    <Field id="repeatPassword" name="repeatPassword" type="password" />
+    <label for="termsAndConditions">
+      <input
+        id="termsAndConditions"
+        name="termsAndConditions"
+        v-model="isTheUserAgreeToTermsAndConditions"
+        type="checkbox"
+      />
+      I agree to the terms and conditions.
+    </label>
+    <button :disabled="!isTheUserAgreeToTermsAndConditions" type="submit">Register</button>
   </Form>
 </template>
+<style scoped>
+* {
+  /* border: 1px red solid; */
+}
+
+h2 {
+  text-align: center;
+}
+
+form {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 486px;
+  padding: 5em;
+  gap: 0.5em;
+  border-radius: 25px;
+}
+
+label {
+  font-weight: bolder;
+}
+
+input {
+  margin-bottom: 1em;
+  font-size: inherit;
+  color: inherit;
+  padding: 0.5em;
+  border-radius: 5px;
+}
+
+form button {
+  font-size: 1.25em;
+  margin-top: 2rem;
+  margin-inline: 12.5%;
+  border-radius: 5px;
+}
+
+@media screen and (max-width: 586px) {
+  form {
+    padding-inline: 0;
+  }
+}
+</style>
