@@ -3,7 +3,7 @@
 
 from datetime import datetime, timedelta, timezone
 from os import environ as env
-from typing import Annotated
+from typing import Annotated, List
 
 import jwt
 from bson.objectid import ObjectId
@@ -15,7 +15,7 @@ from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User
+from core import NewUser, User, NewOrg, Org
 
 load_dotenv("../../.env", verbose=True)
 
@@ -136,3 +136,66 @@ def login_endpoint(
 def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
     return user
+
+
+@app.post("/create_org", tags=["Organizations"])
+def create_education_organization(org: NewOrg):
+    """route to create new Org"""
+    db = get_engine_db()
+    is_found = db.orgs.find_one({"organization_name": org.organization_name})
+    if is_found:
+        raise HTTPException(status_code=422, detail="Org already added")
+    current_time = datetime.now(timezone.utc)
+    db.orgs.insert_one(
+        {
+            "organization_name": org.organization_name,
+            "email_domain": org.email_domain,
+            "location": org.location,
+            "users": [],
+            "_banned_users": [],
+            "_created_at": current_time,
+            "_updated_at": current_time,
+        }
+        )
+    return {"message": "Org added successfully"}
+
+
+@app.get("/orgs", tags=["Organizations"])
+def get_all_orgs() -> List[Org]:
+    """ route to get all Organizations
+    """
+
+    db = get_engine_db()
+    orgs_data = db.orgs.find()
+
+    orgs_list = []
+    for org in orgs_data:
+        user_count = len(org["users"])
+        orgs_list.append({
+            "organization_name": org["organization_name"],
+            "email_domain": org["email_domain"],
+            "location": org["location"],
+            "users": org["users"],
+            "user_count": user_count
+        })
+
+    return orgs_list
+
+
+@app.get("/org/{org_name}", tags=["Organizations"])
+def get_org_by_name(org_name: str) -> Org:
+    """route get Organization by name
+    """
+
+    db = get_engine_db()
+    org = db.orgs.find_one({"organization_name": org_name})
+    if not org:
+        raise HTTPException(status_code=404, detail="Org not found")
+
+    return {
+            "organization_name": org["organization_name"],
+            "email_domain": org["email_domain"],
+            "location": org["location"],
+            "users": org["users"],
+            "user_count": len(org["users"])
+        }

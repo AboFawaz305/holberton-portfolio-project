@@ -34,3 +34,21 @@ class LoginUser(BaseModel):
     """
     username: str = Field(min_length=3, max_length=25)
     password: str = Field(min_length=8, max_length=50)
+
+
+class NewOrg(BaseModel):
+    """The representation of the body
+    Createing a education organization requests
+    """
+    organization_name: str = Field(min_length=3, max_length=25)
+    email_domain: str = Field(min_length=3, max_length=25)
+    location: str = Field(min_length=3, max_length=25)
+
+
+class Org(BaseModel):
+    """The representation of an ORG"""
+    organization_name: str = Field(min_length=3, max_length=25)
+    email_domain: str = Field(min_length=3, max_length=25)
+    location: str = Field(min_length=3, max_length=25)
+    users: list
+    user_count: int
