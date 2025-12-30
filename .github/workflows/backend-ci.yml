@@ -58,7 +58,7 @@ jobs:
             # Lint python files under stage4/backend
             PY_FILES="$(git ls-files 'stage4/backend/**/*.py' || true)"
             if [ -n "$PY_FILES" ]; then
-              pylint $PY_FILES
+              pylint --rcfile ../.pylintrc $PY_FILES
             else
               echo "No python files found to lint"
             fi
