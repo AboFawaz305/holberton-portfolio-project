@@ -21,7 +21,8 @@ GROUPS: List[Dict[str, str | list[str]]] = [
     {
         "id": "grp-mobile-ux",
         "name": "Mobile UX Research",
-        "description": "Qualitative and quantitative user research for mobile apps.",
+        "description": "Qualitative and quantitative user research for "
+        "mobile apps.",
         "keywords": ["mobile", "ux", "research", "design"],
     },
     {
@@ -41,7 +42,8 @@ GROUPS: List[Dict[str, str | list[str]]] = [
 
 def search_groups(keyword: str) -> List[Dict[str, str | list[str]]]:
     """
-    Return groups whose name, description, or keywords include the provided term.
+    Return groups whose name, description, or keywords include the
+    provided term.
 
     The search is case-insensitive and performs simple substring matching.
     """
@@ -57,4 +59,3 @@ def search_groups(keyword: str) -> List[Dict[str, str | list[str]]]:
         if name_hit or desc_hit or keyword_hit:
             results.append(group)
     return results
-

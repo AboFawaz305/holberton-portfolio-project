@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from .core import search_groups
+from core import search_groups
 
 app = FastAPI(title="Holberton Portfolio API", version="1.0.0")
 
@@ -26,7 +26,8 @@ def read_root():
 
 
 @app.get("/groups/search")
-def search_groups_route(keyword: str = Query(..., min_length=1, alias="keyword")):
+def search_groups_route(keyword: str = Query(..., min_length=1,
+                                             alias="keyword")):
     """
     Search groups/courses by keyword and return matches.
 
