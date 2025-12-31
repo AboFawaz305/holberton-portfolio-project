@@ -8,16 +8,17 @@ from typing import Annotated
 import jwt
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Query
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User
+from core import NewUser, User, search_groups
 
-load_dotenv("../../.env", verbose=True)
+app = FastAPI(title="Holberton Portfolio API", version="1.0.0")
 
 SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
@@ -71,6 +72,17 @@ def get_engine_db():
 
 app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
+# Allow local development URLs to call the API from the frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -136,3 +148,13 @@ def login_endpoint(
 def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
     return user
+
+@app.get("/groups/search")
+def search_groups_route(keyword: str = Query(..., min_length=1, alias="keyword")):
+    """
+    Search groups/courses by keyword and return matches.
+
+    This route searches in name, description, and keywords fields.
+    """
+    results = search_groups(keyword)
+    return {"results": results}
