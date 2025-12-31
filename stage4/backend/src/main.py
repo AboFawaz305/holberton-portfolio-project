@@ -150,7 +150,8 @@ def me_endpoint(user: AuthUser) -> User:
     return user
 
 @app.get("/groups/search")
-def search_groups_route(keyword: str = Query(..., min_length=1, alias="keyword")):
+def search_groups_route(keyword: str = Query(..., min_length=1,
+                                             alias="keyword")):
     """
     Search groups/courses by keyword and return matches.
 
