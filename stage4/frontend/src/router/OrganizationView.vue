@@ -34,8 +34,7 @@ const fetchGroups = async () => {
     const data: GroupsResponse = await response.json()
     groups.value = data.groups
   } catch (err) {
-    error.value =
-      err instanceof Error ? err.message : 'An error occurred while fetching groups'
+    error.value = err instanceof Error ? err.message : 'An error occurred while fetching groups'
     console.error('Error fetching groups:', err)
   } finally {
     loading.value = false

@@ -114,7 +114,7 @@ def get_organization_groups(org_id: str):
         return {"organization_id": org_id, "groups": groups}
     except Exception as e:
         error_msg = f"Error fetching groups: {str(e)}"
-        raise HTTPException(status_code=500, detail=error_msg)
+        raise HTTPException(status_code=500, detail=error_msg) from e
 
 
 @app.post("/register")
