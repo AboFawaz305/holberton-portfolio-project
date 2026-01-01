@@ -58,7 +58,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 AuthUser = Annotated[User, Depends(get_current_user)]
 
 
-def get_db_connectoin(host=env.get("MONGO_DB_HOST", "localhost")):
+def get_db_connection(host=env.get("MONGO_DB_HOST", "localhost")):
     """Connect to the database"""
 
     return MongoClient(host, 27017)
@@ -66,7 +66,7 @@ def get_db_connectoin(host=env.get("MONGO_DB_HOST", "localhost")):
 
 def get_engine_db():
     """Get an instance from the main database for the backend"""
-    return get_db_connectoin().engine
+    return get_db_connection().engine
 
 
 app = FastAPI(root_path="/api")
@@ -76,7 +76,7 @@ password_hash = PasswordHash.recommended()
 @app.get("/")
 def read_root():
     """An example hello world route to test that the setup is working"""
-    db_client = get_db_connectoin()
+    db_client = get_db_connection()
     db = db_client.test
     db.collection.insert_one({"msg": "Hello World!"})
     print(db.collection.find({}))
