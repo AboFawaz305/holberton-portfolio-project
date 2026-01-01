@@ -15,7 +15,7 @@ from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User, NewOrg, Org
+from core import NewUser, User, NewOrganization, Organization
 
 load_dotenv("../../.env", verbose=True)
 
@@ -73,17 +73,7 @@ app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
 
 
-@app.get("/")
-def read_root():
-    """An example hello world route to test that the setup is working"""
-    db_client = get_db_connectoin()
-    db = db_client.test
-    db.collection.insert_one({"msg": "Hello World!"})
-    print(db.collection.find({}))
-    return {"Hello": "World"}
-
-
-@app.post("/register")
+@app.post("/register", tags=["User"])
 def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
@@ -107,7 +97,7 @@ def register_endpoint(user: NewUser):
     )
 
 
-@app.post("/login")
+@app.post("/login", tags=["User"])
 def login_endpoint(
     user: Annotated[OAuth2PasswordRequestForm, Depends()],
 ):
@@ -132,19 +122,29 @@ def login_endpoint(
     return {"access_token": token, "token_type": "bearer"}
 
 
-@app.get("/me")
+@app.get("/me", tags=["User"])
 def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
-    return user
+    return {
+            "user_id": str(user["_id"]),
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "username": user["username"],
+            "email": user["email"],
+            "created_at": user["_created_at"],
+            "updated_at": user["_updated_at"]
+        }
 
 
-@app.post("/create_org", tags=["Organizations"])
-def create_education_organization(org: NewOrg):
-    """route to create new Org"""
+@app.post("/organizations", tags=["Organizations"])
+def create_education_organization(org: NewOrganization):
+    """route to create new Organization"""
     db = get_engine_db()
     is_found = db.orgs.find_one({"organization_name": org.organization_name})
     if is_found:
-        raise HTTPException(status_code=422, detail="Org already added")
+        raise HTTPException(
+            status_code=422, detail="Organization already added"
+            )
     current_time = datetime.now(timezone.utc)
     db.orgs.insert_one(
         {
@@ -157,11 +157,11 @@ def create_education_organization(org: NewOrg):
             "_updated_at": current_time,
         }
         )
-    return {"message": "Org added successfully"}
+    return {"message": "Organization added successfully"}
 
 
-@app.get("/orgs", tags=["Organizations"])
-def get_all_orgs() -> List[Org]:
+@app.get("/organizations", tags=["Organizations"])
+def get_all_organization() -> List[Organization]:
     """ route to get all Organizations
     """
 
@@ -182,15 +182,15 @@ def get_all_orgs() -> List[Org]:
     return orgs_list
 
 
-@app.get("/org/{org_name}", tags=["Organizations"])
-def get_org_by_name(org_name: str) -> Org:
+@app.get("/organizations/{org_name}", tags=["Organizations"])
+def get_organization_by_name(org_name: str) -> Organization:
     """route get Organization by name
     """
 
     db = get_engine_db()
     org = db.orgs.find_one({"organization_name": org_name})
     if not org:
-        raise HTTPException(status_code=404, detail="Org not found")
+        raise HTTPException(status_code=404, detail="Organization not found")
 
     return {
             "organization_name": org["organization_name"],

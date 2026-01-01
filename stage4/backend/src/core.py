@@ -21,12 +21,13 @@ class NewUser(BaseModel):
 class User(BaseModel):
     """The representation of a user
     """
+    user_id: str
     first_name: str = Field(min_length=3, max_length=25)
     last_name: str = Field(min_length=3, max_length=25)
     username: str = Field(min_length=3, max_length=25)
     email: list[EmailStr]
-    _created_at: PastDatetime
-    _updated_at: PastDatetime
+    created_at: PastDatetime
+    updated_at: PastDatetime
 
 
 class LoginUser(BaseModel):
@@ -36,7 +37,7 @@ class LoginUser(BaseModel):
     password: str = Field(min_length=8, max_length=50)
 
 
-class NewOrg(BaseModel):
+class NewOrganization(BaseModel):
     """The representation of the body
     Createing a education organization requests
     """
@@ -45,8 +46,8 @@ class NewOrg(BaseModel):
     location: str = Field(min_length=3, max_length=25)
 
 
-class Org(BaseModel):
-    """The representation of an ORG"""
+class Organization(BaseModel):
+    """The representation of an organization"""
     organization_name: str = Field(min_length=3, max_length=25)
     email_domain: str = Field(min_length=3, max_length=25)
     location: str = Field(min_length=3, max_length=25)

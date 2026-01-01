@@ -155,7 +155,7 @@ class TestOrganizations:
     ):
         """Make an org registeration request"""
         return client.post(
-            "/create_org",
+            "/organizations",
             json={
                 "organization_name": organization_name,
                 "email_domain": email_domain,
@@ -173,7 +173,7 @@ class TestOrganizations:
         """wrong input test"""
         assert self.register().status_code == 200
 
-        rs = client.get("/org/BIG_ORG")
+        rs = client.get("/organizations/BIG_ORG")
         body = rs.json()
 
         assert rs.status_code == 200
@@ -185,4 +185,4 @@ class TestOrganizations:
         """Test uniqueness validation of orgs"""
         rs = self.register()
         assert rs.status_code == 422
-        assert rs.json()["detail"] == "Org already added"
+        assert rs.json()["detail"] == "Organization already added"
