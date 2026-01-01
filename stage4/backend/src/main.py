@@ -92,7 +92,7 @@ def register_endpoint(user: NewUser):
                  {"email": {"$eq": user.email}}]}
     )
     if is_found:
-        raise HTTPException(status_code=422, detail="User Already Exists.")
+        raise HTTPException(status_code=422, detail="USER_ALREADY_EXIST")
     current_time = datetime.now(timezone.utc)
     db.users.insert_one(
         {
@@ -117,9 +117,9 @@ def login_endpoint(
 
     found = db.users.find_one({"username": user.username})
     if not found:
-        raise HTTPException(status_code=401, detail="invalid username")
+        raise HTTPException(status_code=401, detail="INVALID_USERNAME")
     if not password_hash.verify(user.password, found["password"]):
-        raise HTTPException(status_code=401, detail="invalid password")
+        raise HTTPException(status_code=401, detail="INVALID_PASSWORD")
 
     exp_time = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
