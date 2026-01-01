@@ -111,6 +111,11 @@ export default {
 }
 .container {
   background-color: #5dadbb;
+  background: hsla(188, 40%, 61%, 1);
+  background: linear-gradient(90deg, hsla(188, 40%, 61%, 1) 0%, hsla(192, 95%, 32%, 1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 h2 {
@@ -121,11 +126,17 @@ form {
   margin: auto;
   display: flex;
   flex-direction: column;
+  box-shadow: 0px 4px 6px black;
   max-width: 486px;
   padding: 5em;
   gap: 0.5em;
   border-radius: 25px;
+  flex: 1;
   background-color: #e2e2e2;
+}
+
+button[disabled] {
+  opacity: 60%;
 }
 
 label {
@@ -145,6 +156,7 @@ form button {
   font-size: 1.25em;
   margin-top: 2rem;
   margin-inline: 12.5%;
+  border: none;
   border-radius: 5px;
   background: #57a8bb;
   background: linear-gradient(90deg, rgba(87, 168, 187, 1) 0%, rgba(40, 76, 85, 1) 100%);

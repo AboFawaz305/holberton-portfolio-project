@@ -79,7 +79,11 @@ export default {
 <style scoped>
 .contanor {
   min-height: 100%;
-  background-color: #5dadbb;
+  background: hsla(188, 40%, 61%, 1);
+  background: linear-gradient(90deg, hsla(188, 40%, 61%, 1) 0%, hsla(192, 95%, 32%, 1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .forgot {
@@ -101,13 +105,14 @@ form {
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
-  max-width: 400px;
-  margin: auto;
-  gap: 20px;
+  gap: 10px;
   border-radius: 15px;
-  border: 2px solid #5dadbb;
-  padding: 5em;
+  border: 1px solid #5dadbb;
+  padding: 2.5em;
+  box-shadow: 0px 4px 6px black;
   background-color: #e2e2e2;
+  flex: 1;
+  max-width: 400px;
 }
 label {
   font-size: 1.5em;
