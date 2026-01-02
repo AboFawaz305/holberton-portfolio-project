@@ -31,6 +31,7 @@ export default {
       registerationErrorMessage: '',
       registerationSucccessMessage: '',
       isTheUserAgreeToTermsAndConditions: false,
+      isRequestInProgress: false,
     }
   },
   components: {
@@ -40,6 +41,7 @@ export default {
   },
   methods: {
     async onSubmit(values) {
+      this.isRequestInProgress = true
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
@@ -68,7 +70,12 @@ export default {
 </script>
 <template>
   <div class="container">
-    <V-Form @submit="onSubmit" :validation-schema="registerationFormSchema">
+    <V-Form
+      :aria-busy="isRequestInProgress"
+      aria-describedby="register-progress"
+      @submit="onSubmit"
+      :validation-schema="registerationFormSchema"
+    >
       <h2>إنشاء حساب جديد</h2>
       <p v-if="registerationErrorMessage.length">{{ registerationErrorMessage }}</p>
       <p v-if="registerationSucccessMessage.length">{{ registerationSucccessMessage }}</p>
@@ -99,11 +106,17 @@ export default {
         />
         أنا أوافق على الشروط والأحكام
       </label>
-      <button :disabled="!isTheUserAgreeToTermsAndConditions" type="submit">إنشاء حساب</button>
+      <button :disabled="!isTheUserAgreeToTermsAndConditions || isRequestInProgress" type="submit">
+        إنشاء حساب
+      </button>
+      <progress id="register-progress" v-if="isRequestInProgress"></progress>
     </V-Form>
   </div>
 </template>
 <style scoped lang="scss">
+progress {
+  align-self: center;
+}
 :root {
 }
 * {

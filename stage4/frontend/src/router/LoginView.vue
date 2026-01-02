@@ -16,6 +16,7 @@ export default {
       }),
       loginErrorMessage: '',
       loginSucccessMessage: '',
+      isRequestInProgress: false,
     }
   },
   components: {
@@ -29,13 +30,15 @@ export default {
       formData.append('username', values.username)
       formData.append('password', values.password)
 
+      this.isRequestInProgress = true
       const response = await fetch('/api/login', {
         method: 'POST',
         body: formData,
       })
+      this.isRequestInProgress = false
 
-      const error = await response.json()
       if (!response.ok) {
+        const error = await response.json()
         console.log(error.detail)
         this.loginSucccessMessage = ''
         this.loginErrorMessage = 'خطا ' + this.$t(error.detail)
@@ -50,19 +53,16 @@ export default {
       setTimeout(() => this.$router.push('/'), 1000)
     },
   },
-  i18n: {
-    messages: {
-      ar: {
-        INVALID_USERNAME: 'إسم المستخدم غير صالح',
-        INVALID_PASSWORD: 'كلمة السر غير صالحة',
-      },
-    },
-  },
 }
 </script>
 <template>
   <div class="contanor">
-    <V-Form @submit="onSubmit" :validation-schema="loginFormSchema">
+    <V-Form
+      :aria-busy="isRequestInProgress"
+      aria-describedby="login-progress"
+      @submit="onSubmit"
+      :validation-schema="loginFormSchema"
+    >
       <h1>تسجيل الدخول</h1>
       <p v-if="loginErrorMessage.length" class="error">{{ loginErrorMessage }}</p>
       <p v-if="loginSucccessMessage.length">{{ loginSucccessMessage }}</p>
@@ -78,7 +78,8 @@ export default {
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> هل نسيت كلمة المرور؟ </a>
       </div>
 
-      <button type="submit">تسيجل الدخول</button>
+      <button :disabled="isRequestInProgress" type="submit">تسيجل الدخول</button>
+      <progress id="login-progress" v-if="isRequestInProgress"></progress>
 
       <div class="noAccount">
         <RouterLink to="/register">ليس لديك حساب ؟ أنشاء حساب</RouterLink>
@@ -87,6 +88,14 @@ export default {
   </div>
 </template>
 <style scoped>
+progress {
+  align-self: center;
+}
+
+button[disabled] {
+  opacity: 50%;
+}
+
 .contanor {
   min-height: 100%;
   background: hsla(188, 40%, 61%, 1);
