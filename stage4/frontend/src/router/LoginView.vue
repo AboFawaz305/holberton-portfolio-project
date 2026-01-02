@@ -34,9 +34,11 @@ export default {
         body: formData,
       })
 
+      const error = await response.json()
       if (!response.ok) {
+        console.log(error.detail)
         this.loginSucccessMessage = ''
-        this.loginErrorMessage = 'خطا يا'
+        this.loginErrorMessage = 'خطا ' + this.$t(error.detail)
         return
       }
 
@@ -45,7 +47,15 @@ export default {
       localStorage.setItem('token', token.access_token)
       this.loginErrorMessage = ''
       this.loginSucccessMessage = 'تم تسجيل الدخل بنجاح'
-      this.$router.push('/')
+      setTimeout(() => this.$router.push('/'), 1000)
+    },
+  },
+  i18n: {
+    messages: {
+      ar: {
+        INVALID_USERNAME: 'إسم المستخدم غير صالح',
+        INVALID_PASSWORD: 'كلمة السر غير صالحة',
+      },
     },
   },
 }
@@ -135,3 +145,12 @@ form button {
   background-image: linear-gradient(to right, #5dadbb, #294f58);
 }
 </style>
+
+<i18n>
+{
+  "ar": {
+    "INVALID_USERNAME": "إسم المستخدم غير صالح",
+    "INVALID_PASSWORD": "كلمة السر غير صالحة"
+  }
+}
+</i18n>

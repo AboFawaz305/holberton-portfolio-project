@@ -56,12 +56,12 @@ export default {
       if (!response.ok) {
         const error = await response.json()
         this.registerationSucccessMessage = ''
-        this.registerationErrorMessage = error.detail
+        this.registerationErrorMessage = this.$t(error.detail)
         return
       }
       this.registerationErrorMessage = ''
       this.registerationSucccessMessage = 'تم إنشاء الحساب بنجاح'
-      this.$router.push('/')
+      setTimeout(() => this.$router.push('/login'), 1000)
     },
   },
 }
@@ -173,3 +173,11 @@ span[role='alert'] {
   }
 }
 </style>
+
+<i18n>
+{
+  ar: {
+    USER_ALREADY_EXIST: "المستخدم موجود مسبقا"
+  }
+}
+</i18n>
