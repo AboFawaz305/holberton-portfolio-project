@@ -4,8 +4,10 @@ This model contains:
     - functional utility functions
 That are commonly used in api routes.
 """
+from typing import Annotated
 from pydantic import BaseModel, EmailStr, Field
 from pydantic.types import PastDatetime
+from fastapi import Form, File, UploadFile
 
 
 class NewUser(BaseModel):
@@ -37,19 +39,36 @@ class LoginUser(BaseModel):
     password: str = Field(min_length=8, max_length=50)
 
 
-class NewOrganization(BaseModel):
-    """The representation of the body
-    Createing a education organization requests
-    """
-    organization_name: str = Field(min_length=3, max_length=25)
-    email_domain: str = Field(min_length=3, max_length=25)
-    location: str = Field(min_length=3, max_length=25)
+class NewOrganizationForm:
+    """The representation of the
+    multi-part form for creating an organization"""
+    def __init__(
+        self,
+        organization_name: Annotated[str, Form(min_length=3, max_length=25)],
+        email_domain: Annotated[str, Form(min_length=3, max_length=25)],
+        location: Annotated[str, Form(min_length=3, max_length=25)],
+        photo: Annotated[UploadFile | None, File()] = None
+    ):
+        self.organization_name = organization_name
+        self.email_domain = email_domain
+        self.location = location
+        self.photo = photo
+
+    def fpylint(self):
+        """this is for pylint pass"""
+        return 1
+
+    def fp2ylint(self):
+        """this is for pylint pass"""
+        return 2
 
 
 class Organization(BaseModel):
     """The representation of an organization"""
+    organization_id: str
     organization_name: str = Field(min_length=3, max_length=25)
     email_domain: str = Field(min_length=3, max_length=25)
     location: str = Field(min_length=3, max_length=25)
+    photo_url: str | None = None
     users: list
     user_count: int

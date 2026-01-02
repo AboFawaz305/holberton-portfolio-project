@@ -5,23 +5,31 @@ from datetime import datetime, timedelta, timezone
 from os import environ as env
 from typing import Annotated, List
 
+
+import shutil
+from pathlib import Path
 import jwt
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User, NewOrganization, Organization
+from core import NewUser, User, NewOrganizationForm, Organization
 
 load_dotenv("../../.env", verbose=True)
 
 SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+UPLOAD_DIR = Path("uploads")
+ORG_PHOTOS_DIR = UPLOAD_DIR / "organizations"
+ORG_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -45,7 +53,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except Exception as ex:
         raise HTTPException(
             status_code=401, detail="invalid user_id format"
-        ) from ex
+            ) from ex
 
     db = get_engine_db()
     found = db.users.find_one({"_id": object_id})
@@ -71,6 +79,7 @@ def get_engine_db():
 
 app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
+app.mount("/static", StaticFiles(directory="uploads"), name="static")
 
 
 @app.post("/register", tags=["User"])
@@ -79,7 +88,8 @@ def register_endpoint(user: NewUser):
     db = get_engine_db()
     is_found = db.users.find_one(
         {"$or": [{"username": {"$eq": user.username}},
-                 {"email": {"$eq": user.email}}]}
+                 {"email": {"$eq": user.email}}
+                 ]}
     )
     if is_found:
         raise HTTPException(status_code=422, detail="User Already Exists.")
@@ -116,8 +126,7 @@ def login_endpoint(
     )
     token = jwt.encode(
         {"user_id": str(found["_id"]), "exp": exp_time},
-        SECRET_KEY,
-        algorithm=ALGORITHM
+        SECRET_KEY, algorithm=ALGORITHM
     )
     return {"access_token": token, "token_type": "bearer"}
 
@@ -126,76 +135,115 @@ def login_endpoint(
 def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
     return {
-            "user_id": str(user["_id"]),
-            "first_name": user["first_name"],
-            "last_name": user["last_name"],
-            "username": user["username"],
-            "email": user["email"],
-            "created_at": user["_created_at"],
-            "updated_at": user["_updated_at"]
-        }
+        "user_id": str(user["_id"]),
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "username": user["username"],
+        "email": user["email"],
+        "created_at": user["_created_at"],
+        "updated_at": user["_updated_at"],
+    }
 
 
 @app.post("/organizations", tags=["Organizations"])
-def create_education_organization(org: NewOrganization):
+async def create_education_organization(
+    form: Annotated[NewOrganizationForm, Depends()]
+):
     """route to create new Organization"""
+
     db = get_engine_db()
-    is_found = db.orgs.find_one({"organization_name": org.organization_name})
+    is_found = db.organizations.find_one(
+        {"organization_name": form.organization_name}
+        )
     if is_found:
         raise HTTPException(
             status_code=422, detail="Organization already added"
             )
+
+    photo_url = None
+    if form.photo:
+
+        if form.photo.content_type not in ["image/jpeg", "image/png",
+                                           "image/gif"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Only JPEG, PNG, and GIF images are allowed."
+            )
+
+        file_extension = Path(form.photo.filename).suffix
+        unique_name = f"{int(datetime.now(timezone.utc)
+                             .timestamp())}{file_extension}"
+        file_path = ORG_PHOTOS_DIR / unique_name
+
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(form.photo.file, buffer)
+
+        photo_url = f"/api/static/organizations/{unique_name}"
+    else:
+        photo_url = "/api/static/organizations/RR.gif"
+
     current_time = datetime.now(timezone.utc)
-    db.orgs.insert_one(
+    db.organizations.insert_one(
         {
-            "organization_name": org.organization_name,
-            "email_domain": org.email_domain,
-            "location": org.location,
+            "organization_name": form.organization_name,
+            "email_domain": form.email_domain,
+            "location": form.location,
+            "photo_url": photo_url,
             "users": [],
             "_banned_users": [],
             "_created_at": current_time,
             "_updated_at": current_time,
         }
-        )
+    )
     return {"message": "Organization added successfully"}
 
 
 @app.get("/organizations", tags=["Organizations"])
 def get_all_organization() -> List[Organization]:
-    """ route to get all Organizations
-    """
+    """route to get all Organizations"""
 
     db = get_engine_db()
-    orgs_data = db.orgs.find()
+    orgs_data = db.organizations.find()
 
     orgs_list = []
     for org in orgs_data:
         user_count = len(org["users"])
-        orgs_list.append({
-            "organization_name": org["organization_name"],
-            "email_domain": org["email_domain"],
-            "location": org["location"],
-            "users": org["users"],
-            "user_count": user_count
-        })
+        orgs_list.append(
+            {
+                "organization_id": str(org["_id"]),
+                "organization_name": org["organization_name"],
+                "email_domain": org["email_domain"],
+                "location": org["location"],
+                "photo_url": org["photo_url"],
+                "users": org["users"],
+                "user_count": user_count,
+            }
+        )
 
     return orgs_list
 
 
-@app.get("/organizations/{org_name}", tags=["Organizations"])
-def get_organization_by_name(org_name: str) -> Organization:
-    """route get Organization by name
-    """
+@app.get("/organizations/{org_id}", tags=["Organizations"])
+def get_organization_by_id(org_id: str) -> Organization:
+    """route get Organization by name"""
+    try:
+        org_obj_id = ObjectId(org_id)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=401, detail="invalid org_id format"
+            ) from ex
 
     db = get_engine_db()
-    org = db.orgs.find_one({"organization_name": org_name})
+    org = db.organizations.find_one({"_id": org_obj_id})
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
 
     return {
-            "organization_name": org["organization_name"],
-            "email_domain": org["email_domain"],
-            "location": org["location"],
-            "users": org["users"],
-            "user_count": len(org["users"])
-        }
+        "organization_id": str(org["_id"]),
+        "organization_name": org["organization_name"],
+        "email_domain": org["email_domain"],
+        "location": org["location"],
+        "photo_url": org["photo_url"],
+        "users": org["users"],
+        "user_count": len(org["users"]),
+    }

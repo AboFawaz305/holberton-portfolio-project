@@ -147,7 +147,7 @@ class TestOrganizations:
     def setup_assure_empty_database(self):
         """Assure the database is empty before testing the registeration"""
         db = get_engine_db()
-        db.orgs.delete_many({})
+        db.organizations.delete_many({})
 
     def register(
         self, organization_name="BIG_ORG", email_domain="@GG.EDU",
@@ -156,27 +156,39 @@ class TestOrganizations:
         """Make an org registeration request"""
         return client.post(
             "/organizations",
-            json={
+            data={
                 "organization_name": organization_name,
                 "email_domain": email_domain,
-                "location": location,
+                "location": location
             },
         )
 
-    def test_empty_login(self):
+    def test_empty_org_registeration(self):
         """empty input test"""
         assert self.register(organization_name="").status_code == 422
         assert self.register(email_domain="").status_code == 422
         assert self.register(location="").status_code == 422
 
-    def test_valid_login_info(self):
-        """wrong input test"""
-        assert self.register().status_code == 200
+    def test_wrong_input_org_registeration(self):
+        """empty wrong input test"""
+        assert self.register(organization_name="2").status_code == 422
+        assert self.register(email_domain="2").status_code == 422
+        assert self.register(location="2").status_code == 422
 
-        rs = client.get("/organizations/BIG_ORG")
+    def test_valid_data_returned_by_id(self):
+        """testing valid data returned by id"""
+        org = self.register()
+        assert org.status_code == 200
+
+        all_orgs = client.get("/organizations")
+
+        org_id = all_orgs.json()[0]["organization_id"]
+
+        rs = client.get(f"/organizations/{org_id}")
         body = rs.json()
 
         assert rs.status_code == 200
+        assert body['organization_id'] == org_id
         assert body["organization_name"] == "BIG_ORG"
         assert body["email_domain"] == "@GG.EDU"
         assert body["location"] == "RIYADH"
