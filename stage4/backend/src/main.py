@@ -27,7 +27,8 @@ SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-UPLOAD_DIR = Path("uploads")
+BASE_DIR = Path(__file__).resolve().parent
+UPLOAD_DIR = BASE_DIR / "uploads"
 ORG_PHOTOS_DIR = UPLOAD_DIR / "organizations"
 ORG_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -79,7 +80,7 @@ def get_engine_db():
 
 app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
-app.mount("/static", StaticFiles(directory="uploads"), name="static")
+app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
 
 
 @app.post("/register", tags=["User"])
