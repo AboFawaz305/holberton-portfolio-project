@@ -40,7 +40,6 @@ export default {
         this.organizations = data
       } catch (err) {
         this.error = `خطأ في الشبكة  : ${err}`
-
       } finally {
         this.isLoading = false
       }
