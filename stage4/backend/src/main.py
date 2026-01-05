@@ -248,7 +248,7 @@ def get_organization_by_id(org_id: str) -> Organization:
     db = get_engine_db()
     org = db.organizations.find_one({"_id": org_obj_id})
     if not org:
-        raise HTTPException(status_code=404, detail="Organization not found")
+        raise HTTPException(status_code=404, detail="ORGANIZATION_NOT_FOUND")
 
     return {
         "organization_id": str(org["_id"]),

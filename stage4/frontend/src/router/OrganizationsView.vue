@@ -39,8 +39,7 @@ export default {
         const data = await response.json()
         this.organizations = data
       } catch (err) {
-        this.error = ' خطاء'
-        console.error('Fetch error:', err)
+        this.error = 'خطأ بالشبكة'
       } finally {
         this.isLoading = false
       }
@@ -78,6 +77,7 @@ export default {
     <div class="bottm">
       <div v-if="isLoading">جاري تحميل البيانات ...</div>
       <div v-else-if="error" class="error">Error: {{ error }}</div>
+      <div v-else-if="organizations.length === 0">لا توجد مؤسسات</div>
       <div v-else class="grid-container">
         <div v-for="org in filteredOrganizations" :key="org.organization_id" class="card">
           <div class="card-content">
