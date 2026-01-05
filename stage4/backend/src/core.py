@@ -4,10 +4,10 @@ This model contains:
     - functional utility functions
 That are commonly used in api routes.
 """
-from typing import Annotated
+from typing import Annotated, Literal
 from pydantic import BaseModel, EmailStr, Field
 from pydantic.types import PastDatetime
-from fastapi import Form, File, UploadFile
+from fastapi import File, UploadFile
 
 
 class NewUser(BaseModel):
@@ -42,10 +42,10 @@ class LoginUser(BaseModel):
 class NewOrganizationForm(BaseModel):
     """The representation of the
     multi-part form for creating an organization"""
-    organization_name: Annotated[str, Form(min_length=3, max_length=25)]
-    email_domain: Annotated[str, Form(min_length=3, max_length=25)]
-    location: Annotated[str, Form(min_length=3, max_length=25)]
-    photo: Annotated[UploadFile | None, File()] = None
+    organization_name: str = Field(min_length=3, max_length=25)
+    email_domain: str = Field(min_length=3, max_length=25)
+    location: str = Field(min_length=3, max_length=25)
+    photo: Annotated[UploadFile | None | Literal[''], File()] = None
 
 
 class Organization(BaseModel):

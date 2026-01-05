@@ -180,15 +180,13 @@ class TestOrganizations:
         org = self.register()
         assert org.status_code == 200
 
-        all_orgs = client.get("/organizations")
-
-        org_id = all_orgs.json()[0]["organization_id"]
+        org_id = org.json()["organization_id"]
 
         rs = client.get(f"/organizations/{org_id}")
         body = rs.json()
 
         assert rs.status_code == 200
-        assert body['organization_id'] == org_id
+        assert body["organization_id"] == org_id
         assert body["organization_name"] == "BIG_ORG"
         assert body["email_domain"] == "@GG.EDU"
         assert body["location"] == "RIYADH"

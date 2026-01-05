@@ -11,7 +11,7 @@ from pathlib import Path
 import jwt
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -148,7 +148,7 @@ def me_endpoint(user: AuthUser) -> User:
 
 @app.post("/organizations", tags=["Organizations"])
 async def create_education_organization(
-    form: Annotated[NewOrganizationForm, Depends()]
+    form: Annotated[NewOrganizationForm, Form()]
 ):
     """route to create new Organization"""
 
@@ -162,7 +162,7 @@ async def create_education_organization(
             )
 
     photo_url = None
-    if form.photo:
+    if form.photo and form.photo == "":
 
         if form.photo.content_type not in ["image/jpeg", "image/png",
                                            "image/gif"]:
@@ -184,7 +184,7 @@ async def create_education_organization(
         photo_url = "/api/static/organizations/RR.gif"
 
     current_time = datetime.now(timezone.utc)
-    db.organizations.insert_one(
+    org_id = db.organizations.insert_one(
         {
             "organization_name": form.organization_name,
             "email_domain": form.email_domain,
@@ -196,7 +196,8 @@ async def create_education_organization(
             "_updated_at": current_time,
         }
     )
-    return {"message": "Organization added successfully"}
+    return {"message": "Organization added successfully",
+            "organization_id": str(org_id.inserted_id)}
 
 
 @app.get("/organizations", tags=["Organizations"])
