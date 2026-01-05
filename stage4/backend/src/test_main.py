@@ -13,110 +13,112 @@ client = TestClient(app)
 
 
 def test_always_pass():
-    """Make sure the testing suite work
-    """
+    """Make sure the testing suite work"""
     assert True
 
 
 class TestRegisteration:
-    """Registeration unit tests definitions
-    """
+    """Registeration unit tests definitions"""
+
     @pytest.fixture(scope="class", autouse=True)
     def setup_assure_empty_database(self):
-        """Assure the database is empty before testing the registeration
-        """
+        """Assure the database is empty before testing the registeration"""
         db = get_engine_db()
         db.users.delete_many({})
 
-    def register(self, first_name="ali", last_name="redmon", username="ali",
-                 email="ali@gmail.com", password="ali12345"):
-        """Make a registeration request
-        """
-        return client.post("/register", json={
-            "email": email,
-            "password": password,
-            "first_name": first_name,
-            "last_name": last_name,
-            "username": username
-        })
+    def register(
+        self,
+        first_name="ali",
+        last_name="redmon",
+        username="ali",
+        email="ali@gmail.com",
+        password="ali12345",
+    ):
+        """Make a registeration request"""
+        return client.post(
+            "/register",
+            json={
+                "email": email,
+                "password": password,
+                "first_name": first_name,
+                "last_name": last_name,
+                "username": username,
+            },
+        )
 
     def test_registeration_with_empty_fields(self):
-        """Test the failure of registeration if any of the fields is empty
-        """
+        """Test the failure of registeration if any of the fields is empty"""
         assert self.register(username="").status_code == 422
         assert self.register(email="").status_code == 422
         assert self.register(password="").status_code == 422
 
     def test_registeration_of_new_valid_account(self):
-        """Test creating a valid user account
-        """
+        """Test creating a valid user account"""
         res = self.register()
         assert res.status_code == 200
 
     def test_registeratoin_of_a_repetitive_accouunt(self):
-        """Test uniqueness validation of users accounts
-        """
+        """Test uniqueness validation of users accounts"""
         assert self.register().status_code == 422
 
 
 class TestLogin:
-    """login unit tests definitions
-    """
+    """login unit tests definitions"""
 
     @pytest.fixture(scope="class", autouse=True)
     def setup_assure_empty_database(self):
-        """Assure the database is empty before testing the registeration
-        """
+        """Assure the database is empty before testing the registeration"""
         db = get_engine_db()
         db.users.delete_many({})
         self.register()
 
-    def register(self, first_name="ali", last_name="redmon", username="ali",
-                 email="ali@gmail.com", password="ali12345"):
-        """Make a registeration request
-        """
-        return client.post("/register", json={
-            "email": email,
-            "password": password,
-            "first_name": first_name,
-            "last_name": last_name,
-            "username": username
-        })
+    def register(
+        self,
+        first_name="ali",
+        last_name="redmon",
+        username="ali",
+        email="ali@gmail.com",
+        password="ali12345",
+    ):
+        """Make a registeration request"""
+        return client.post(
+            "/register",
+            json={
+                "email": email,
+                "password": password,
+                "first_name": first_name,
+                "last_name": last_name,
+                "username": username,
+            },
+        )
 
     def login(self, username="ali", password="ali12345"):
-        """make loging request
-        """
-        return client.post("/login",
-                           data={"username": username, "password": password}
-                           )
+        """make loging request"""
+        return client.post("/login", data={"username": username,
+                           "password": password})
 
     def test_empty_login(self):
-        """empty input test
-        """
+        """empty input test"""
         assert self.login(username="").status_code == 422
         assert self.login(password="").status_code == 422
 
     def test_invalid_login_info(self):
-        """wrong input test
-        """
+        """wrong input test"""
         assert self.login(username="allll").status_code == 401
         assert self.login(password="12344444").status_code == 401
 
     def test_valid_login_info(self):
-        """valid input test
-        """
+        """valid input test"""
         data = self.login(username="ali", password="ali12345")
         assert data.status_code == 200
 
     def test_geting_user_info(self):
-        """ testing for user info return for route /me
-        """
+        """testing for user info return for route /me"""
         data = self.login(username="ali", password="ali12345")
         token = data.json()["access_token"]
 
-        response = client.get(
-            "/me", headers={"Authorization": f"Bearer {token}"}
-        )
+        response = client.get("/me",
+                              headers={"Authorization": f"Bearer {token}"})
 
         assert response.status_code == 200
 
@@ -127,8 +129,7 @@ class TestLogin:
         assert body["email"][0] == "ali@gmail.com"
 
     def test_sending_invalid_token(self):
-        """ testing sending invalid token to route /me
-        """
+        """testing sending invalid token to route /me"""
         data = self.login(username="ali", password="ali12345")
         token = data.json()["access_token"]
         response = client.get(
@@ -137,3 +138,61 @@ class TestLogin:
 
         assert response.status_code == 401
         assert response.json()["detail"] == "invalid token"
+
+
+class TestOrganizations:
+    """ test class for Organizations"""
+
+    @pytest.fixture(scope="class", autouse=True)
+    def setup_assure_empty_database(self):
+        """Assure the database is empty before testing the registeration"""
+        db = get_engine_db()
+        db.organizations.delete_many({})
+
+    def register(
+        self, organization_name="BIG_ORG", email_domain="@GG.EDU",
+        location="RIYADH"
+    ):
+        """Make an org registeration request"""
+        return client.post(
+            "/organizations",
+            data={
+                "organization_name": organization_name,
+                "email_domain": email_domain,
+                "location": location
+            },
+        )
+
+    def test_empty_org_registeration(self):
+        """empty input test"""
+        assert self.register(organization_name="").status_code == 422
+        assert self.register(email_domain="").status_code == 422
+        assert self.register(location="").status_code == 422
+
+    def test_wrong_input_org_registeration(self):
+        """empty wrong input test"""
+        assert self.register(organization_name="2").status_code == 422
+        assert self.register(email_domain="2").status_code == 422
+        assert self.register(location="2").status_code == 422
+
+    def test_valid_data_returned_by_id(self):
+        """testing valid data returned by id"""
+        org = self.register()
+        assert org.status_code == 200
+
+        org_id = org.json()["organization_id"]
+
+        rs = client.get(f"/organizations/{org_id}")
+        body = rs.json()
+
+        assert rs.status_code == 200
+        assert body["organization_id"] == org_id
+        assert body["organization_name"] == "BIG_ORG"
+        assert body["email_domain"] == "@GG.EDU"
+        assert body["location"] == "RIYADH"
+
+    def test_registeratoin_of_a_repetitive_org(self):
+        """Test uniqueness validation of orgs"""
+        rs = self.register()
+        assert rs.status_code == 422
+        assert rs.json()["detail"] == "Organization already added"

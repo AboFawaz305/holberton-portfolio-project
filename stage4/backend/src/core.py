@@ -4,8 +4,10 @@ This model contains:
     - functional utility functions
 That are commonly used in api routes.
 """
+from typing import Annotated, Literal
 from pydantic import BaseModel, EmailStr, Field
 from pydantic.types import PastDatetime
+from fastapi import File, UploadFile
 
 
 class NewUser(BaseModel):
@@ -21,12 +23,13 @@ class NewUser(BaseModel):
 class User(BaseModel):
     """The representation of a user
     """
+    user_id: str
     first_name: str = Field(min_length=3, max_length=25)
     last_name: str = Field(min_length=3, max_length=25)
     username: str = Field(min_length=3, max_length=25)
     email: list[EmailStr]
-    _created_at: PastDatetime
-    _updated_at: PastDatetime
+    created_at: PastDatetime
+    updated_at: PastDatetime
 
 
 class LoginUser(BaseModel):
@@ -34,3 +37,23 @@ class LoginUser(BaseModel):
     """
     username: str = Field(min_length=3, max_length=25)
     password: str = Field(min_length=8, max_length=50)
+
+
+class NewOrganizationForm(BaseModel):
+    """The representation of the
+    multi-part form for creating an organization"""
+    organization_name: str = Field(min_length=3, max_length=25)
+    email_domain: str = Field(min_length=3, max_length=25)
+    location: str = Field(min_length=3, max_length=25)
+    photo: Annotated[UploadFile | None | Literal[''], File()] = None
+
+
+class Organization(BaseModel):
+    """The representation of an organization"""
+    organization_id: str
+    organization_name: str = Field(min_length=3, max_length=25)
+    email_domain: str = Field(min_length=3, max_length=25)
+    location: str = Field(min_length=3, max_length=25)
+    photo_url: str | None = None
+    users: list
+    user_count: int
