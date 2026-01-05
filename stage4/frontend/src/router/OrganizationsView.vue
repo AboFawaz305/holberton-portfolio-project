@@ -167,12 +167,12 @@ svg {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: flex-start;
+  justify-content: center;
   margin: 0 auto;
   max-width: 1170px;
   min-height: 800px;
   align-content: flex-start;
-  padding: 20px;
+  padding: 15px;
 }
 .card {
   /* border: 2px solid blue; */
