@@ -39,7 +39,8 @@ export default {
         const data = await response.json()
         this.organizations = data
       } catch (err) {
-        this.error = 'خطأ بالشبكة'
+        this.error = `خطأ في الشبكة  : ${err}`
+
       } finally {
         this.isLoading = false
       }
