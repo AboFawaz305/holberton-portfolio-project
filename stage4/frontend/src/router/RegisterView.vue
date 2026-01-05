@@ -31,6 +31,7 @@ export default {
       registerationErrorMessage: '',
       registerationSucccessMessage: '',
       isTheUserAgreeToTermsAndConditions: false,
+      isRequestInProgress: false,
     }
   },
   components: {
@@ -40,6 +41,7 @@ export default {
   },
   methods: {
     async onSubmit(values) {
+      this.isRequestInProgress = true
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
@@ -56,19 +58,24 @@ export default {
       if (!response.ok) {
         const error = await response.json()
         this.registerationSucccessMessage = ''
-        this.registerationErrorMessage = error.detail
+        this.registerationErrorMessage = this.$t(error.detail)
         return
       }
       this.registerationErrorMessage = ''
       this.registerationSucccessMessage = 'تم إنشاء الحساب بنجاح'
-      this.$router.push('/')
+      setTimeout(() => this.$router.push('/login'), 1000)
     },
   },
 }
 </script>
 <template>
   <div class="container">
-    <V-Form @submit="onSubmit" :validation-schema="registerationFormSchema">
+    <V-Form
+      :aria-busy="isRequestInProgress"
+      aria-describedby="register-progress"
+      @submit="onSubmit"
+      :validation-schema="registerationFormSchema"
+    >
       <h2>إنشاء حساب جديد</h2>
       <p v-if="registerationErrorMessage.length">{{ registerationErrorMessage }}</p>
       <p v-if="registerationSucccessMessage.length">{{ registerationSucccessMessage }}</p>
@@ -99,11 +106,17 @@ export default {
         />
         أنا أوافق على الشروط والأحكام
       </label>
-      <button :disabled="!isTheUserAgreeToTermsAndConditions" type="submit">إنشاء حساب</button>
+      <button :disabled="!isTheUserAgreeToTermsAndConditions || isRequestInProgress" type="submit">
+        إنشاء حساب
+      </button>
+      <progress id="register-progress" v-if="isRequestInProgress"></progress>
     </V-Form>
   </div>
 </template>
 <style scoped lang="scss">
+progress {
+  align-self: center;
+}
 :root {
 }
 * {
@@ -111,6 +124,11 @@ export default {
 }
 .container {
   background-color: #5dadbb;
+  background: hsla(188, 40%, 61%, 1);
+  background: linear-gradient(90deg, hsla(188, 40%, 61%, 1) 0%, hsla(192, 95%, 32%, 1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 h2 {
@@ -121,11 +139,17 @@ form {
   margin: auto;
   display: flex;
   flex-direction: column;
+  box-shadow: 0px 4px 6px black;
   max-width: 486px;
   padding: 5em;
   gap: 0.5em;
   border-radius: 25px;
+  flex: 1;
   background-color: #e2e2e2;
+}
+
+button[disabled] {
+  opacity: 60%;
 }
 
 label {
@@ -145,6 +169,7 @@ form button {
   font-size: 1.25em;
   margin-top: 2rem;
   margin-inline: 12.5%;
+  border: none;
   border-radius: 5px;
   background: #57a8bb;
   background: linear-gradient(90deg, rgba(87, 168, 187, 1) 0%, rgba(40, 76, 85, 1) 100%);
@@ -161,3 +186,11 @@ span[role='alert'] {
   }
 }
 </style>
+
+<i18n>
+{
+  ar: {
+    USER_ALREADY_EXIST: "المستخدم موجود مسبقا"
+  }
+}
+</i18n>

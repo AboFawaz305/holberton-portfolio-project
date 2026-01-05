@@ -67,7 +67,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 AuthUser = Annotated[User, Depends(get_current_user)]
 
 
-def get_db_connectoin(host=env.get("MONGO_DB_HOST", "localhost")):
+def get_db_connection(host=env.get("MONGO_DB_HOST", "localhost")):
     """Connect to the database"""
 
     return MongoClient(host, 27017)
@@ -75,7 +75,7 @@ def get_db_connectoin(host=env.get("MONGO_DB_HOST", "localhost")):
 
 def get_engine_db():
     """Get an instance from the main database for the backend"""
-    return get_db_connectoin().engine
+    return get_db_connection().engine
 
 
 app = FastAPI(root_path="/api")
@@ -83,7 +83,17 @@ password_hash = PasswordHash.recommended()
 app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
 
 
-@app.post("/register", tags=["User"])
+@app.get("/")
+def read_root():
+    """An example hello world route to test that the setup is working"""
+    db_client = get_db_connection()
+    db = db_client.test
+    db.collection.insert_one({"msg": "Hello World!"})
+    print(db.collection.find({}))
+    return {"Hello": "World"}
+
+
+@app.post("/register")
 def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
@@ -93,7 +103,7 @@ def register_endpoint(user: NewUser):
                  ]}
     )
     if is_found:
-        raise HTTPException(status_code=422, detail="User Already Exists.")
+        raise HTTPException(status_code=422, detail="USER_ALREADY_EXIST")
     current_time = datetime.now(timezone.utc)
     db.users.insert_one(
         {
@@ -118,9 +128,9 @@ def login_endpoint(
 
     found = db.users.find_one({"username": user.username})
     if not found:
-        raise HTTPException(status_code=401, detail="invalid username")
+        raise HTTPException(status_code=401, detail="INVALID_USERNAME")
     if not password_hash.verify(user.password, found["password"]):
-        raise HTTPException(status_code=401, detail="invalid password")
+        raise HTTPException(status_code=401, detail="INVALID_PASSWORD")
 
     exp_time = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES

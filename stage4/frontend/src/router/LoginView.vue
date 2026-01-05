@@ -16,6 +16,7 @@ export default {
       }),
       loginErrorMessage: '',
       loginSucccessMessage: '',
+      isRequestInProgress: false,
     }
   },
   components: {
@@ -29,14 +30,18 @@ export default {
       formData.append('username', values.username)
       formData.append('password', values.password)
 
+      this.isRequestInProgress = true
       const response = await fetch('/api/login', {
         method: 'POST',
         body: formData,
       })
+      this.isRequestInProgress = false
 
       if (!response.ok) {
+        const error = await response.json()
+        console.log(error.detail)
         this.loginSucccessMessage = ''
-        this.loginErrorMessage = 'خطا يا'
+        this.loginErrorMessage = 'خطا ' + this.$t(error.detail)
         return
       }
 
@@ -45,14 +50,19 @@ export default {
       localStorage.setItem('token', token.access_token)
       this.loginErrorMessage = ''
       this.loginSucccessMessage = 'تم تسجيل الدخل بنجاح'
-      this.$router.push('/')
+      setTimeout(() => this.$router.push('/'), 1000)
     },
   },
 }
 </script>
 <template>
   <div class="contanor">
-    <V-Form @submit="onSubmit" :validation-schema="loginFormSchema">
+    <V-Form
+      :aria-busy="isRequestInProgress"
+      aria-describedby="login-progress"
+      @submit="onSubmit"
+      :validation-schema="loginFormSchema"
+    >
       <h1>تسجيل الدخول</h1>
       <p v-if="loginErrorMessage.length" class="error">{{ loginErrorMessage }}</p>
       <p v-if="loginSucccessMessage.length">{{ loginSucccessMessage }}</p>
@@ -68,7 +78,8 @@ export default {
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> هل نسيت كلمة المرور؟ </a>
       </div>
 
-      <button type="submit">تسيجل الدخول</button>
+      <button :disabled="isRequestInProgress" type="submit">تسيجل الدخول</button>
+      <progress id="login-progress" v-if="isRequestInProgress"></progress>
 
       <div class="noAccount">
         <RouterLink to="/register">ليس لديك حساب ؟ أنشاء حساب</RouterLink>
@@ -77,9 +88,21 @@ export default {
   </div>
 </template>
 <style scoped>
+progress {
+  align-self: center;
+}
+
+button[disabled] {
+  opacity: 50%;
+}
+
 .contanor {
   min-height: 100%;
-  background-color: #5dadbb;
+  background: hsla(188, 40%, 61%, 1);
+  background: linear-gradient(90deg, hsla(188, 40%, 61%, 1) 0%, hsla(192, 95%, 32%, 1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .forgot {
@@ -101,13 +124,14 @@ form {
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
-  max-width: 400px;
-  margin: auto;
-  gap: 20px;
+  gap: 10px;
   border-radius: 15px;
-  border: 2px solid #5dadbb;
-  padding: 5em;
+  border: 1px solid #5dadbb;
+  padding: 2.5em;
+  box-shadow: 0px 4px 6px black;
   background-color: #e2e2e2;
+  flex: 1;
+  max-width: 400px;
 }
 label {
   font-size: 1.5em;
@@ -130,3 +154,12 @@ form button {
   background-image: linear-gradient(to right, #5dadbb, #294f58);
 }
 </style>
+
+<i18n>
+{
+  "ar": {
+    "INVALID_USERNAME": "إسم المستخدم غير صالح",
+    "INVALID_PASSWORD": "كلمة السر غير صالحة"
+  }
+}
+</i18n>
