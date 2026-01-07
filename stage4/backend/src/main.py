@@ -396,10 +396,15 @@ def patch_update_user(user: AuthUser, new_user: NewPatchUser):
         exclude_unset=True, exclude_none=True)
     if len(values_to_update.keys()) == 0:
         return
+    db = get_engine_db()
+    if "username" in values_to_update.keys():
+        found = db.users.find_one({"username": values_to_update['username']})
+        if found is not None:
+            raise HTTPException(
+                status_code=422, detail="USERNAME_ALREADY_EXIST")
     if "password" in values_to_update.keys():
         values_to_update["password"] = password_hash.hash(
             values_to_update["password"])
-    db = get_engine_db()
     db.users.update_one({"username": {"$eq": user.username}}, {
         "$set": {
             **values_to_update,

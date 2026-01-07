@@ -402,3 +402,10 @@ class TestUserUpdate:
             })
             print(field)
             assert response.status_code == 422
+
+    def test_update_username_to_an_already_exist_username(self):
+        """Check that you cant update username to an already existent username
+        """
+        assert self.register(
+            username="jhon", email="jhon@jjj.com").status_code == 200
+        assert self.update_user(username="jhon").status_code == 422
