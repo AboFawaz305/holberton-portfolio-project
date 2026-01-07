@@ -1,27 +1,26 @@
 """API router definitions of the backend
 """
 
+import shutil
 from datetime import datetime, timedelta, timezone
 from os import environ as env
+from pathlib import Path
 from typing import Annotated, List
 
-
-import shutil
-from pathlib import Path
 import jwt
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Form, WebSocket, \
-      WebSocketDisconnect, status
-from fastapi.staticfiles import StaticFiles
+from fastapi import (Depends, FastAPI, Form, WebSocket, WebSocketDisconnect,
+                     status)
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User, NewOrganizationForm, \
-    Organization, ConnectionManager
+from core import (ConnectionManager, NewOrganizationForm, NewPatchUser,
+                  NewUser, Organization, User)
 
 load_dotenv("../../.env", verbose=True)
 
@@ -56,14 +55,19 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except Exception as ex:
         raise HTTPException(
             status_code=401, detail="invalid user_id format"
-            ) from ex
+        ) from ex
 
     db = get_engine_db()
     found = db.users.find_one({"_id": object_id})
     if not found:
         raise HTTPException(status_code=401, detail="user not in Database")
 
-    return found
+    # remove the underscore from fields prefixed with an underscore
+    found = {("user_id" if k == "_id" else k[1:] if k[0] == "_" else k): v
+             for k, v in found.items()}
+    found["user_id"] = str(found["user_id"])
+
+    return User(**found)
 
 
 AuthUser = Annotated[User, Depends(get_current_user)]
@@ -133,7 +137,6 @@ def read_root():
     db_client = get_db_connection()
     db = db_client.test
     db.collection.insert_one({"msg": "Hello World!"})
-    print(db.collection.find({}))
     return {"Hello": "World"}
 
 
@@ -189,15 +192,8 @@ def login_endpoint(
 @app.get("/me", tags=["User"])
 def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
-    return {
-        "user_id": str(user["_id"]),
-        "first_name": user["first_name"],
-        "last_name": user["last_name"],
-        "username": user["username"],
-        "email": user["email"],
-        "created_at": user["_created_at"],
-        "updated_at": user["_updated_at"],
-    }
+
+    return user
 
 
 @app.post("/organizations", tags=["Organizations"])
@@ -209,11 +205,11 @@ async def create_education_organization(
     db = get_engine_db()
     is_found = db.organizations.find_one(
         {"organization_name": form.organization_name}
-        )
+    )
     if is_found:
         raise HTTPException(
             status_code=422, detail="Organization already added"
-            )
+        )
 
     photo_url = "/api/static/organizations/RR.gif"
     if form.photo and form.photo.filename:
@@ -226,8 +222,8 @@ async def create_education_organization(
             )
 
         file_extension = Path(form.photo.filename).suffix
-        unique_name = f"{int(datetime.now(timezone.utc)
-                             .timestamp())}{file_extension}"
+        unique_name = f"{int(datetime.now(timezone.utc).timestamp())}"
+        unique_name += f"{file_extension}"
         file_path = ORG_PHOTOS_DIR / unique_name
 
         with file_path.open("wb") as buffer:
@@ -287,14 +283,14 @@ def get_organization_by_id(org_id: str) -> Organization:
     except Exception as ex:
         raise HTTPException(
             status_code=401, detail="invalid org_id format"
-            ) from ex
+        ) from ex
 
     db = get_engine_db()
     org = db.organizations.find_one({"_id": org_obj_id})
     if not org:
         raise HTTPException(status_code=404, detail="ORGANIZATION_NOT_FOUND")
 
-    return {
+    return Organization(**{
         "organization_id": str(org["_id"]),
         "organization_name": org["organization_name"],
         "email_domain": org["email_domain"],
@@ -303,7 +299,7 @@ def get_organization_by_id(org_id: str) -> Organization:
         "messages": org["messages"],
         "users": org["users"],
         "user_count": len(org["users"]),
-    }
+    })
 
 
 @app.websocket("/ws")
@@ -351,7 +347,7 @@ async def websocket_endpoint(websocket: WebSocket):
         history_payload = {
             "type": "history",
             "data": list_msges
-            }
+        }
 
         await manager.send_personal_message(history_payload, websocket)
 
@@ -363,12 +359,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 "sender_id": ObjectId(user_id),
                 "content": message_text,
                 "timestamp": datetime.now(timezone.utc)
-                }
+            }
 
             db.organizations.update_one(
                 {"_id": ObjectId(org_id)},
                 {"$push": {"messages": new_message}}
-                )
+            )
 # this code only handle chats in orgs add support for
 # saving the chat of groups and sub groups
             broadcast_data = {
@@ -390,3 +386,23 @@ async def websocket_endpoint(websocket: WebSocket):
             manager.disconnect(websocket, org_id)
         if websocket.client_state.name != "DISCONNECTED":
             await websocket.close()
+
+
+@app.patch("/users")
+def patch_update_user(user: AuthUser, new_user: NewPatchUser):
+    """Update the fields in user based on the given fields in new_user
+    """
+    values_to_update = new_user.model_dump(
+        exclude_unset=True, exclude_none=True)
+    if len(values_to_update.keys()) == 0:
+        return
+    if "password" in values_to_update.keys():
+        values_to_update["password"] = password_hash.hash(
+            values_to_update["password"])
+    db = get_engine_db()
+    db.users.update_one({"username": {"$eq": user.username}}, {
+        "$set": {
+            **values_to_update,
+            **{"_updated_at": datetime.now(timezone.utc)}
+        }
+    })
