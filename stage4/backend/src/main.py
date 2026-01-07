@@ -11,7 +11,7 @@ from pathlib import Path
 import jwt
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Form
+from fastapi import Depends, FastAPI, Form, WebSocket, WebSocketDisconnect, status, File, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -19,7 +19,7 @@ from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 from pymongo import MongoClient
 
-from core import NewUser, User, NewOrganizationForm, Organization
+from core import NewUser, User, NewOrganizationForm, Organization, ConnectionManager
 
 load_dotenv("../../.env", verbose=True)
 
@@ -81,6 +81,8 @@ def get_engine_db():
 app = FastAPI(root_path="/api")
 password_hash = PasswordHash.recommended()
 app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
+
+manager = ConnectionManager()
 
 
 @app.get("/")
@@ -158,7 +160,7 @@ def me_endpoint(user: AuthUser) -> User:
 
 @app.post("/organizations", tags=["Organizations"])
 async def create_education_organization(
-    form: Annotated[NewOrganizationForm, Form()]
+    form: NewOrganizationForm = Depends()
 ):
     """route to create new Organization"""
 
@@ -171,8 +173,8 @@ async def create_education_organization(
             status_code=422, detail="Organization already added"
             )
 
-    photo_url = None
-    if form.photo and form.photo == "":
+    photo_url = "/api/static/organizations/RR.gif"
+    if form.photo and form.photo.filename:
 
         if form.photo.content_type not in ["image/jpeg", "image/png",
                                            "image/gif"]:
@@ -190,8 +192,6 @@ async def create_education_organization(
             shutil.copyfileobj(form.photo.file, buffer)
 
         photo_url = f"/api/static/organizations/{unique_name}"
-    else:
-        photo_url = "/api/static/organizations/RR.gif"
 
     current_time = datetime.now(timezone.utc)
     org_id = db.organizations.insert_one(
@@ -201,6 +201,7 @@ async def create_education_organization(
             "location": form.location,
             "photo_url": photo_url,
             "users": [],
+            "messages":[],
             "_banned_users": [],
             "_created_at": current_time,
             "_updated_at": current_time,
@@ -227,6 +228,7 @@ def get_all_organization() -> List[Organization]:
                 "email_domain": org["email_domain"],
                 "location": org["location"],
                 "photo_url": org["photo_url"],
+                # "messages":org["messages"],
                 "users": org["users"],
                 "user_count": user_count,
             }
@@ -256,6 +258,83 @@ def get_organization_by_id(org_id: str) -> Organization:
         "email_domain": org["email_domain"],
         "location": org["location"],
         "photo_url": org["photo_url"],
+        "messages":org["messages"],
         "users": org["users"],
         "user_count": len(org["users"]),
     }
+
+
+@app.websocket("/wsss")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    
+    db = get_engine_db()
+    org_id = None
+    user_id = None
+    try:
+
+        data = await websocket.receive_json()
+        token = data.get("token")
+        org_id= data.get("org_id")
+
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            print("token done decode")
+        except Exception:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+
+        user_id = payload.get("user_id")
+        print(user_id)
+        if not user_id:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+        
+        user_doc = db.users.find_one({"_id": ObjectId(user_id)})
+        print("db ok ?")
+        if not user_doc:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+
+        username = user_doc.get("username")
+        #websocket.connection_id = client_id
+        manager.connect(websocket, org_id)
+        
+
+        await websocket.send_json({"type":"connected",
+                             "status":"ok"}
+                            )
+        while True:
+            message_text = await websocket.receive_text()
+
+            new_message = {
+                "_id": ObjectId(), 
+                "sender_id": ObjectId(user_id),
+                "content": message_text,
+                "timestamp": datetime.now(timezone.utc)
+                }
+            
+            db.organizations.update_one(
+                {"_id": ObjectId(org_id)},
+                {"$push": {"messages": new_message}}
+                )
+            # TODO: this code only handle chats in organizatons add support for saving the chat of groups and sub groups
+            broadcast_data = {
+                "id": str(new_message["_id"]),
+                "sender_id": user_id,
+                "username":username,
+                "content": message_text,
+                "timestamp": new_message["timestamp"].isoformat()
+            }
+            
+            await manager.broadcast(broadcast_data, org_id)
+
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, org_id)
+    except Exception as e:
+        print(f"Connection error: {e}")
+        if org_id:
+            manager.disconnect(websocket, org_id)
+        if websocket.client_state.name != "DISCONNECTED":
+            await websocket.close()

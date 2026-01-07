@@ -79,7 +79,7 @@ export default {
       <div v-else-if="error" class="error">Error: {{ error }}</div>
       <div v-else-if="organizations.length === 0">لا توجد مؤسسات</div>
       <div v-else class="grid-container">
-        <div v-for="org in filteredOrganizations" :key="org.organization_id" class="card">
+        <router-link v-for="org in filteredOrganizations" :key="org.organization_id" :to = "'/organizations/' + org.organization_id" class="card" >
           <div class="card-content">
             <img :src="org.photo_url" class="org_photo" alt="logo" />
             <h3 class="org_name">{{ org.organization_name }}</h3>
@@ -88,7 +88,7 @@ export default {
             <div class="org_location">{{ org.location }}</div>
             <div class="user_count">{{ org.user_count }} طالب</div>
           </div>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
@@ -176,6 +176,7 @@ svg {
 }
 .card {
   /* border: 2px solid blue; */
+  text-decoration: none;
   background-color: white;
   border-radius: 18px;
   overflow: hidden;

@@ -50,7 +50,7 @@ export default {
       localStorage.setItem('token', token.access_token)
       this.loginErrorMessage = ''
       this.loginSucccessMessage = 'تم تسجيل الدخل بنجاح'
-      setTimeout(() => this.$router.push('/'), 1000)
+      setTimeout(() => this.$router.push('/organizations'), 1000)
     },
   },
 }

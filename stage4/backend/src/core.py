@@ -7,7 +7,7 @@ That are commonly used in api routes.
 from typing import Annotated, Literal
 from pydantic import BaseModel, EmailStr, Field
 from pydantic.types import PastDatetime
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, WebSocket, WebSocketDisconnect, WebSocketException
 
 
 class NewUser(BaseModel):
@@ -45,7 +45,7 @@ class NewOrganizationForm(BaseModel):
     organization_name: str = Field(min_length=3, max_length=25)
     email_domain: str = Field(min_length=3, max_length=25)
     location: str = Field(min_length=3, max_length=25)
-    photo: Annotated[UploadFile | None | Literal[''], File()] = None
+    photo: UploadFile | None = None
 
 
 class Organization(BaseModel):
@@ -55,5 +55,32 @@ class Organization(BaseModel):
     email_domain: str = Field(min_length=3, max_length=25)
     location: str = Field(min_length=3, max_length=25)
     photo_url: str | None = None
+    # messages: list
     users: list
     user_count: int
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: dict[str,list[WebSocket]] = {}
+
+    def connect(self, websocket: WebSocket, org_id:str):
+        if org_id not in self.active_connections:
+            self.active_connections[org_id] = []
+        self.active_connections[org_id].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, org_id:str):
+        if org_id in self.active_connections:
+            if websocket in self.active_connections[org_id]:
+                self.active_connections[org_id].remove(websocket)
+            if not self.active_connections[org_id]:
+                del self.active_connections[org_id]
+
+    
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message_payload: dict, org_id:str):
+        if org_id in self.active_connections:
+            for connection in self.active_connections[org_id]:
+                await connection.send_json(message_payload)
