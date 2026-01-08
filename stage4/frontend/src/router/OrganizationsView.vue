@@ -80,11 +80,16 @@ export default {
       <div v-else-if="error" class="error">Error: {{ error }}</div>
       <div v-else-if="organizations.length === 0">لا توجد مؤسسات</div>
       <div v-else class="grid-container">
-        <router-link v-for="org in filteredOrganizations"
-                           :key="org.organization_id"
-                           :to = "{path: '/organizations/' + org.organization_id,state: {name: org.organization_name}}"
-                           class="card"
-                           @click.prevent="handleEntry(org)" >
+        <router-link
+          v-for="org in filteredOrganizations"
+          :key="org.organization_id"
+          :to="{
+            path: '/organizations/' + org.organization_id,
+            state: { name: org.organization_name },
+          }"
+          class="card"
+          @click.prevent="handleEntry(org)"
+        >
           <div class="card-content">
             <img :src="org.photo_url" class="org_photo" alt="logo" />
             <h3 class="org_name">{{ org.organization_name }}</h3>

@@ -6,121 +6,128 @@ export default {
       token: localStorage.getItem('token'),
       socket: null,
       messages: [],
-      messageText: "",
-      connectionStatus: "connecting",
-      errorMessage: "",
+      messageText: '',
+      connectionStatus: 'connecting',
+      errorMessage: '',
       organizationName: window.history.state?.name || 'Loading...',
       host: window.location.host,
-    };
+    }
   },
   mounted() {
     if (!this.token) {
-      this.connectionStatus = "error";
-      this.errorMessage = "No authentication token found";
-      return;
+      this.connectionStatus = 'error'
+      this.errorMessage = 'No authentication token found'
+      return
     }
-    this.initChat();
+    this.initChat()
   },
   computed: {
-  statusLabel() {
-    const labels = {
-      connected: 'Connected',
-      connecting: 'Connecting...',
-      disconnected: 'Offline',
-      error: 'Connection Error'
-    };
-    return labels[this.connectionStatus] || this.connectionStatus;
-  }
-},
+    statusLabel() {
+      const labels = {
+        connected: 'Connected',
+        connecting: 'Connecting...',
+        disconnected: 'Offline',
+        error: 'Connection Error',
+      }
+      return labels[this.connectionStatus] || this.connectionStatus
+    },
+  },
   methods: {
     formatTime(ts) {
-      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     },
     initChat() {
-      this.connectionStatus = "connecting";
-      const wsUrl = `ws://${this.host}/api/ws`;
-      this.socket = new WebSocket(wsUrl);
+      this.connectionStatus = 'connecting'
+      const wsUrl = `ws://${this.host}/api/ws`
+      this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        const authData = { token: this.token, org_id: this.id };
-        this.socket.send(JSON.stringify(authData));
-      };
+        const authData = { token: this.token, org_id: this.id }
+        this.socket.send(JSON.stringify(authData))
+      }
 
       this.socket.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          if (data.type === "connected" && data.status === "ok") {
-            this.connectionStatus = "connected";
-            return;
+          const data = JSON.parse(event.data)
+          if (data.type === 'connected' && data.status === 'ok') {
+            this.connectionStatus = 'connected'
+            return
           }
-          if (data.type === "history") {
-            this.messages = data.data;
-            this.scrollToBottom();
-            return;
+          if (data.type === 'history') {
+            this.messages = data.data
+            this.scrollToBottom()
+            return
           }
-          this.messages.push(data);
-          this.scrollToBottom();
+          this.messages.push(data)
+          this.scrollToBottom()
         } catch (e) {
-          console.log("Error parsing message", e);
+          console.log('Error parsing message', e)
         }
-      };
+      }
 
-      this.socket.onerror = () => { this.connectionStatus = "error"; };
-      this.socket.onclose = () => { this.connectionStatus = "disconnected"; };
+      this.socket.onerror = () => {
+        this.connectionStatus = 'error'
+      }
+      this.socket.onclose = () => {
+        this.connectionStatus = 'disconnected'
+      }
     },
     scrollToBottom() {
       this.$nextTick(() => {
-        const container = this.$el.querySelector('.messages-container');
-        if (container) container.scrollTop = container.scrollHeight;
-      });
+        const container = this.$el.querySelector('.messages-container')
+        if (container) container.scrollTop = container.scrollHeight
+      })
     },
     sendMessage() {
-      if (!this.messageText.trim()) return;
+      if (!this.messageText.trim()) return
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(this.messageText);
-        this.messageText = "";
+        this.socket.send(this.messageText)
+        this.messageText = ''
       }
-    }
-  }
-};
+    },
+  },
+}
 </script>
 
 <template>
   <div class="full-page">
     <div class="top">
-      <h1> {{ organizationName }} #</h1>
+      <h1>{{ organizationName }} #</h1>
     </div>
 
     <div class="bottom">
-      <div class="group-window">
-        </div>
+      <div class="group-window"></div>
 
       <div class="chat-window">
         <div class="chat-header">
-            <div class="header-icon">
+          <div class="header-icon">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
             </svg>
           </div>
           <div class="header-info">
             <div class="header-title-row">
-                <h3>المحادثة العامة</h3>
-                <div :class="['status-badge', connectionStatus]">
-                    <span class="status-dot"></span>
-                    <span class="status-text">{{ statusLabel }}</span>
-                </div>
+              <h3>المحادثة العامة</h3>
+              <div :class="['status-badge', connectionStatus]">
+                <span class="status-dot"></span>
+                <span class="status-text">{{ statusLabel }}</span>
+              </div>
             </div>
             <p>تواصل مع جميع طلاب الجامعة</p>
           </div>
-
         </div>
 
-        <hr class="divider">
+        <hr class="divider" />
 
         <div class="messages-container" ref="messageBox">
           <div v-for="(msg, index) in messages" :key="index" class="message-row">
             <div class="avatar">
-               <img :src="'https://ui-avatars.com/api/?name=' + (msg.user?.username ||msg.username|| 'U')" alt="avatar">
+              <img
+                :src="
+                  'https://ui-avatars.com/api/?name=' + (msg.user?.username || msg.username || 'U')
+                "
+                alt="avatar"
+              />
             </div>
 
             <div class="message-body">
@@ -131,27 +138,26 @@ export default {
                   {{ formatTime(msg.timestamp) }}
                 </span>
               </div>
-              
+
               <div class="message-text">
                 {{ msg.content }}
               </div>
 
-              <div class="message-footer">
-              </div>
+              <div class="message-footer"></div>
             </div>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-bar">
-            <input 
-              v-model="messageText" 
-              @keyup.enter="sendMessage" 
+            <input
+              v-model="messageText"
+              @keyup.enter="sendMessage"
               placeholder="شارك أفكارك مع المجتمع..."
               :disabled="connectionStatus !== 'connected'"
             />
-            <button 
-              @click="sendMessage" 
+            <button
+              @click="sendMessage"
               class="send-btn"
               :disabled="connectionStatus !== 'connected'"
             >
@@ -204,7 +210,7 @@ export default {
   background-color: white;
   margin: 20px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -219,8 +225,16 @@ export default {
   text-align: right;
 }
 
-.header-info h3 { margin: 0; font-size: 1.1rem; color: #333; }
-.header-info p { margin: 0; font-size: 0.85rem; color: #888; }
+.header-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+.header-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #888;
+}
 .header-title-row {
   display: flex;
   align-items: center;
@@ -248,18 +262,29 @@ export default {
   background-color: #f39c12;
   animation: pulse 1.5s infinite;
 }
-.status-badge.disconnected, .status-badge.error {
+.status-badge.disconnected,
+.status-badge.error {
   color: #e74c3c;
   background-color: #fdedec;
 }
-.status-badge.disconnected .status-dot, .status-badge.error .status-dot {
+.status-badge.disconnected .status-dot,
+.status-badge.error .status-dot {
   background-color: #e74c3c;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .status-badge {
   display: flex;
@@ -320,7 +345,10 @@ export default {
   gap: 10px;
 }
 
-.username { font-weight: bold; color: #444; }
+.username {
+  font-weight: bold;
+  color: #444;
+}
 
 .major-badge {
   background-color: #fff9e6;
@@ -330,7 +358,10 @@ export default {
   font-size: 0.75rem;
 }
 
-.time-ago { font-size: 0.75rem; color: #bbb; }
+.time-ago {
+  font-size: 0.75rem;
+  color: #bbb;
+}
 
 .message-text {
   color: #666;
@@ -389,5 +420,7 @@ export default {
   transition: transform 0.2s;
 }
 
-.send-btn:hover { transform: scale(1.1); }
+.send-btn:hover {
+  transform: scale(1.1);
+}
 </style>
