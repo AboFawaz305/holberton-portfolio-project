@@ -5,9 +5,10 @@ This model contains:
 That are commonly used in api routes.
 """
 from typing import Any
+
+from fastapi import UploadFile, WebSocket
 from pydantic import BaseModel, EmailStr, Field, model_validator
 from pydantic.types import PastDatetime
-from fastapi import UploadFile, WebSocket
 
 
 class NewUser(BaseModel):
@@ -71,6 +72,7 @@ class Organization(BaseModel):
 
 class ConnectionManager:
     """ manager class for websocket connections"""
+
     def __init__(self):
         self.active_connections: dict[str, list[WebSocket]] = {}
 
@@ -97,3 +99,19 @@ class ConnectionManager:
         if org_id in self.active_connections:
             for connection in self.active_connections[org_id]:
                 await connection.send_json(message_payload)
+
+
+class NewPatchUser(BaseModel, extra="forbid"):
+    """The representation of a user
+    Extra fields are not permitted
+    """
+    first_name: str | None = Field(min_length=3, max_length=25, default=None)
+    last_name: str | None = Field(min_length=3, max_length=25, default=None)
+    username: str | None = Field(min_length=3, max_length=25, default=None)
+    password: str | None = Field(min_length=8, max_length=50, default=None)
+
+
+class UserAddEmailData(BaseModel):
+    """The representation of data to add an email
+    """
+    email: EmailStr
