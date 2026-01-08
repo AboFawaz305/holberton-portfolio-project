@@ -159,7 +159,7 @@ class TestOrganizations:
             data={
                 "organization_name": organization_name,
                 "email_domain": email_domain,
-                "location": location
+                "location": location,
             },
         )
 
