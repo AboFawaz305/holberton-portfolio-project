@@ -4,10 +4,10 @@ This model contains:
     - functional utility functions
 That are commonly used in api routes.
 """
-from typing import Annotated, Literal
-from pydantic import BaseModel, EmailStr, Field
+from typing import Any
+from pydantic import BaseModel, EmailStr, Field, model_validator
 from pydantic.types import PastDatetime
-from fastapi import File, UploadFile, WebSocket, WebSocketDisconnect, WebSocketException
+from fastapi import UploadFile, WebSocket
 
 
 class NewUser(BaseModel):
@@ -47,6 +47,15 @@ class NewOrganizationForm(BaseModel):
     location: str = Field(min_length=3, max_length=25)
     photo: UploadFile | None = None
 
+    @model_validator(mode='before')
+    @classmethod
+    def check_card_number_not_present(cls, data: Any) -> Any:
+        """ to check the req photo set to none if not there"""
+        if isinstance(data, dict):
+            if 'photo' in data and data["photo"] == "":
+                data["photo"] = None
+        return data
+
 
 class Organization(BaseModel):
     """The representation of an organization"""
@@ -61,26 +70,30 @@ class Organization(BaseModel):
 
 
 class ConnectionManager:
+    """ manager class for websocket connections"""
     def __init__(self):
-        self.active_connections: dict[str,list[WebSocket]] = {}
+        self.active_connections: dict[str, list[WebSocket]] = {}
 
-    def connect(self, websocket: WebSocket, org_id:str):
+    def connect(self, websocket: WebSocket, org_id: str):
+        """add a websocket to an org"""
         if org_id not in self.active_connections:
             self.active_connections[org_id] = []
         self.active_connections[org_id].append(websocket)
 
-    def disconnect(self, websocket: WebSocket, org_id:str):
+    def disconnect(self, websocket: WebSocket, org_id: str):
+        """removes a websocket connection"""
         if org_id in self.active_connections:
             if websocket in self.active_connections[org_id]:
                 self.active_connections[org_id].remove(websocket)
             if not self.active_connections[org_id]:
                 del self.active_connections[org_id]
 
-    
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_personal_message(self, message, websocket: WebSocket):
+        """send to self a massage"""
+        await websocket.send_json(message)
 
-    async def broadcast(self, message_payload: dict, org_id:str):
+    async def broadcast(self, message_payload: dict, org_id: str):
+        """broadcast a massage to all websockets with same org_id"""
         if org_id in self.active_connections:
             for connection in self.active_connections[org_id]:
                 await connection.send_json(message_payload)

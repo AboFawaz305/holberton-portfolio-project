@@ -6,6 +6,7 @@ export default {
       isLoading: true,
       error: null,
       searchQuery: '',
+      showLoginModal: false,
     }
   },
 
@@ -79,7 +80,11 @@ export default {
       <div v-else-if="error" class="error">Error: {{ error }}</div>
       <div v-else-if="organizations.length === 0">لا توجد مؤسسات</div>
       <div v-else class="grid-container">
-        <router-link v-for="org in filteredOrganizations" :key="org.organization_id" :to = "'/organizations/' + org.organization_id" class="card" >
+        <router-link v-for="org in filteredOrganizations"
+                           :key="org.organization_id"
+                           :to = "{path: '/organizations/' + org.organization_id,state: {name: org.organization_name}}"
+                           class="card"
+                           @click.prevent="handleEntry(org)" >
           <div class="card-content">
             <img :src="org.photo_url" class="org_photo" alt="logo" />
             <h3 class="org_name">{{ org.organization_name }}</h3>
@@ -89,6 +94,17 @@ export default {
             <div class="user_count">{{ org.user_count }} طالب</div>
           </div>
         </router-link>
+        <div v-if="showLoginModal" class="modal-overlay" @click.self="showLoginModal = false">
+          <div class="modal-content">
+            <div class="modal-icon">🔒</div>
+            <h3>تسجيل الدخول مطلوب</h3>
+            <p>يجب عليك تسجيل الدخول أولاً لتتمكن من الانضمام إلى مجتمع هذه المؤسسة.</p>
+            <div class="modal-buttons">
+              <button @click="goToLogin" class="btn-login">تسجيل الدخول</button>
+              <button @click="showLoginModal = false" class="btn-close">إغلاق</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
