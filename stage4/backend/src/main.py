@@ -383,7 +383,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except WebSocketDisconnect:
         manager.disconnect(websocket, org_id)
-    #pylint: disable=broad-exception-caught
+    # pylint: disable=broad-exception-caught
     except Exception as e:
         print(f"Connection error: {e}")
         if org_id:
