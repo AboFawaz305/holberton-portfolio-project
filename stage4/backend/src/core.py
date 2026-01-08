@@ -109,3 +109,9 @@ class NewPatchUser(BaseModel, extra="forbid"):
     last_name: str | None = Field(min_length=3, max_length=25, default=None)
     username: str | None = Field(min_length=3, max_length=25, default=None)
     password: str | None = Field(min_length=8, max_length=50, default=None)
+
+
+class UserAddEmailData(BaseModel):
+    """The representation of data to add an email
+    """
+    email: EmailStr

@@ -20,7 +20,7 @@ from pwdlib import PasswordHash
 from pymongo import MongoClient
 
 from core import (ConnectionManager, NewOrganizationForm, NewPatchUser,
-                  NewUser, Organization, User)
+                  NewUser, Organization, User, UserAddEmailData)
 
 load_dotenv("../../.env", verbose=True)
 
@@ -411,3 +411,45 @@ def patch_update_user(user: AuthUser, new_user: NewPatchUser):
             **{"_updated_at": datetime.now(timezone.utc)}
         }
     })
+
+
+@app.post("/users/emails")
+def add_user_email(user: AuthUser, email: UserAddEmailData):
+    """Add a new email to the user
+    """
+    db = get_engine_db()
+    pipeline = [
+        {"$unwind": "$email"},
+        {
+            "$group": {
+                "_id": None,
+                "emails": {"$addToSet": "$email"}
+            }
+        },
+        {"$project": {"_id": 0, "emails": 1}}
+    ]
+
+    result = list(db.users.aggregate(pipeline))
+    print(result)
+    if email.email in result[0]["emails"]:
+        raise HTTPException(status_code=422, detail="EMAIL_ALREADY_EXIST")
+    db.users.update_one(
+        {"username": user.username},
+        {"$push": {"email": email.email}}
+    )
+
+
+@app.delete("/users/emails/{email_id}")
+def delete_user_email(user: AuthUser, email_id: int):
+    """Delete an email from the user
+    """
+    if email_id >= len(user.email):
+        raise HTTPException(status_code=422, detail="EMAIL_DONT_EXIST")
+    if len(user.email) == 1:
+        raise HTTPException(
+            status_code=422, detail="DELETE_ALL_EMAILS_NOT_ALLOWED")
+    db = get_engine_db()
+    db.users.update_one(
+        {"username": user.username},
+        {"$pull": {"email": user.email[email_id]}}
+    )

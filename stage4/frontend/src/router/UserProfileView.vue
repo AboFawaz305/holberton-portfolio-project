@@ -34,6 +34,10 @@ export default {
         //   .max(50, 'هذا الحقل يجب ألا يتعدى ٥٠ حرف')
         //   .oneOf([yupRef('password')], 'كلمات السر لا تتطابق'),
       }),
+      addEmailFormSchema: object({
+        email: string().required('هذا الحقل إلزامي').email('يجب أن يكون الإيميل صالحا'),
+      }),
+      emailAddError: '',
     }
   },
   components: {
@@ -104,6 +108,23 @@ export default {
         username: this.user.username,
       })
     },
+
+    async onEmailAdd({ email }) {
+      this.emailAddError = ''
+      const response = await fetch('/api/users/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email }),
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        this.emailAddError = error.detail
+        return
+      }
+    },
   },
 }
 </script>
@@ -136,7 +157,20 @@ export default {
         <V-Field id="username" name="username" />
         <button type="submit">تحديث</button>
       </V-Form>
-      <div id="emails-card"></div>
+      <div id="emails-card">
+        <div class="email-field" v-for="(email, index) in user.email" :key="index">
+          <span>X</span>
+          <span>{{ email }}</span>
+          <span>Resest</span>
+        </div>
+        <V-Form @submit="onEmailAdd" :validation-schema="addEmailFormSchema">
+          <span v-if="emailAddError.length">{{ emailAddError }}</span>
+          <label for="email">الإيميل</label>
+          <V-ErrorMessage name="email" />
+          <V-Field id="email" name="email" />
+          <button type="submit">أضف</button>
+        </V-Form>
+      </div>
     </div>
   </div>
   <div v-else>
