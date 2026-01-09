@@ -2,8 +2,12 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
-
-import './styles/global.scss'
+// Vuetify
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import atrabTheme from '@/styles/atrabTheme'
 
 const i18n = createI18n({
   locale: 'ar',
@@ -17,9 +21,23 @@ const i18n = createI18n({
   },
 })
 
+const vuetify = createVuetify({
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'atrabTheme',
+    themes: {
+      atrabTheme,
+    },
+  },
+})
+
+import './styles/global.scss'
+
 const app = createApp(App)
 
 app.use(i18n)
 app.use(router)
+app.use(vuetify)
 
 app.mount('#app')

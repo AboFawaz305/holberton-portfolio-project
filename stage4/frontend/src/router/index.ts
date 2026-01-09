@@ -1,23 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import authService from '@/services/authService'
 
-import RegisterView from './RegisterView.vue'
-import LoginView from './LoginView.vue'
-import OrganizationsView from './OrganizationsView.vue'
-import OrgView from './OrganizationChatView.vue'
-import UserProfileView from './UserProfileView.vue'
-import MainView from './MainView.vue'
+import RegisterationPage from '@/pages/RegisterationPage.vue'
+import LoginPage from '@/pages/LoginPage.vue'
+import OrganizationsPage from '@/pages/OrganizationsPage.vue'
+import OrganizationHomePage from '@/pages/OrganizationHomePage.vue'
+import UserProfilePage from '@/pages/UserProfilePage.vue'
+import HomePage from '@/pages/HomePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/register', component: RegisterView },
-    { path: '/login', component: LoginView },
-    { path: '/organizations', component: OrganizationsView },
-    { path: '/organizations/:id', component: OrgView, props: true },
-    { path: '/profile', component: UserProfileView },
-    { path: '/home', component: MainView },
+    { path: '/register', component: RegisterationPage },
+    { path: '/login', component: LoginPage },
+    { path: '/organizations', component: OrganizationsPage },
+    {
+      path: '/organizations/:id',
+      component: OrganizationHomePage,
+      props: true,
+      meta: { requiresAuth: true },
+    },
+    { path: '/profile', component: UserProfilePage, meta: { requiresAuth: true } },
+    { path: '/home', component: HomePage },
     { path: '/', redirect: '/home' },
   ],
 })
 
 export default router
+router.beforeEach((to, _, next) => {
+  if (to.meta.requiresAuth && !authService.isLoggedIn()) {
+    next('/login') // Redirect to login if user is not authenticated
+  } else {
+    next() // Proceed as normal if authenticated
+  }
+})
