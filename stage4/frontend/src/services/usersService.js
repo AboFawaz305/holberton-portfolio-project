@@ -37,4 +37,19 @@ export default {
 
     return await response.json() // Return success response
   },
+
+  // Delete an eamil from the user account
+  async deleteEmail(email_id) {
+    const response = await fetch(`/api/users/emails/${email_id}`, {
+      method: 'DELETE',
+      headers: authService.addAuthHeader({}),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to delete email')
+    }
+
+    return await response.json() // Return success response
+  },
 }
