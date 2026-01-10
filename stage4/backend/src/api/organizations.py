@@ -10,7 +10,7 @@ from constants import ORG_PHOTOS_DIR
 from core.NewOrganizationForm import NewOrganizationForm
 from core.Organization import Organization
 from db import get_engine_db
-from fastapi import Form
+from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 
@@ -19,7 +19,7 @@ orgs = APIRouter(prefix="/organizations", tags=["Organizations"])
 
 @orgs.post("")
 async def create_education_organization(
-    form: Annotated[NewOrganizationForm, Form()]
+    form: NewOrganizationForm = Depends()
 ):
     """route to create new Organization"""
 

@@ -152,7 +152,7 @@ export default {
         md="4"
       >
         <v-card outlined class="card" @click="handleEntry(org)">
-          <v-img :src="org.photo_url" alt="logo"></v-img>
+          <v-img :src="org.photo_url" height="250px" class="stretched-img" alt="logo"></v-img>
           <v-card-title>{{ org.organization_name }}</v-card-title>
           <v-card-subtitle>
             <v-chip color="teal lighten-5" class="ma-2">{{ org.location }}</v-chip>
@@ -182,6 +182,9 @@ export default {
 </template>
 
 <style scoped>
+.stretched-img :deep(img) {
+  object-fit: fill !important;
+}
 .card {
   transition: 0.2s ease;
   cursor: pointer;

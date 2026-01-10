@@ -100,7 +100,7 @@ export default {
     <!-- Messages Container -->
     <div class="messages-container" ref="messageBox">
       <div v-for="(msg, index) in messages" :key="index" class="d-flex message-row pa-2">
-        <v-avatar size="40">
+        <v-avatar size="40" rounded="lg">
           <img
             :src="'https://ui-avatars.com/api/?name=' + (msg.user?.username || msg.username || 'U')"
             alt="avatar"
