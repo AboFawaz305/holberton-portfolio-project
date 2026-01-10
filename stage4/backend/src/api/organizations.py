@@ -3,7 +3,7 @@
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, List
+from typing import List
 
 from bson.objectid import ObjectId
 from constants import ORG_PHOTOS_DIR
