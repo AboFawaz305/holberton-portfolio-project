@@ -52,7 +52,7 @@ export default {
     if (!token) return false
     try {
       await this.getCurrentUser()
-    } catch (error) {
+    } catch {
       localStorage.removeItem('token')
       return false
     }
