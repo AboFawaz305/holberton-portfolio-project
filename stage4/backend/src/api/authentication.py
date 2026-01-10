@@ -17,7 +17,7 @@ from fastapi.security.oauth2 import (OAuth2PasswordBearer,
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 auth = APIRouter(prefix="/auth", tags=["Authentication"])
 password_hash = PasswordHash.recommended()
 
