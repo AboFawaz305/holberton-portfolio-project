@@ -19,7 +19,7 @@ orgs = APIRouter(prefix="/organizations", tags=["Organizations"])
 
 @orgs.post("")
 async def create_education_organization(
-    form: NewOrganizationForm = Depends()
+    form: NewOrganizationForm = Depends(NewOrganizationForm.as_form)
 ):
     """route to create new Organization"""
 
