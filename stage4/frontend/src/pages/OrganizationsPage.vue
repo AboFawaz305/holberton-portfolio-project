@@ -78,8 +78,8 @@ export default {
     },
 
     // Handle organization entry and require login if the user is not authenticated
-    handleEntry(org) {
-      if (!authService.isLoggedIn()) {
+    async handleEntry(org) {
+      if (!(await authService.isLoggedIn())) {
         this.showLoginModal = true // Show modal if not logged in
       } else {
         // Redirect to the organization's route
