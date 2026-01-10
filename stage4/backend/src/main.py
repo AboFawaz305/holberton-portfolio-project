@@ -117,6 +117,59 @@ def get_organization_groups(org_id: str):
         raise HTTPException(status_code=500, detail=error_msg) from e
 
 
+@app.get("/organizations/{org_id}/groups/{group_id}/resources")
+def get_group_resources(org_id: str, group_id: str):
+    """Get all resources for a specific group in an organization
+
+    Database Schema:
+    Resources are stored in the 'resources' collection with the following structure:
+    {
+        "id": "resource_id",  # MongoDB _id converted to string
+        "group_id": "group_id",  # Reference to the group
+        "organization_id": "org_id",  # Reference to the organization
+        "name": "Resource Name",
+        "description": "Resource description (optional)",
+        "type": "file|link|document",  # Type of resource
+        "url": "https://...",  # URL or file path
+        "created_at": "ISO timestamp",
+        "updated_at": "ISO timestamp"
+    }
+
+    Args:
+        org_id: The ID of the education organization
+        group_id: The ID of the group
+
+    Returns:
+        List of resources in the group
+    """
+    try:
+        db = get_engine_db()
+        resources_collection: Collection = db.resources
+
+        # Find all resources that belong to this group and organization
+        query = {"group_id": group_id, "organization_id": org_id}
+        cursor = resources_collection.find(query)
+
+        # Convert MongoDB documents to JSON-serializable format
+        resources = []
+        for resource in cursor:
+            # Convert _id to id if it exists
+            resource_dict = dict(resource)
+            if "_id" in resource_dict:
+                resource_dict["id"] = str(resource_dict["_id"])
+                del resource_dict["_id"]
+            resources.append(resource_dict)
+
+        return {
+            "organization_id": org_id,
+            "group_id": group_id,
+            "resources": resources,
+        }
+    except Exception as e:
+        error_msg = f"Error fetching resources: {str(e)}"
+        raise HTTPException(status_code=500, detail=error_msg) from e
+
+
 @app.post("/register")
 def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""

@@ -1,7 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <main>
-    <RouterView />
-  </main>
+  <v-app>
+    <v-main>
+      <RouterView />
+    </v-main>
+  </v-app>
 </template>
