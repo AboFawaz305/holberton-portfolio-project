@@ -27,8 +27,8 @@ const router = createRouter({
 })
 
 export default router
-router.beforeEach((to, _, next) => {
-  if (to.meta.requiresAuth && !authService.isLoggedIn()) {
+router.beforeEach(async (to, _, next) => {
+  if (to.meta.requiresAuth && !(await authService.isLoggedIn())) {
     next('/login') // Redirect to login if user is not authenticated
   } else {
     next() // Proceed as normal if authenticated

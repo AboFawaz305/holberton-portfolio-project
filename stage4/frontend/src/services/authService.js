@@ -47,9 +47,16 @@ export default {
   },
 
   // Check if the user is logged in
-  isLoggedIn() {
+  async isLoggedIn() {
     const token = localStorage.getItem('token')
-    return !!token // Returns true if the token exists, otherwise false
+    if (!token) return false
+    try {
+      await this.getCurrentUser()
+    } catch {
+      localStorage.removeItem('token')
+      return false
+    }
+    return true
   },
 
   // Retrieve the authentication token

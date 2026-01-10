@@ -1,9 +1,43 @@
+<script>
+import authService from '@/services/authService' // Import authService for authentication checks
+export default {
+  data() {
+    return { isLoggedIn: false }
+  },
+  async mounted() {
+    await this.checkLogin()
+  },
+  methods: {
+    async checkLogin() {
+      this.isLoggedIn = await authService.isLoggedIn()
+    },
+    logout() {
+      authService.logout()
+      this.$router.push('/login')
+    },
+  },
+  watch: {
+    async $route() {
+      await this.checkLogin()
+    },
+  },
+}
+</script>
 <template>
   <v-app-bar app>
     <v-container>
       <v-row align="center" justify="space-between">
         <!-- Start Side -->
-        <v-btn text to="/login" class="font-weight-bold"> تسجيل الدخول </v-btn>
+        <div v-if="isLoggedIn">
+          <v-menu location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-account" variant="text" v-bind="props"></v-btn>
+            </template>
+            <v-btn text v-bind="props" to="/profile">الملف الشخصي</v-btn>
+            <v-btn text v-bind="props" @click="logout">تسجيل الخروج</v-btn>
+          </v-menu>
+        </div>
+        <v-btn v-else text to="/login" class="font-weight-bold"> تسجيل الدخول </v-btn>
 
         <!-- Center Navigation -->
         <v-btn-group>
