@@ -1,5 +1,7 @@
 FROM node:latest
 WORKDIR /app
-COPY . .
+COPY package.json package-lock.json ./
 RUN npm i
-CMD npx vite --host 0.0.0.0
+COPY . .
+RUN npm run build
+CMD node server.js

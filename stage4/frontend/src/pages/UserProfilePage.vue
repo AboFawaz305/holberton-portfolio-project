@@ -10,6 +10,7 @@ export default {
       userInformationFormErrorMessage: '',
       userInformationFormSuccessMessage: '',
       emailAddError: '',
+      emailAddSuccess: '',
       // Form data
       form: {
         firstname: '',
@@ -19,6 +20,12 @@ export default {
       emailForm: {
         email: '',
       },
+      passwordResetForm: {
+        password: '',
+        repeatPassword: '',
+      },
+      passwordResetFormError: '',
+      passwordResetFormSuccess: '',
       // Validation rules
       rules: {
         required: (value) => !!value || 'هذا الحقل إلزامي',
@@ -27,6 +34,8 @@ export default {
         maxLength: (max) => (value) =>
           (value && value.length <= max) || `هذا الحقل يجب ألا يتعدى ${max} ��رف`,
         email: (value) => /.+@.+\..+/.test(value) || 'يجب أن يكون الإيميل صالحا',
+        passwordsMatch: (confirmPassword) => (value) =>
+          confirmPassword === value || 'كلمات السر لا تتطابق',
       },
     }
   },
@@ -44,19 +53,22 @@ export default {
     async onUserInformationUpdate() {
       if (!this.validateUserInformationForm()) return
 
-      const valuesToUpdate = {}
-      if (this.form.username !== this.user.username) valuesToUpdate.username = this.form.username
+      const valuestoupdate = {}
+      if (this.form.username !== this.user.username) valuestoupdate.username = this.form.username
       if (this.form.firstname !== this.user.first_name)
-        valuesToUpdate.first_name = this.form.firstname
-      if (this.form.lastname !== this.user.last_name) valuesToUpdate.last_name = this.form.lastname
+        valuestoupdate.first_name = this.form.firstname
+      if (this.form.lastname !== this.user.last_name) valuestoupdate.last_name = this.form.lastname
 
-      if (Object.keys(valuesToUpdate).length <= 0) return
+      if (Object.keys(valuestoupdate).length <= 0) return
 
       try {
-        await usersService.updateUser(valuesToUpdate)
+        await usersService.updateUser(valuestoupdate)
+        this.userInformationFormErrorMessage = ''
         this.userInformationFormSuccessMessage = 'تم تحديث المعلومات بنجاح'
+        this.$refs.userInfoForm.reset()
         this.refreshUserData()
       } catch (error) {
+        this.userInformationFormSuccessMessage = ''
         this.userInformationFormErrorMessage = error.message
       }
     },
@@ -67,8 +79,44 @@ export default {
       try {
         await usersService.addEmail(this.emailForm.email)
         this.emailAddError = ''
+        this.emailAddSuccess = 'تمت إضافة الإيميل بنجاح' + ` ${this.emailForm.email}`
+        this.emailForm.email = ''
+        this.$refs.emailAddForm.reset()
+        this.refreshUserData()
       } catch (error) {
+        this.emailAddSuccess = ''
         this.emailAddError = error.message
+      }
+    },
+
+    async deleteEmail(email_id) {
+      try {
+        if (this.user.email.length <= 1) {
+          this.emailAddError = 'لا تستطيع حذف أخر إيميل لديك'
+          return
+        }
+        await usersService.deleteEmail(email_id)
+        this.emailAddError = ''
+        this.emailAddSuccess = 'تم حذف تاإيميل ' + this.user.email[email_id] + ' بنجاح'
+        this.refreshUserData()
+      } catch (error) {
+        this.emailAddSuccess = ''
+        this.emailAddError = error.message
+      }
+    },
+    async onPasswordReset() {
+      if (!this.validatePasswordResetForm()) return
+
+      const valuestoupdate = {}
+      if (this.passwordResetForm.password !== '')
+        valuestoupdate.password = this.passwordResetForm.password
+
+      try {
+        await usersService.updateUser(valuestoupdate)
+        this.passwordResetFormSuccess = 'تم تحديث كلمة السر بنجاح'
+        this.$refs.passwordResetForm.reset()
+      } catch (error) {
+        this.passwordResetFormError = error.message
       }
     },
 
@@ -111,6 +159,19 @@ export default {
       }
       return true
     },
+    validatePasswordResetForm() {
+      const rules = this.rules
+      if (
+        !rules.required(this.passwordResetForm.password) ||
+        !rules.minLength(8)(this.passwordResetForm.password) ||
+        !rules.maxLength(50)(this.passwordResetForm.pasword) ||
+        this.passwordResetForm.password !== this.passwordResetForm.repeatPassword
+      ) {
+        this.passwordResetFormError = 'كلمة السر غير صالحة'
+        return false
+      }
+      return true
+    },
   },
 }
 </script>
@@ -120,7 +181,7 @@ export default {
     <div v-if="user">
       <v-row>
         <v-col>
-          <v-card>
+          <v-card outline>
             <v-card-title>
               <span>المعلومات الشخصية</span>
             </v-card-title>
@@ -132,7 +193,7 @@ export default {
                 {{ userInformationFormSuccessMessage }}
               </v-alert>
 
-              <v-form @submit.prevent="onUserInformationUpdate">
+              <v-form @submit.prevent="onUserInformationUpdate" ref="userInfoForm">
                 <v-text-field
                   v-model="form.firstname"
                   label="الإسم الأول"
@@ -148,7 +209,7 @@ export default {
                   label="إسم المستخدم"
                   :rules="[rules.required, rules.minLength(3), rules.maxLength(25)]"
                 />
-                <v-btn type="submit">تحديث</v-btn>
+                <v-btn color="primary" type="submit">تحديث</v-btn>
               </v-form>
             </v-card-text>
           </v-card>
@@ -156,18 +217,61 @@ export default {
       </v-row>
       <v-row>
         <v-col>
-          <v-card>
+          <v-card outline>
             <v-card-title>
-              <span>إضافة الإيميل</span>
+              <span>الإيميلات</span>
             </v-card-title>
             <v-card-text>
-              <v-form @submit.prevent="onEmailAdd">
+              <v-alert type="error" v-if="emailAddError.length">{{ emailAddError }}</v-alert>
+              <v-alert type="success" v-if="emailAddSuccess.length">{{ emailAddSuccess }}</v-alert>
+              <v-list>
+                <v-list-item v-for="(email, i) in user.email" :key="i">
+                  <v-btn icon="mdi-delete" @click="deleteEmail(i)"></v-btn>
+                  {{ email }}</v-list-item
+                >
+              </v-list>
+              <v-form @submit.prevent="onEmailAdd" ref="emailAddForm">
                 <v-text-field
                   v-model="emailForm.email"
                   label="الإيميل"
                   :rules="[rules.required, rules.email]"
                 />
-                <v-btn type="submit">أضف</v-btn>
+                <v-btn color="primary" type="submit">أضف</v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-card outline>
+            <v-card-title>تغيير كلمة السر</v-card-title>
+            <v-card-text>
+              <v-form @submit.prevent="onPasswordReset" ref="passwordResetForm">
+                <v-alert type="error" v-if="passwordResetFormError.length">{{
+                  passwordResetFormError
+                }}</v-alert>
+                <v-alert type="success" v-if="passwordResetFormSuccess.length">{{
+                  passwordResetFormSuccess
+                }}</v-alert>
+                <v-text-field
+                  v-model="passwordResetForm.password"
+                  type="password"
+                  label="كلمة السر"
+                  :rules="[rules.required, rules.minLength(8), rules.maxLength(50)]"
+                />
+                <v-text-field
+                  v-model="passwordResetForm.repeatPassword"
+                  type="password"
+                  label="أعد كلمة السر"
+                  :rules="[
+                    rules.required,
+                    rules.minLength(8),
+                    rules.maxLength(50),
+                    rules.passwordsMatch(passwordResetForm.password),
+                  ]"
+                />
+                <v-btn color="primary" type="submit">حدث كلمة السر</v-btn>
               </v-form>
             </v-card-text>
           </v-card>
