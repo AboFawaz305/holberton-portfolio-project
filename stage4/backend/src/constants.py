@@ -8,3 +8,4 @@ ORG_PHOTOS_DIR = UPLOAD_DIR / "organizations"
 SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+GROUPS_RESOURCES_DIR = UPLOAD_DIR / "groups" / "resources"

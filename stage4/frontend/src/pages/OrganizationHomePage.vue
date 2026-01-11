@@ -7,6 +7,7 @@ export default {
   components: {
     ChatWindow,
     GroupSideBar,
+    ChatWindow, // Make sure the component is registered
   },
   props: { id: String },
   data() {
