@@ -27,18 +27,15 @@ export default {
 </script>
 
 <template>
+  <v-card flat class="pa-12 text-center gradient-bg">
+    <h1 start >{{ organizationName }} #</h1>
+  </v-card>
   <v-layout>
     <GroupSideBar />
 
     <v-main>
       <v-container class="full-page" fluid>
         <v-row class="top">
-          <v-col cols="12" class="text-center">
-            <v-btn icon color="primary">
-              <v-icon>mdi-university</v-icon>
-            </v-btn>
-            <h1>{{ organizationName }} #</h1>
-          </v-col>
         </v-row>
 
         <v-row>

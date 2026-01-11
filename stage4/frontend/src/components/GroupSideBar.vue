@@ -16,7 +16,6 @@ export default {
         {
           name: 'كلية الهندسة',
           students: 5100,
-          active: 412,
           icon: 'mdi-cog-outline',
           bgColor: 'light-green-lighten-5',
           iconColor: 'light-green-darken-2',
@@ -24,7 +23,6 @@ export default {
         {
           name: 'كلية الطب',
           students: 2800,
-          active: 189,
           icon: 'mdi-hospital-building',
           bgColor: 'green-lighten-5',
           iconColor: 'green-darken-2',
