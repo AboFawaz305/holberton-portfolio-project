@@ -85,6 +85,7 @@ export default {
       <v-card
         v-for="group in filteredGroups"
         :key="group.group_id"
+        :to="`/groups/${group.group_id}`"
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"
