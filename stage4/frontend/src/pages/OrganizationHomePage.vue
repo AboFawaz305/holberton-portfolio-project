@@ -1,18 +1,18 @@
 <script>
-import ChatWindow from '@/components/ChatWindow.vue' // The child component for chat functionality
+import ChatWindow from '@/components/ChatWindow.vue'
 import authService from '@/services/authService'
 import GroupSideBar from '@/components/GroupSideBar.vue'
 
 export default {
   components: {
-    ChatWindow, // Make sure the component is registered
+    ChatWindow,
     GroupSideBar,
   },
   props: { id: String },
   data() {
     return {
-      token: authService.getToken(), // Retrieve token using authService
-      connectionStatus: 'connecting', // WebSocket connection status
+      token: authService.getToken(),
+      connectionStatus: 'connecting',
       errorMessage: '',
       organizationName: window.history.state?.name || 'Loading...',
       host: window.location.host,
@@ -28,15 +28,14 @@ export default {
 
 <template>
   <v-card flat class="pa-12 text-center gradient-bg">
-    <h1 start >{{ organizationName }} #</h1>
+    <h1 start>{{ organizationName }} #</h1>
   </v-card>
   <v-layout>
-    <GroupSideBar />
+    <GroupSideBar :org_id="id" />
 
     <v-main>
       <v-container class="full-page" fluid>
-        <v-row class="top">
-        </v-row>
+        <v-row class="top"> </v-row>
 
         <v-row>
           <v-col cols="12">

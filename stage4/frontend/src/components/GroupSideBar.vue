@@ -1,66 +1,54 @@
 <script>
 export default {
-  name: 'CollegeSidebar',
+  name: 'GroupSideBar',
+  props: { org_id: String },
   data() {
     return {
-      searchQuery: '', // 1. Added search variable
-      colleges: [
-        {
-          name: 'كلية علوم الحاسب والمعلومات',
-          students: 3200,
-          active: 245,
-          icon: 'mdi-laptop',
-          bgColor: 'orange-lighten-5',
-          iconColor: 'orange-darken-2',
-        },
-        {
-          name: 'كلية الهندسة',
-          students: 5100,
-          icon: 'mdi-cog-outline',
-          bgColor: 'light-green-lighten-5',
-          iconColor: 'light-green-darken-2',
-        },
-        {
-          name: 'كلية الطب',
-          students: 2800,
-          icon: 'mdi-hospital-building',
-          bgColor: 'green-lighten-5',
-          iconColor: 'green-darken-2',
-        },
-        {
-          name: 'كلية إدارة الأعمال',
-          students: 4200,
-          active: 356,
-          icon: 'mdi-briefcase-outline',
-          bgColor: 'lime-lighten-5',
-          iconColor: 'lime-darken-3',
-        },
-        {
-          name: 'كلية العلوم',
-          students: 3600,
-          active: 298,
-          icon: 'mdi-microscope',
-          bgColor: 'cyan-lighten-5',
-          iconColor: 'cyan-darken-2',
-        },
-        {
-          name: 'كلية الآداب',
-          students: 4800,
-          active: 401,
-          icon: 'mdi-book-open-variant',
-          bgColor: 'amber-lighten-5',
-          iconColor: 'amber-darken-2',
-        },
-      ],
+      searchQuery: '',
+      groups: [],
+      loading: false,
     }
   },
   computed: {
-    // 2. Added filtering logic
-    filteredColleges() {
-      if (!this.searchQuery) return this.colleges
-
+    filteredGroups() {
+      if (!this.searchQuery) return this.groups
       const query = this.searchQuery.toLowerCase()
-      return this.colleges.filter((college) => college.name.toLowerCase().includes(query))
+      return this.groups.filter((group) => group.title.toLowerCase().includes(query))
+    },
+  },
+  watch: {
+    org_id: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.fetchGroups()
+        }
+      },
+    },
+  },
+  methods: {
+    async fetchGroups() {
+      console.log('Fetching for Org ID:', this.org_id)
+      this.loading = true
+      try {
+        const response = await fetch(`/api/groups?org_id=${this.org_id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        this.groups = data
+      } catch (error) {
+        console.error('Fetch error:', error)
+      } finally {
+        this.loading = false
+      }
     },
   },
 }
@@ -68,7 +56,7 @@ export default {
 
 <template>
   <v-navigation-drawer
-    width="400"
+    width="350"
     permanent
     location="right"
     border="left"
@@ -89,46 +77,47 @@ export default {
       clearable
     ></v-text-field>
 
-    <v-list bg-color="transparent" class="pa-0">
+    <div v-if="loading" class="text-center pa-10">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+
+    <v-list v-else bg-color="transparent" class="pa-0">
       <v-card
-        v-for="(college, index) in filteredColleges"
-        :key="index"
+        v-for="group in filteredGroups"
+        :key="group.group_id"
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"
+        @click="$emit('select-group', group.group_id)"
       >
         <v-list-item class="pa-4">
           <div class="d-flex flex-column w-100">
             <div class="d-flex align-center w-100 mb-4">
-              <v-avatar :color="college.bgColor" size="48" rounded="lg" class="elevation-1 ms-3">
-                <v-icon :color="college.iconColor" size="28">{{ college.icon }}</v-icon>
+              <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
+                <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
               </v-avatar>
 
               <div class="flex-grow-1 text-center">
                 <span class="text-subtitle-1 font-weight-bold">
-                  {{ college.name }}
+                  {{ group.title }}
                 </span>
               </div>
 
-              <span class="text-body-2 text-grey-darken-1"> {{ college.students }} طالب </span>
+              <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} طالب </span>
             </div>
 
             <v-divider class="mb-3"></v-divider>
 
             <div class="d-flex justify-space-between align-center">
-              <div class="d-flex align-center">
-                <v-badge dot color="success" inline class="ms-2"></v-badge>
-                <span class="text-caption text-grey-darken-1">نشط {{ college.active }}</span>
-              </div>
-
+              <div class="d-flex align-center"></div>
               <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
             </div>
           </div>
         </v-list-item>
       </v-card>
 
-      <div v-if="filteredColleges.length === 0" class="text-center pa-4 text-grey">
-        لا توجد نتائج بحث
+      <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
+        لا توجد مجموعات متاحة
       </div>
     </v-list>
   </v-navigation-drawer>

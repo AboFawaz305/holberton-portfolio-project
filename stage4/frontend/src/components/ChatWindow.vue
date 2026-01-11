@@ -87,7 +87,7 @@ export default {
 <template>
   <v-card class="chat-window pa-3">
     <v-card-title>
-      <v-icon color="primary" start >mdi-message</v-icon>
+      <v-icon color="primary" start>mdi-message</v-icon>
       <span class="ml-3">المحادثة العامة</span>
       <v-chip class="ml-auto" color="primary" label outlined>
         {{ statusLabel }}
