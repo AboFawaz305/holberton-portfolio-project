@@ -4,7 +4,7 @@
 from typing import List
 
 from bson.objectid import ObjectId
-from core.Group import Groups
+from core.Group import Group
 from db import get_engine_db
 from fastapi.routing import APIRouter
 
@@ -13,7 +13,7 @@ groups = APIRouter(prefix="/groups", tags=["Groups"])
 
 
 @groups.get("")
-def get_all_groups_in_organization(org_id: str) -> List[Groups]:
+def get_all_groups_in_organization(org_id: str) -> List[Group]:
     """route get all groups in Organization"""
     db = get_engine_db()
 
