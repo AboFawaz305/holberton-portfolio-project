@@ -61,6 +61,7 @@ async def create_education_organization(
             "photo_url": photo_url,
             "users": [],
             "messages": [],
+            "groups": [],
             "_banned_users": [],
             "_created_at": current_time,
             "_updated_at": current_time,
