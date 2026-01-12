@@ -2,6 +2,7 @@
 """
 from datetime import datetime, timezone
 
+from bson.objectid import ObjectId
 from core.NewPatchUser import NewPatchUser
 from core.UserAddEmailData import UserAddEmailData
 from db import get_engine_db
@@ -77,3 +78,44 @@ def delete_user_email(user: AuthUser, email_id: int):
         {"username": user.username},
         {"$pull": {"email": user.email[email_id]}}
     )
+
+
+@users.post("/groups/{gid}")
+def join_group(user: AuthUser, gid: str, is_org: bool):
+    """Join a user to a group
+    """
+    db = get_engine_db()
+    found = True
+    if is_org:
+        found = db.organizations.find_one({"_id": ObjectId(gid)})
+    else:
+        found = db.groups.find_one({"_id": ObjectId(gid)})
+    if not found:
+        raise HTTPException(
+            status_code=422, detail="ORGANIZATION_NOT_FOUND")
+    if user.username in found["members"]:
+        raise HTTPException(status_code=422, detail="USER_ALREADY_JOINED")
+    if is_org:
+        db.organizations.update_one(
+            {"_id": ObjectId(gid)}, {"$addToSet": {"members": user.username}})
+    else:
+        db.groups.update_one(
+            {"_id": ObjectId(gid)}, {"$addToSet": {"members": user.username}})
+
+
+@users.get("/groups/{gid}/join_status")
+def is_joined_to_group(user: AuthUser, gid: str, is_org: bool):
+    """Join a user to a group
+    """
+    db = get_engine_db()
+    found = True
+    if is_org:
+        found = db.organizations.find_one({"_id": ObjectId(gid)})
+    else:
+        found = db.groups.find_one({"_id": ObjectId(gid)})
+    if not found:
+        raise HTTPException(
+            status_code=422, detail="ORGANIZATION_NOT_FOUND")
+    if user.username in found["members"]:
+        return {"msg": "yes"}
+    return {"msg": "no"}
