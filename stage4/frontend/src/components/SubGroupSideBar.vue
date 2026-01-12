@@ -1,37 +1,40 @@
 <script>
 export default {
-  name: 'GroupSideBar',
-  props: { org_id: String },
+  name: 'SubGroupSideBar',
+  props: {
+    group_id: String,
+    org_id: String,
+  },
   data() {
     return {
       searchQuery: '',
-      groups: [],
+      subGroups: [],
       loading: false,
     }
   },
   computed: {
     filteredGroups() {
-      if (!this.searchQuery) return this.groups
+      if (!this.searchQuery) return this.subGroups
       const query = this.searchQuery.toLowerCase()
-      return this.groups.filter((group) => group.title.toLowerCase().includes(query))
+      return this.subGroups.filter((group) => group.title.toLowerCase().includes(query))
     },
   },
   watch: {
-    org_id: {
+    group_id: {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          this.fetchGroups()
+          this.fetchSubGroups()
         }
       },
     },
   },
   methods: {
-    async fetchGroups() {
-      console.log('Fetching for Org ID:', this.org_id)
+    async fetchSubGroups() {
+      console.log('Fetching subgroups for Group ID:', this.group_id)
       this.loading = true
       try {
-        const response = await fetch(`/api/groups/org/${this.org_id}`, {
+        const response = await fetch(`/api/groups/${this.group_id}/subgroups`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -43,11 +46,19 @@ export default {
         }
 
         const data = await response.json()
-        this.groups = data
+        this.subGroups = data
       } catch (error) {
         console.error('Fetch error:', error)
       } finally {
         this.loading = false
+      }
+    },
+    goBack() {
+      this.$router.back()
+    },
+    goToOrg() {
+      if (this.org_id) {
+        this.$router.push(`/organizations/${this.org_id}`)
       }
     },
   },
@@ -62,12 +73,22 @@ export default {
     border="left"
     class="pa-4 bg-grey-lighten-5"
   >
-    <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
+    <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">المجموعات</h2>
+
+    <!-- Navigation buttons -->
+    <div class="d-flex mb-4 gap-2">
+      <v-btn size="small" variant="outlined" @click="goBack" prepend-icon="mdi-arrow-right">
+        رجوع
+      </v-btn>
+      <v-btn size="small" variant="text" @click="goToOrg" prepend-icon="mdi-domain">
+        المنظمة
+      </v-btn>
+    </div>
 
     <v-text-field
       v-model="searchQuery"
       variant="outlined"
-      placeholder="ابحث عن كلية..."
+      placeholder="ابحث عن مجموعة..."
       prepend-inner-icon="mdi-magnify"
       rounded="lg"
       bg-color="white"
@@ -95,7 +116,7 @@ export default {
           <div class="d-flex flex-column w-100">
             <div class="d-flex align-center w-100 mb-4">
               <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
-                <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
+                <v-icon color="indigo-darken-2" size="28">mdi-folder-outline</v-icon>
               </v-avatar>
 
               <div class="flex-grow-1 text-center">
@@ -104,7 +125,7 @@ export default {
                 </span>
               </div>
 
-              <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} طالب </span>
+              <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} عضو </span>
             </div>
 
             <v-divider class="mb-3"></v-divider>
@@ -118,7 +139,7 @@ export default {
       </v-card>
 
       <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
-        لا توجد مجموعات متاحة
+        لا توجد مجموعات فرعية
       </div>
     </v-list>
   </v-navigation-drawer>
@@ -135,5 +156,9 @@ export default {
   border-color: #d1d1d1 !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
   transform: translateY(-2px);
+}
+
+.gap-2 {
+  gap: 8px;
 }
 </style>
