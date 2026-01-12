@@ -69,6 +69,7 @@ def save_message_to_db(room_id: str, is_org:  bool, message: dict):
         {"$push": {"messages": message}}
     )
 
+
 # pylint: disable=too-many-locals
 @chat.websocket("")
 async def websocket_endpoint(websocket: WebSocket):

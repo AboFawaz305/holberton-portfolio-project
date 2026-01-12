@@ -18,7 +18,6 @@ const chatService = {
     this.socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-
         if (data.type === 'connected' && data.status === 'ok') {
           onStatusUpdate('connected')
           return
@@ -46,7 +45,7 @@ const chatService = {
       onStatusUpdate('error')
     }
 
-    this.socket.onclose = (event) => {
+    this.socket.onclose = () => {
       onStatusUpdate('disconnected')
     }
   },
