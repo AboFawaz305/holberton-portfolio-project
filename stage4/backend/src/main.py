@@ -9,6 +9,7 @@ from api.authentication import auth
 from api.chat import chat
 from api.organizations import orgs
 from api.users import users
+from api.groups import groups
 from constants import ORG_PHOTOS_DIR, UPLOAD_DIR
 
 ORG_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
@@ -21,4 +22,5 @@ app.include_router(auth)
 app.include_router(orgs)
 app.include_router(chat)
 app.include_router(users)
+app.include_router(groups)
 app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")

@@ -9,7 +9,7 @@ client = TestClient(app)
 class TestOrganizations:
     """ test class for Organizations"""
 
-    @pytest.fixture(scope="class", autouse=True)
+    @pytest.fixture(autouse=True)
     def setup_assure_empty_database(self):
         """Assure the database is empty before testing the registeration"""
         db = get_engine_db()
@@ -26,7 +26,7 @@ class TestOrganizations:
                 "organization_name": organization_name,
                 "email_domain": email_domain,
                 "location": location,
-            },
+            }
         )
 
     def test_empty_org_registeration(self):
@@ -59,6 +59,7 @@ class TestOrganizations:
 
     def test_registeratoin_of_a_repetitive_org(self):
         """Test uniqueness validation of orgs"""
+        self.register()
         rs = self.register()
         assert rs.status_code == 422
         assert rs.json()["detail"] == "Organization already added"

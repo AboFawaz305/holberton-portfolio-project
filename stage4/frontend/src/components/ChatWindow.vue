@@ -87,7 +87,7 @@ export default {
 <template>
   <v-card class="chat-window pa-3">
     <v-card-title>
-      <v-icon color="primary">mdi-message</v-icon>
+      <v-icon color="primary" start>mdi-message</v-icon>
       <span class="ml-3">المحادثة العامة</span>
       <v-chip class="ml-auto" color="primary" label outlined>
         {{ statusLabel }}
@@ -100,7 +100,7 @@ export default {
     <!-- Messages Container -->
     <div class="messages-container" ref="messageBox">
       <div v-for="(msg, index) in messages" :key="index" class="d-flex message-row pa-2">
-        <v-avatar size="40">
+        <v-avatar size="large" rounded="lg">
           <img
             :src="'https://ui-avatars.com/api/?name=' + (msg.user?.username || msg.username || 'U')"
             alt="avatar"

@@ -3,14 +3,14 @@
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, List
+from typing import List
 
 from bson.objectid import ObjectId
 from constants import ORG_PHOTOS_DIR
 from core.NewOrganizationForm import NewOrganizationForm
 from core.Organization import Organization
 from db import get_engine_db
-from fastapi import Form
+from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 
@@ -19,7 +19,7 @@ orgs = APIRouter(prefix="/organizations", tags=["Organizations"])
 
 @orgs.post("")
 async def create_education_organization(
-    form: Annotated[NewOrganizationForm, Form()]
+    form: NewOrganizationForm = Depends(NewOrganizationForm.as_form)
 ):
     """route to create new Organization"""
 
