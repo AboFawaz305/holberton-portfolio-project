@@ -7,3 +7,4 @@ pymongo
 pwdlib[argon2]
 pyjwt
 uvicorn[standard]
+resend

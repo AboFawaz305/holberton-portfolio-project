@@ -1,7 +1,10 @@
 <script>
+import authService from '@/services/authService'
+
 export default {
   name: 'GroupSideBar',
   props: { org_id: String },
+  emits: ['access-denied'],
   data() {
     return {
       searchQuery: '',
@@ -50,6 +53,26 @@ export default {
         this.loading = false
       }
     },
+    async onGroupClick(event, groupId) {
+      event.preventDefault() // Stop navigation
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}`, {
+          headers: authService.addAuthHeader(),
+        })
+
+        if (response.ok) {
+          // Access granted - navigate
+          this.$router.push(`/groups/${groupId}`)
+        } else {
+          // Access denied - emit error to parent
+          const error = await response.json()
+          this.$emit('access-denied', error.detail)
+        }
+      } catch (error) {
+        console.error('Access check failed:', error)
+      }
+    },
   },
 }
 </script>
@@ -89,7 +112,7 @@ export default {
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"
-        @click="$emit('select-group', group.group_id)"
+        @click="onGroupClick($event, group.group_id)"
       >
         <v-list-item class="pa-4">
           <div class="d-flex flex-column w-100">

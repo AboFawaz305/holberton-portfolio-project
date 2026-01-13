@@ -16,6 +16,7 @@ export default {
       registerationSucccessMessage: '',
       isTheUserAgreeToTermsAndConditions: false,
       isRequestInProgress: false,
+      showVerificationDialog: false,
       rules: {
         required: (value) => !!value || 'هذا الحقل إلزامي',
         min: (length) => (value) => value.length >= length || `أدخل على الأقل ${length} أحرف`,
@@ -47,13 +48,17 @@ export default {
         // Success message and redirect
         this.registerationErrorMessage = ''
         this.registerationSucccessMessage = 'تم إنشاء الحساب بنجاح'
-        setTimeout(() => this.$router.push('/login'), 1000)
+        this.showVerificationDialog = true
       } catch (error) {
         // Error handling
         this.registerationErrorMessage = error.message
       } finally {
         this.isRequestInProgress = false
       }
+    },
+    onDialogClose() {
+      this.showVerificationDialog = false
+      this.$router.push('/login')
     },
   },
 }
@@ -161,6 +166,16 @@ export default {
         </v-btn>
       </v-form>
     </v-card>
+
+    <v-dialog v-model="showVerificationDialog" max-width="400" persistent>
+      <v-card class="pa-6 text-center">
+        <v-icon color="success" size="64" class="mb-4">mdi-email-check</v-icon>
+        <h3 class="mb-4">تم إرسال رسالة التحقق</h3>
+        <p class="mb-6">يرجى التحقق من بريدك الإلكتروني والنقر على رابط التأكيد</p>
+        <v-btn color="primary" block @click="onDialogClose">حسناً</v-btn>
+      </v-card>
+    </v-dialog>
+    
   </v-container>
 </template>
 

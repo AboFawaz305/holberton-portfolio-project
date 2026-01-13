@@ -5,10 +5,43 @@
 from bson. objectid import ObjectId
 from db import get_engine_db
 from fastapi import HTTPException
-from fastapi. routing import APIRouter
-
+from fastapi.routing import APIRouter
+from .authentication import AuthUser
 
 groups = APIRouter(prefix="/groups", tags=["Groups"])
+
+
+def check_group_access(user: AuthUser, allowed_domains: list[str]):
+    """Check if user can access group based on email domain
+    
+    Returns None if access granted, raises HTTPException otherwise
+    """
+    # No restrictions - allow everyone
+    if not allowed_domains:
+        return
+
+    # Check all user emails
+    has_matching_domain = False
+    has_verified_matching = False
+
+    for email in user.email:
+        domain = email.value.split("@")[1].lower()
+        if domain in [d.lower() for d in allowed_domains]:
+            has_matching_domain = True
+            if email.is_verified:
+                has_verified_matching = True
+                break
+
+    # User has verified email with allowed domain - grant access
+    if has_verified_matching:
+        return
+
+    # User has matching domain but not verified
+    if has_matching_domain:
+        raise HTTPException(status_code=403, detail="EMAIL_NOT_VERIFIED")
+
+    # User has no email with allowed domain
+    raise HTTPException(status_code=403, detail="EMAIL_DOMAIN_NOT_ALLOWED")
 
 
 @groups.get("/org/{org_id}")
@@ -38,7 +71,7 @@ def get_all_groups_in_organization(org_id: str):
 
 
 @groups.get("/{group_id}")
-def get_group_by_id(group_id: str):
+def get_group_by_id(group_id: str, user: AuthUser):
     """Get a group by its ID"""
     db = get_engine_db()
 
@@ -53,11 +86,13 @@ def get_group_by_id(group_id: str):
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
 
+    check_group_access(user, group.get("AllowedEmailDomains", []))
+
     return {
         "group_id": str(group["_id"]),
         "title": group["title"],
         "org_id": str(group["org_id"]),
-        "members_count": len(group. get("members", [])),
+        "members_count": len(group.get("members", [])),
     }
 
 
@@ -82,7 +117,6 @@ def get_subgroups_of_group(group_id: str):
     if not subgroup_ids:
         return []
 
-    # Convert string IDs to ObjectIds
     subgroup_obj_ids = []
     for sub_id in subgroup_ids:
         try:
