@@ -128,6 +128,7 @@ def get_organization_by_id(org_id: str) -> Organization:
 @orgs.post("/{org_id}/groups")
 def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
     """Create Group in org OR SubGroup in a parent group (single endpoint)
+
     - If parent_group_id is None => create a main group in the org
     - If parent_group_id exists => create a subgroup inside that parent group
     """
@@ -137,7 +138,8 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
         org_obj_id = ObjectId(org_id)
     except Exception as ex:
         raise HTTPException(
-            status_code=401, detail="invalid org_id format"
+            status_code=401,
+            detail="invalid org_id format",
         ) from ex
 
     db = get_engine_db()
@@ -157,26 +159,30 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
     # CASE A: Create Group in Org
     # -------------------------
     if not new_group.parent_group_id:
-        found = db.groups.find_one({
-            "orgId": org_obj_id,
-            "title": title,
-            "parentGroupId": {"$exists": False}
-        })
+        found = db.groups.find_one(
+            {
+                "orgId": org_obj_id,
+                "title": title,
+                "parentGroupId": {"$exists": False},
+            }
+        )
         if found:
             raise HTTPException(status_code=422, detail="GROUP_ALREADY_EXIST")
 
-        inserted = db.groups.insert_one({
-            "title": title,
-            "orgId": org_obj_id,
-            "messages": [],
-            "resources": [],
-            "members": [user.username],
-            "subGroups": [],
-            "AllowedEmailDomains": [],
-            "admin": user.username,
-            "_created_at": current_time,
-            "_updated_at": current_time,
-        })
+        inserted = db.groups.insert_one(
+            {
+                "title": title,
+                "orgId": org_obj_id,
+                "messages": [],
+                "resources": [],
+                "members": [user.username],
+                "subGroups": [],
+                "AllowedEmailDomains": [],
+                "admin": user.username,
+                "_created_at": current_time,
+                "_updated_at": current_time,
+            }
+        )
         new_id = inserted.inserted_id
 
     # -------------------------
@@ -188,11 +194,17 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
             parent_obj_id = ObjectId(new_group.parent_group_id)
         except Exception as ex:
             raise HTTPException(
-                status_code=401, detail="invalid parent_group_id format"
+                status_code=401,
+                detail="invalid parent_group_id format",
             ) from ex
 
         # parent must exist and belong to same org
-        parent = db.groups.find_one({"_id": parent_obj_id, "orgId": org_obj_id})
+        parent = db.groups.find_one(
+            {
+                "_id": parent_obj_id,
+                "orgId": org_obj_id,
+            }
+        )
         if not parent:
             raise HTTPException(status_code=404, detail="PARENT_GROUP_NOT_FOUND")
 
@@ -201,35 +213,39 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
             raise HTTPException(status_code=403, detail="NOT_A_MEMBER")
 
         # unique subgroup title under same parent
-        found = db.groups.find_one({
-            "orgId": org_obj_id,
-            "parentGroupId": parent_obj_id,
-            "title": title
-        })
+        found = db.groups.find_one(
+            {
+                "orgId": org_obj_id,
+                "parentGroupId": parent_obj_id,
+                "title": title,
+            }
+        )
         if found:
             raise HTTPException(status_code=422, detail="SUBGROUP_ALREADY_EXIST")
 
-        inserted = db.groups.insert_one({
-            "title": title,
-            "orgId": org_obj_id,
-            "parentGroupId": parent_obj_id,
-            "messages": [],
-            "resources": [],
-            "members": [user.username],
-            "subGroups": [],
-            "AllowedEmailDomains": [],
-            "admin": user.username,
-            "_created_at": current_time,
-            "_updated_at": current_time,
-        })
+        inserted = db.groups.insert_one(
+            {
+                "title": title,
+                "orgId": org_obj_id,
+                "parentGroupId": parent_obj_id,
+                "messages": [],
+                "resources": [],
+                "members": [user.username],
+                "subGroups": [],
+                "AllowedEmailDomains": [],
+                "admin": user.username,
+                "_created_at": current_time,
+                "_updated_at": current_time,
+            }
+        )
 
         # link subgroup into parent.subGroups
         db.groups.update_one(
             {"_id": parent_obj_id},
             {
                 "$push": {"subGroups": inserted.inserted_id},
-                "$set": {"_updated_at": current_time}
-            }
+                "$set": {"_updated_at": current_time},
+            },
         )
         new_id = inserted.inserted_id
 
@@ -243,7 +259,7 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                 "from": "groups",
                 "localField": "subGroups",
                 "foreignField": "_id",
-                "as": "subGroupsData"
+                "as": "subGroupsData",
             }
         },
         {
@@ -256,7 +272,7 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                     "$cond": [
                         {"$ifNull": ["$parentGroupId", False]},
                         {"$toString": "$parentGroupId"},
-                        None
+                        None,
                     ]
                 },
                 "admin": 1,
@@ -270,11 +286,11 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                             "title": "$$sg.title",
                             "admin": "$$sg.admin",
                             "members_count": {"$size": "$$sg.members"},
-                        }
+                        },
                     }
-                }
+                },
             }
-        }
+        },
     ]
 
     result = list(db.groups.aggregate(pipeline))
