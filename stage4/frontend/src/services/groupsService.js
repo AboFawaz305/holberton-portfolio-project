@@ -68,6 +68,12 @@ const groupsService = {
       xhr.send(formData)
     })
   },
+
+  async getAllResources(gid) {
+    const response = await fetch(`${API_URL}/${gid}/resources`)
+    if (!response.ok) throw new Error('Failed to fetch resources')
+    return response.json()
+  },
 }
 
 export default groupsService

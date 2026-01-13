@@ -2,11 +2,13 @@
 import ChatWindow from '@/components/ChatWindow.vue'
 import authService from '@/services/authService'
 import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
+import ResourcesPanel from '@/components/SubGroupSideBar.vue'
 
 export default {
   components: {
     ChatWindow,
     SubGroupSideBar,
+    ResourcesPanel,
   },
   props: { id: String },
   data() {
@@ -17,6 +19,7 @@ export default {
       groupName: 'Loading...',
       orgId: null,
       chatKey: 0,
+      tab: 'subgroups',
     }
   },
   watch: {
@@ -55,8 +58,20 @@ export default {
     <h1>{{ groupName }} #</h1>
   </v-card>
   <v-layout>
-    <SubGroupSideBar :group_id="id" :org_id="orgId" />
+    <v-tabs v-model="tab" grow>
+      <v-tab value="subgroups">القروبات</v-tab>
+      <v-tab value="resources">المصادر</v-tab>
+    </v-tabs>
 
+    <v-window v-model="tab">
+      <v-window-item value="subgroups">
+        <SubGroupSideBar :group_id="id" :org_id="orgId" />
+      </v-window-item>
+
+      <v-window-item value="resources">
+        <ResourcesPanel :group_id="id" />
+      </v-window-item>
+    </v-window>
     <v-main>
       <v-container class="full-page" fluid>
         <v-row class="top"></v-row>

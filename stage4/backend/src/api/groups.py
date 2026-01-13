@@ -177,3 +177,19 @@ def add_new_resource_to_a_groupa(
         {"_id": group_obj_id},
         {"$push":  {"resources": new_resource}}
     )
+
+
+@groups.get("{gid}/resources")
+def get_resources(gid: str):
+    db = get_engine_db()
+
+    try:
+        group_obj_id = ObjectId(gid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="Invalid group_id format") from ex
+
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    return group.get("resources")
