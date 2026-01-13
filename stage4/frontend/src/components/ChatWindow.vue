@@ -1,13 +1,20 @@
 <script>
-import chatService from '@/services/chatService' // Import the chat service
+import chatService from '@/services/chatService'
 
 export default {
-  props: { id: String, token: String },
+  props: {
+    id: String,
+    token: String,
+    isOrg: {
+      type: Boolean,
+      default: true,
+    },
+  },
   data() {
     return {
       messages: [],
       messageText: '',
-      connectionStatus: 'connecting', // Connection status for UI display
+      connectionStatus: 'connecting',
       errorMessage: '',
       host: window.location.host,
     }
@@ -25,20 +32,50 @@ export default {
     },
   },
 
+  watch: {
+    // Reinitialize chat when id or isOrg changes
+    id: {
+      handler() {
+        this.reconnectChat()
+      },
+    },
+    isOrg: {
+      handler() {
+        this.reconnectChat()
+      },
+    },
+  },
+
   methods: {
-    // Format timestamp into a readable time
     formatTime(ts) {
-      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      const date = new Date(ts)
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      })
     },
 
-    // Initialize the chat service
+    reconnectChat() {
+      // Close existing connection and reinitialize
+      chatService.close()
+      this.messages = []
+      this.connectionStatus = 'connecting'
+      this.initChat()
+    },
+
     initChat() {
+      if (!this.id || !this.token) {
+        console.error('Missing id or token for chat')
+        return
+      }
+
       chatService.init({
         host: this.host,
         token: this.token,
-        orgId: this.id,
+        roomId: this.id,
+        isOrg: this.isOrg,
 
-        // Handle incoming messages
         onMessage: (event) => {
           if (event.type === 'history') {
             this.messages = event.data
@@ -49,15 +86,13 @@ export default {
           }
         },
 
-        // Handle connection status updates
         onStatusUpdate: (status) => {
           this.connectionStatus = status
-          this.$emit('status-update', status) // Notify parent component of the status
+          this.$emit('status-update', status)
         },
       })
     },
 
-    // Scroll to the bottom of the messages container
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messageBox
@@ -65,21 +100,19 @@ export default {
       })
     },
 
-    // Send a message through the WebSocket
     sendMessage() {
-      if (!this.messageText.trim()) return // Prevent empty messages
-      chatService.sendMessage(this.messageText) // Use the service to send the message
-      this.messageText = '' // Clear the input field
+      if (!this.messageText.trim()) return
+      chatService.sendMessage(this.messageText)
+      this.messageText = ''
     },
   },
 
-  // Cleanup the WebSocket when the component is destroyed
   beforeUnmount() {
-    chatService.close() // Close the WebSocket connection
+    chatService.close()
   },
 
   mounted() {
-    this.initChat() // Initialize WebSocket chat on component mount
+    this.initChat()
   },
 }
 </script>
@@ -94,15 +127,15 @@ export default {
       </v-chip>
     </v-card-title>
 
-    <!-- Divider -->
     <v-divider></v-divider>
 
-    <!-- Messages Container -->
     <div class="messages-container" ref="messageBox">
       <div v-for="(msg, index) in messages" :key="index" class="d-flex message-row pa-2">
         <v-avatar size="large" rounded="lg">
           <img
-            :src="'https://ui-avatars.com/api/?name=' + (msg.user?.username || msg.username || 'U')"
+            :src="
+              'https://ui-avatars.com/api/? name=' + (msg.user?.username || msg.username || 'U')
+            "
             alt="avatar"
           />
         </v-avatar>
@@ -119,7 +152,6 @@ export default {
       </div>
     </div>
 
-    <!-- Message Input -->
     <v-row class="mt-3">
       <v-col cols="10">
         <v-text-field

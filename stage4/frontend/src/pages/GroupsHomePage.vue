@@ -1,13 +1,12 @@
 <script>
 import ChatWindow from '@/components/ChatWindow.vue'
 import authService from '@/services/authService'
-import GroupSideBar from '@/components/GroupSideBar.vue'
+import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
 
 export default {
   components: {
     ChatWindow,
-    GroupSideBar,
-    ChatWindow, // Make sure the component is registered
+    SubGroupSideBar,
   },
   props: { id: String },
   data() {
@@ -15,8 +14,8 @@ export default {
       token: authService.getToken(),
       connectionStatus: 'connecting',
       errorMessage: '',
-      organizationName: 'Loading...',
-      host: window.location.host,
+      groupName: 'Loading...',
+      orgId: null,
       chatKey: 0,
     }
   },
@@ -25,22 +24,23 @@ export default {
       immediate: true,
       async handler(newId) {
         if (newId) {
-          await this.fetchOrgInfo()
+          await this.fetchGroupInfo()
           this.chatKey++
         }
       },
     },
   },
   methods: {
-    async fetchOrgInfo() {
+    async fetchGroupInfo() {
       try {
-        const response = await fetch(`/api/organizations/${this.id}`)
+        const response = await fetch(`/api/groups/${this.id}`)
         if (response.ok) {
           const data = await response.json()
-          this.organizationName = data.organization_name
+          this.groupName = data.title
+          this.orgId = data.org_id
         }
       } catch (error) {
-        console.error('Failed to fetch organization:', error)
+        console.error('Failed to fetch group:', error)
       }
     },
     updateConnectionStatus(status) {
@@ -52,10 +52,10 @@ export default {
 
 <template>
   <v-card flat class="pa-12 text-center gradient-bg">
-    <h1 start>{{ organizationName }} #</h1>
+    <h1>{{ groupName }} #</h1>
   </v-card>
   <v-layout>
-    <GroupSideBar :org_id="id" />
+    <SubGroupSideBar :group_id="id" :org_id="orgId" />
 
     <v-main>
       <v-container class="full-page" fluid>
@@ -63,12 +63,11 @@ export default {
 
         <v-row>
           <v-col cols="12">
-            <!-- Added :key and :isOrg="true" -->
             <ChatWindow
               :key="chatKey"
               :id="id"
               :token="token"
-              :isOrg="true"
+              :isOrg="false"
               @status-update="updateConnectionStatus"
             />
           </v-col>

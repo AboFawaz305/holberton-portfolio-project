@@ -16,23 +16,26 @@ chat = APIRouter(prefix="/ws/chat", tags=["chat"])
 manager = ConnectionManager()
 
 
-def get_organization_messages_with_users(org_id):
-    """gets orgs messages with users"""
-
+def get_messages_with_users(room_id: str, is_org: bool):
+    """Gets messages with user info for org or group"""
     db = get_engine_db()
 
+    collection = db. organizations if is_org else db.groups
+
     pipeline = [
-        {"$match": {"_id": ObjectId(org_id)}},
-        {"$unwind": "$messages"},
+        {"$match": {"_id": ObjectId(room_id)}},
+        {"$unwind": {"path": "$messages",
+                     "preserveNullAndEmptyArrays": False}},
         {
             "$lookup": {
                 "from": "users",
                 "localField": "messages.sender_id",
-                "foreignField": "_id",
-                "as": "sender_info"
+                "foreignField":  "_id",
+                "as":  "sender_info"
             }
         },
-        {"$unwind": "$sender_info"},
+        {"$unwind": {"path": "$sender_info",
+                     "preserveNullAndEmptyArrays": True}},
         {
             "$project": {
                 "_id": 0,
@@ -40,35 +43,50 @@ def get_organization_messages_with_users(org_id):
                 "content": "$messages.content",
                 "timestamp": {
                     "$dateToString": {
-                        "format": "%Y-%m-%d %H:%M:%S",
-                        "date": "$messages.timestamp"
+                        "format": "%Y-%m-%dT%H:%M:%S.%LZ",  # ← Remove space
+                        "date": "$messages.timestamp",
+                        "timezone":  "UTC"
                     }
                 },
                 "user": {
-                    "_id": {"$toString": "$sender_info._id"},
-                    "username": "$sender_info.username",
-                    # "photo_url": "$sender_info.photo_url"
+                    "_id": {"$toString":  "$sender_info._id"},
+                    "username":  "$sender_info.username",
                 }
             }
         }
     ]
 
-    return list(db.organizations.aggregate(pipeline))
+    return list(collection.aggregate(pipeline))
 
 
+def save_message_to_db(room_id: str, is_org:  bool, message: dict):
+    """Saves a message to the appropriate collection"""
+    db = get_engine_db()
+    collection = db.organizations if is_org else db.groups
+
+    collection.update_one(
+        {"_id": ObjectId(room_id)},
+        {"$push": {"messages": message}}
+    )
+
+
+# pylint: disable=too-many-locals
 @chat.websocket("")
 async def websocket_endpoint(websocket: WebSocket):
     """ route for websocket connection"""
     await websocket.accept()
 
     db = get_engine_db()
-    org_id = None
+    room_id = None
+    is_org = True
     user_id = None
+
     try:
 
         data = await websocket.receive_json()
         token = data.get("token")
-        org_id = data.get("org_id")
+        room_id = data.get("room_id")
+        is_org = data.get("isOrg", True)
 
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -93,11 +111,11 @@ async def websocket_endpoint(websocket: WebSocket):
             return
 
         username = user_doc.get("username")
-        manager.connect(websocket, org_id)
+        manager.connect(websocket, room_id)
 
         await websocket.send_json({"type": "connected", "status": "ok"})
 
-        list_msges = get_organization_messages_with_users(org_id)
+        list_msges = get_messages_with_users(room_id, is_org)
         history_payload = {
             "type": "history",
             "data": list_msges
@@ -115,12 +133,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 "timestamp": datetime.now(timezone.utc)
             }
 
-            db.organizations.update_one(
-                {"_id": ObjectId(org_id)},
-                {"$push": {"messages": new_message}}
-            )
-            # this code only handle chats in orgs add support for
-            # saving the chat of groups and sub groups
+            save_message_to_db(room_id, is_org, new_message)
+
             broadcast_data = {
                 "id": str(new_message["_id"]),
                 "sender_id": user_id,
@@ -129,14 +143,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 "timestamp": new_message["timestamp"].isoformat()
             }
 
-            await manager.broadcast(broadcast_data, org_id)
+            await manager.broadcast(broadcast_data, room_id)
 
     except WebSocketDisconnect:
-        manager.disconnect(websocket, org_id)
+        manager.disconnect(websocket, room_id)
     # pylint: disable=broad-exception-caught
     except Exception as e:
         print(f"Connection error: {e}")
-        if org_id:
-            manager.disconnect(websocket, org_id)
+        if room_id:
+            manager.disconnect(websocket, room_id)
         if websocket.client_state.name != "DISCONNECTED":
             await websocket.close()
