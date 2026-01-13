@@ -17,6 +17,8 @@ export default {
       connectionStatus: 'connecting',
       errorMessage: '',
       host: window.location.host,
+      snackbar: false,
+      msg: '',
     }
   },
 
@@ -47,6 +49,11 @@ export default {
   },
 
   methods: {
+    showMessage(text) {
+      this.msg = text
+      this.snackbar = true
+    },
+
     formatTime(ts) {
       const date = new Date(ts)
       return date.toLocaleTimeString([], {
@@ -80,6 +87,8 @@ export default {
           if (event.type === 'history') {
             this.messages = event.data
             this.scrollToBottom()
+          } else if (event.data && event.data.error === 'MESSAGE_IS_SPAM') {
+            this.showMessage('لم يتم الإرسال بنجاح الرسالة مزعجة')
           } else if (event.type === 'new_message') {
             this.messages.push(event.data)
             this.scrollToBottom()
@@ -175,6 +184,13 @@ export default {
       </v-col>
     </v-row>
   </v-card>
+  <v-snackbar v-model="snackbar" timeout="5000" closable>
+    {{ msg }}
+
+    <template v-slot:actions>
+      <v-btn color="pink" variant="text" @click="snackbar = false"> Close </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>
