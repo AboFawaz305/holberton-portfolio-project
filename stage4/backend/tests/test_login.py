@@ -71,7 +71,7 @@ class TestLogin:
         assert body["username"] == "ali"
         assert body["first_name"] == "ali"
         assert body["last_name"] == "redmon"
-        assert body["email"][0] == "ali@gmail.com"
+        assert body["email"][0] == {'is_verified': False, 'value': 'ali@gmail.com'}
 
     def test_sending_invalid_token(self):
         """testing sending invalid token to route /auth/me"""
