@@ -71,8 +71,7 @@ export default {
   </v-card>
   <v-layout>
     <v-navigation-drawer width="360" permanent>
-    <GroupSideBar class="pa-4" :org_id="id" @access-denied="onAccessDenied" />
-    
+      <GroupSideBar class="pa-4" :org_id="id" @access-denied="onAccessDenied" />
     </v-navigation-drawer>
     <v-main>
       <v-container class="full-page" fluid>

@@ -23,8 +23,7 @@ const groupsService = {
   async getGroupById(groupId) {
     const response = await fetch(`${API_URL}/${groupId}`, {
       method: 'GET',
-      headers: authService.addAuthHeader({
-      }),
+      headers: authService.addAuthHeader({}),
     })
 
     if (!response.ok) {
@@ -39,10 +38,9 @@ const groupsService = {
    * Get all subgroups of a group
    */
   async getSubgroups(groupId) {
-     const response = await fetch(`${API_URL}/${groupId}/subgroups`, {
+    const response = await fetch(`${API_URL}/${groupId}/subgroups`, {
       method: 'GET',
-      headers: authService.addAuthHeader({
-      }),
+      headers: authService.addAuthHeader({}),
     })
     if (!response.ok) throw new Error('Failed to fetch subgroups')
     return response.json()

@@ -79,74 +79,72 @@ export default {
 </script>
 
 <template>
-    <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">المجموعات</h2>
+  <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">المجموعات</h2>
 
-    <!-- Navigation buttons -->
-    <div class="d-flex mb-4 gap-2">
-      <v-btn size="small" variant="outlined" @click="handleBack" prepend-icon="mdi-arrow-right">
-        رجوع
-      </v-btn>
-      <v-btn size="small" variant="text" @click="goToOrg" prepend-icon="mdi-domain">
-        المنظمة
-      </v-btn>
-    </div>
+  <!-- Navigation buttons -->
+  <div class="d-flex mb-4 gap-2">
+    <v-btn size="small" variant="outlined" @click="handleBack" prepend-icon="mdi-arrow-right">
+      رجوع
+    </v-btn>
+    <v-btn size="small" variant="text" @click="goToOrg" prepend-icon="mdi-domain"> المنظمة </v-btn>
+  </div>
 
-    <v-text-field
-      v-model="searchQuery"
-      variant="outlined"
-      placeholder="ابحث عن مجموعة..."
-      prepend-inner-icon="mdi-magnify"
-      rounded="lg"
-      bg-color="white"
-      density="compact"
-      class="mb-4"
-      hide-details
-      clearable
-    ></v-text-field>
+  <v-text-field
+    v-model="searchQuery"
+    variant="outlined"
+    placeholder="ابحث عن مجموعة..."
+    prepend-inner-icon="mdi-magnify"
+    rounded="lg"
+    bg-color="white"
+    density="compact"
+    class="mb-4"
+    hide-details
+    clearable
+  ></v-text-field>
 
-    <div v-if="loading" class="text-center pa-10">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
+  <div v-if="loading" class="text-center pa-10">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
 
-    <v-list v-else bg-color="transparent" class="pa-0">
-      <v-card
-        v-for="group in filteredGroups"
-        :key="group.group_id"
-        variant="flat"
-        class="mb-4 college-card"
-        rounded="xl"
-        @click.stop.prevent="onGroupClick($event, group.group_id)"
-      >
-        <v-list-item class="pa-4">
-          <div class="d-flex flex-column w-100">
-            <div class="d-flex align-center w-100 mb-4">
-              <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
-                <v-icon color="indigo-darken-2" size="28">mdi-folder-outline</v-icon>
-              </v-avatar>
+  <v-list v-else bg-color="transparent" class="pa-0">
+    <v-card
+      v-for="group in filteredGroups"
+      :key="group.group_id"
+      variant="flat"
+      class="mb-4 college-card"
+      rounded="xl"
+      @click.stop.prevent="onGroupClick($event, group.group_id)"
+    >
+      <v-list-item class="pa-4">
+        <div class="d-flex flex-column w-100">
+          <div class="d-flex align-center w-100 mb-4">
+            <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
+              <v-icon color="indigo-darken-2" size="28">mdi-folder-outline</v-icon>
+            </v-avatar>
 
-              <div class="flex-grow-1 text-center">
-                <span class="text-subtitle-1 font-weight-bold">
-                  {{ group.title }}
-                </span>
-              </div>
-
-              <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} عضو </span>
+            <div class="flex-grow-1 text-center">
+              <span class="text-subtitle-1 font-weight-bold">
+                {{ group.title }}
+              </span>
             </div>
 
-            <v-divider class="mb-3"></v-divider>
-
-            <div class="d-flex justify-space-between align-center">
-              <div class="d-flex align-center"></div>
-              <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
-            </div>
+            <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} عضو </span>
           </div>
-        </v-list-item>
-      </v-card>
 
-      <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
-        لا توجد مجموعات فرعية
-      </div>
-    </v-list>
+          <v-divider class="mb-3"></v-divider>
+
+          <div class="d-flex justify-space-between align-center">
+            <div class="d-flex align-center"></div>
+            <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
+          </div>
+        </div>
+      </v-list-item>
+    </v-card>
+
+    <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
+      لا توجد مجموعات فرعية
+    </div>
+  </v-list>
 </template>
 
 <style scoped>

@@ -86,11 +86,11 @@ export default {
       <v-window v-model="tab" class="mt-4">
         <v-window-item class="pa-4" value="subgroups">
           <SubGroupSideBar
-      :group_id="id"
-      :org_id="orgId"
-      :parent_group_id="parentGroupId"
-      @access-denied="onAccessDenied"
-    />
+            :group_id="id"
+            :org_id="orgId"
+            :parent_group_id="parentGroupId"
+            @access-denied="onAccessDenied"
+          />
         </v-window-item>
 
         <v-window-item class="pa-4" value="resources">
@@ -102,8 +102,7 @@ export default {
     <!-- Main content -->
     <v-main>
       <v-container class="full-page" fluid>
-        <v-row class="top"></v-row>
-        
+        <v-row class="top">
           <v-col cols="12">
             <ChatWindow
               :key="chatKey"

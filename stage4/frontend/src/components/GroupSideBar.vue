@@ -76,22 +76,22 @@ export default {
     <v-progress-circular indeterminate color="primary"></v-progress-circular>
   </div>
 
-      <v-list v-else bg-color="transparent" class="pa-0">
-      <v-card
-        v-for="group in filteredGroups"
-        :key="group.group_id"
-        variant="flat"
-        class="mb-4 college-card"
-        rounded="xl"
-        @click="onGroupClick($event, group.group_id)"
-      >
-        <v-list-item class="pa-4">
-          <div class="d-flex flex-column w-100">
-            <div class="d-flex align-center w-100 mb-4">
-              <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
-                <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
-              </v-avatar>
-              
+  <v-list v-else bg-color="transparent" class="pa-0">
+    <v-card
+      v-for="group in filteredGroups"
+      :key="group.group_id"
+      variant="flat"
+      class="mb-4 college-card"
+      rounded="xl"
+      @click="onGroupClick($event, group.group_id)"
+    >
+      <v-list-item class="pa-4">
+        <div class="d-flex flex-column w-100">
+          <div class="d-flex align-center w-100 mb-4">
+            <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
+              <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
+            </v-avatar>
+
             <div class="flex-grow-1 text-center">
               <span class="text-subtitle-1 font-weight-bold">
                 {{ group.title }}
