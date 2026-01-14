@@ -17,6 +17,8 @@ export default {
       organizationName: 'Loading...',
       host: window.location.host,
       chatKey: 0,
+      snackbar: false,
+      snackbarMessage: '',
     }
   },
   watch: {
@@ -45,6 +47,16 @@ export default {
     updateConnectionStatus(status) {
       this.connectionStatus = status
     },
+    onAccessDenied(errorCode) {
+      if (errorCode === 'EMAIL_NOT_VERIFIED') {
+        this.snackbarMessage = 'يجب تأكيد بريدك الإلكتروني للوصول لهذه المجموعة'
+      } else if (errorCode === 'EMAIL_DOMAIN_NOT_ALLOWED') {
+        this.snackbarMessage = 'بريدك الإلكتروني غير مسموح له بالوصول لهذه المجموعة'
+      } else {
+        this.snackbarMessage = 'لا يمكنك الوصول لهذه المجموعة'
+      }
+      this.snackbar = true
+    },
   },
 }
 </script>
@@ -54,7 +66,7 @@ export default {
     <h1 start>{{ organizationName }} #</h1>
   </v-card>
   <v-layout>
-    <GroupSideBar :org_id="id" />
+    <GroupSideBar :org_id="id" @access-denied="onAccessDenied" />
 
     <v-main>
       <v-container class="full-page" fluid>
@@ -75,6 +87,9 @@ export default {
       </v-container>
     </v-main>
   </v-layout>
+  <v-snackbar v-model="snackbar" color="error" timeout="4000">
+    {{ snackbarMessage }}
+  </v-snackbar>
 </template>
 
 <style scoped>

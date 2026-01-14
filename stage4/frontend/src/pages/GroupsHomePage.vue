@@ -2,6 +2,7 @@
 import ChatWindow from '@/components/ChatWindow.vue'
 import authService from '@/services/authService'
 import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
+import groupsService from '@/services/groupsService'
 
 export default {
   components: {
@@ -16,7 +17,10 @@ export default {
       errorMessage: '',
       groupName: 'Loading...',
       orgId: null,
+      parentGroupId: null,
       chatKey: 0,
+      snackbar: false,
+      snackbarMessage: '',
     }
   },
   watch: {
@@ -24,6 +28,7 @@ export default {
       immediate: true,
       async handler(newId) {
         if (newId) {
+          this.groupName = 'Loading...'
           await this.fetchGroupInfo()
           this.chatKey++
         }
@@ -33,18 +38,30 @@ export default {
   methods: {
     async fetchGroupInfo() {
       try {
-        const response = await fetch(`/api/groups/${this.id}`)
-        if (response.ok) {
-          const data = await response.json()
-          this.groupName = data.title
-          this.orgId = data.org_id
-        }
+        const data = await groupsService.getGroupById(this.id)
+
+        this.groupName = data.title
+        this.orgId = data.org_id
+        this.parentGroupId = data.parentGroupId
       } catch (error) {
-        console.error('Failed to fetch group:', error)
+        console.error('Failed to fetch group:', error.message)
+        this.groupName = 'Error loading group'
+
+        this.onAccessDenied(error.message)
       }
     },
     updateConnectionStatus(status) {
       this.connectionStatus = status
+    },
+    onAccessDenied(errorCode) {
+      if (errorCode === 'EMAIL_NOT_VERIFIED') {
+        this.snackbarMessage = 'يجب تأكيد بريدك الإلكتروني للوصول لهذه المجموعة'
+      } else if (errorCode === 'EMAIL_DOMAIN_NOT_ALLOWED') {
+        this.snackbarMessage = 'بريدك الإلكتروني غير مسموح له بالوصول لهذه المجموعة'
+      } else {
+        this.snackbarMessage = 'لا يمكنك الوصول لهذه المجموعة'
+      }
+      this.snackbar = true
     },
   },
 }
@@ -55,7 +72,12 @@ export default {
     <h1>{{ groupName }} #</h1>
   </v-card>
   <v-layout>
-    <SubGroupSideBar :group_id="id" :org_id="orgId" />
+    <SubGroupSideBar
+      :group_id="id"
+      :org_id="orgId"
+      :parent_group_id="parentGroupId"
+      @access-denied="onAccessDenied"
+    />
 
     <v-main>
       <v-container class="full-page" fluid>
@@ -75,6 +97,10 @@ export default {
       </v-container>
     </v-main>
   </v-layout>
+
+  <v-snackbar v-model="snackbar" color="error" timeout="4000">
+    {{ snackbarMessage }}
+  </v-snackbar>
 </template>
 
 <style scoped>

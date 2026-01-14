@@ -1,10 +1,14 @@
 <script>
+import groupsService from '@/services/groupsService'
+
 export default {
   name: 'SubGroupSideBar',
   props: {
     group_id: String,
     org_id: String,
+    parent_group_id: String,
   },
+  emits: ['access-denied'],
   data() {
     return {
       searchQuery: '',
@@ -34,27 +38,36 @@ export default {
       console.log('Fetching subgroups for Group ID:', this.group_id)
       this.loading = true
       try {
-        const response = await fetch(`/api/groups/${this.group_id}/subgroups`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        this.subGroups = data
+        this.subGroups = await groupsService.getSubgroups(this.group_id)
       } catch (error) {
         console.error('Fetch error:', error)
       } finally {
         this.loading = false
       }
     },
-    goBack() {
-      this.$router.back()
+    async onGroupClick(event, subGroupId) {
+      event.preventDefault()
+
+      try {
+        await groupsService.getGroupById(subGroupId)
+
+        this.$router.push(`/groups/${subGroupId}`)
+      } catch (error) {
+        console.error('Access check failed:', error.message)
+        this.$emit('access-denied', error.message)
+      }
+    },
+    handleBack() {
+      if (this.parent_group_id) {
+        // If we are in a subgroup, go to the Parent Group
+        this.$router.push(`/groups/${this.parent_group_id}`)
+      } else if (this.org_id) {
+        // If we are in a Main Group (no parent), go to the Organization Home
+        this.$router.push(`/organizations/${this.org_id}`)
+      } else {
+        // Fallback if everything fails
+        this.$router.back()
+      }
     },
     goToOrg() {
       if (this.org_id) {
@@ -77,7 +90,7 @@ export default {
 
     <!-- Navigation buttons -->
     <div class="d-flex mb-4 gap-2">
-      <v-btn size="small" variant="outlined" @click="goBack" prepend-icon="mdi-arrow-right">
+      <v-btn size="small" variant="outlined" @click="handleBack" prepend-icon="mdi-arrow-right">
         رجوع
       </v-btn>
       <v-btn size="small" variant="text" @click="goToOrg" prepend-icon="mdi-domain">
@@ -106,11 +119,10 @@ export default {
       <v-card
         v-for="group in filteredGroups"
         :key="group.group_id"
-        :to="`/groups/${group.group_id}`"
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"
-        @click="$emit('select-group', group.group_id)"
+        @click.stop.prevent="onGroupClick($event, group.group_id)"
       >
         <v-list-item class="pa-4">
           <div class="d-flex flex-column w-100">
