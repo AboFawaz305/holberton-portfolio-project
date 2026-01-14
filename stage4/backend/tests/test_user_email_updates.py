@@ -5,6 +5,7 @@ from main import app
 
 client = TestClient(app)
 
+
 class TestUserEmailsUpdate:
     """Test user emails updates functionalities"""
     access_token: str = ""
@@ -57,7 +58,7 @@ class TestUserEmailsUpdate:
 
         nu = self.get_current_user().json()
         assert len(nu['email']) == 2
-        
+
         email_values = [e['value'] for e in nu['email']]
         assert "ali2@gmail.com" in email_values
 
@@ -84,17 +85,17 @@ class TestUserEmailsUpdate:
         """delete an email"""
         old_me = self.get_current_user().json()
         assert len(old_me["email"]) == 3
-        
+
         old_email_strings = [e['value'] for e in old_me['email']]
         assert "ali2@gmail.com" in old_email_strings
-        
+
         response = client.delete("/users/emails/1", headers={
             "Authorization": f"Bearer {self.access_token}"
         })
         assert response.status_code == 200
-        
+
         me = self.get_current_user().json()
         assert len(me["email"]) == 2
-        
+
         new_email_strings = [e['value'] for e in me['email']]
         assert "ali2@gmail.com" not in new_email_strings
