@@ -2,7 +2,6 @@
 """
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 ORG_PHOTOS_DIR = UPLOAD_DIR / "organizations"

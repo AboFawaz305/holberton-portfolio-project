@@ -5,22 +5,14 @@ import shutil
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List
 
 from bson.objectid import ObjectId
 from constants import GROUPS_RESOURCES_DIR
-from core.Group import Group
 from db import get_engine_db
 from fastapi import Form, UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 
-from api.authentication import AuthUser
-
-from bson. objectid import ObjectId
-from db import get_engine_db
-from fastapi import HTTPException
-from fastapi.routing import APIRouter
 from .authentication import AuthUser
 
 groups = APIRouter(prefix="/groups", tags=["Groups"])
@@ -119,7 +111,7 @@ def get_group_by_id(group_id: str, user: AuthUser):
             str(group["parentGroupId"])
             if group.get("parentGroupId")
             else None
-            ),
+        ),
         "members_count": len(group.get("members", [])),
     }
 
@@ -237,6 +229,8 @@ def add_new_resource_to_a_groupa(
 
 @groups.get("/{gid}/resources")
 def get_resources(gid: str):
+    """Get all resources belonging to a group
+    """
     db = get_engine_db()
 
     try:
