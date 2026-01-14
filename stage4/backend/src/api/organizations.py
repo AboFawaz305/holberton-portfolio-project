@@ -59,7 +59,7 @@ async def create_education_organization(
             "email_domain": form.email_domain,
             "location": form.location,
             "photo_url": photo_url,
-            "users": [],
+            "members": [],
             "messages": [],
             "_banned_users": [],
             "_created_at": current_time,
@@ -79,7 +79,7 @@ def get_all_organization() -> List[Organization]:
 
     orgs_list = []
     for org in orgs_data:
-        user_count = len(org["users"])
+        user_count = len(org["members"])
         orgs_list.append(
             {
                 "organization_id": str(org["_id"]),
@@ -88,7 +88,7 @@ def get_all_organization() -> List[Organization]:
                 "location": org["location"],
                 "photo_url": org["photo_url"],
                 # "messages": org["messages"],
-                "users": org["users"],
+                "members": org["members"],
                 "user_count": user_count,
             }
         )
@@ -118,6 +118,6 @@ def get_organization_by_id(org_id: str) -> Organization:
         "location": org["location"],
         "photo_url": org["photo_url"],
         "messages": org["messages"],
-        "users": org["users"],
-        "user_count": len(org["users"]),
+        "members": org["members"],
+        "user_count": len(org["members"]),
     })

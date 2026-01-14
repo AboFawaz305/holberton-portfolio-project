@@ -1,7 +1,10 @@
 <script>
+import groupsService from '@/services/groupsService'
+
 export default {
   name: 'GroupSideBar',
   props: { org_id: String },
+  emits: ['access-denied'],
   data() {
     return {
       searchQuery: '',
@@ -31,23 +34,22 @@ export default {
       console.log('Fetching for Org ID:', this.org_id)
       this.loading = true
       try {
-        const response = await fetch(`/api/groups/org/${this.org_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        this.groups = data
+        this.groups = await groupsService.getGroupsByOrg(this.org_id)
       } catch (error) {
         console.error('Fetch error:', error)
       } finally {
         this.loading = false
+      }
+    },
+    async onGroupClick(event, groupId) {
+      event.preventDefault() // Stop navigation
+
+      try {
+        await groupsService.getGroupById(groupId)
+
+        this.$router.push(`/groups/${groupId}`)
+      } catch (error) {
+        this.$emit('access-denied', error.message)
       }
     },
   },
@@ -55,13 +57,6 @@ export default {
 </script>
 
 <template>
-  <!-- <v-navigation-drawer -->
-  <!--   width="350" -->
-  <!--   permanent -->
-  <!--   location="right" -->
-  <!--   border="left" -->
-  <!--   class="pa-4 bg-grey-lighten-5" -->
-  <!-- > -->
   <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
 
   <v-text-field
@@ -81,23 +76,22 @@ export default {
     <v-progress-circular indeterminate color="primary"></v-progress-circular>
   </div>
 
-  <v-list v-else bg-color="transparent" class="pa-0">
-    <v-card
-      v-for="group in filteredGroups"
-      :key="group.group_id"
-      :to="`/groups/${group.group_id}`"
-      variant="flat"
-      class="mb-4 college-card"
-      rounded="xl"
-      @click="$emit('select-group', group.group_id)"
-    >
-      <v-list-item class="pa-4">
-        <div class="d-flex flex-column w-100">
-          <div class="d-flex align-center w-100 mb-4">
-            <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
-              <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
-            </v-avatar>
-
+      <v-list v-else bg-color="transparent" class="pa-0">
+      <v-card
+        v-for="group in filteredGroups"
+        :key="group.group_id"
+        variant="flat"
+        class="mb-4 college-card"
+        rounded="xl"
+        @click="onGroupClick($event, group.group_id)"
+      >
+        <v-list-item class="pa-4">
+          <div class="d-flex flex-column w-100">
+            <div class="d-flex align-center w-100 mb-4">
+              <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
+                <v-icon color="indigo-darken-2" size="28">mdi-town-hall</v-icon>
+              </v-avatar>
+              
             <div class="flex-grow-1 text-center">
               <span class="text-subtitle-1 font-weight-bold">
                 {{ group.title }}
@@ -121,7 +115,6 @@ export default {
       لا توجد مجموعات متاحة
     </div>
   </v-list>
-  <!-- </v-navigation-drawer> -->
 </template>
 
 <style scoped>
