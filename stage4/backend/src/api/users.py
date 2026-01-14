@@ -6,6 +6,8 @@ from core.NewPatchUser import NewPatchUser
 from core.UserAddEmailData import UserAddEmailData
 from db import get_engine_db
 from fastapi import APIRouter, HTTPException
+from services.email_service import (generate_verification_token,
+                                    send_verification_email)
 
 from .authentication import AuthUser, password_hash
 
@@ -38,42 +40,43 @@ def patch_update_user(user: AuthUser, new_user: NewPatchUser):
 
 
 @users.post("/emails")
-def add_user_email(user: AuthUser, email: UserAddEmailData):
-    """Add a new email to the user
-    """
+def add_user_email(user: AuthUser, email:  UserAddEmailData):
+    """Add a new email to the user"""
     db = get_engine_db()
-    pipeline = [
-        {"$unwind": "$email"},
-        {
-            "$group": {
-                "_id": None,
-                "emails": {"$addToSet": "$email"}
-            }
-        },
-        {"$project": {"_id": 0, "emails": 1}}
-    ]
 
-    result = list(db.users.aggregate(pipeline))
-    print(result)
-    if email.email in result[0]["emails"]:
+    # Check if email already exists
+    existing = db.users.find_one({"email.value": email.email})
+    if existing:
         raise HTTPException(status_code=422, detail="EMAIL_ALREADY_EXIST")
+
+    # Add email with new structure
     db.users.update_one(
         {"username": user.username},
-        {"$push": {"email": email.email}}
+        {"$push": {"email": {
+            "value": email.email,
+            "is_verified": False
+        }}}
     )
+
+    # Send verification email
+    token = generate_verification_token(email.email)
+    send_verification_email(email.email, token, user.username)
 
 
 @users.delete("/emails/{email_id}")
 def delete_user_email(user: AuthUser, email_id: int):
     """Delete an email from the user
     """
-    if email_id >= len(user.email):
+    if email_id < 0 or email_id >= len(user.email):
         raise HTTPException(status_code=422, detail="EMAIL_DONT_EXIST")
+
     if len(user.email) == 1:
         raise HTTPException(
             status_code=422, detail="DELETE_ALL_EMAILS_NOT_ALLOWED")
+
     db = get_engine_db()
+    email_to_remove = user.email[email_id].value
     db.users.update_one(
         {"username": user.username},
-        {"$pull": {"email": user.email[email_id]}}
+        {"$pull": {"email": {"value": email_to_remove}}}
     )

@@ -1,7 +1,10 @@
 <script>
+import groupsService from '@/services/groupsService'
+
 export default {
   name: 'GroupSideBar',
   props: { org_id: String },
+  emits: ['access-denied'],
   data() {
     return {
       searchQuery: '',
@@ -31,23 +34,22 @@ export default {
       console.log('Fetching for Org ID:', this.org_id)
       this.loading = true
       try {
-        const response = await fetch(`/api/groups/org/${this.org_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        this.groups = data
+        this.groups = this.groups = await groupsService.getGroupsByOrg(this.org_id)
       } catch (error) {
         console.error('Fetch error:', error)
       } finally {
         this.loading = false
+      }
+    },
+    async onGroupClick(event, groupId) {
+      event.preventDefault() // Stop navigation
+
+      try {
+        await groupsService.getGroupById(groupId)
+
+        this.$router.push(`/groups/${groupId}`)
+      } catch (error) {
+        this.$emit('access-denied', error.message)
       }
     },
   },
@@ -85,11 +87,10 @@ export default {
       <v-card
         v-for="group in filteredGroups"
         :key="group.group_id"
-        :to="`/groups/${group.group_id}`"
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"
-        @click="$emit('select-group', group.group_id)"
+        @click="onGroupClick($event, group.group_id)"
       >
         <v-list-item class="pa-4">
           <div class="d-flex flex-column w-100">
