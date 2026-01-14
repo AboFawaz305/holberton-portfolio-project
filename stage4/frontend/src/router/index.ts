@@ -7,6 +7,7 @@ import OrganizationsPage from '@/pages/OrganizationsPage.vue'
 import OrganizationHomePage from '@/pages/OrganizationHomePage.vue'
 import UserProfilePage from '@/pages/UserProfilePage.vue'
 import HomePage from '@/pages/HomePage.vue'
+import GroupsHomePage from '@/pages/GroupsHomePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,12 @@ const router = createRouter({
       component: OrganizationHomePage,
       props: true,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/groups/:id',
+      name: 'group',
+      component: GroupsHomePage,
+      props: true,
     },
     { path: '/profile', component: UserProfilePage, meta: { requiresAuth: true } },
     { path: '/home', component: HomePage },
