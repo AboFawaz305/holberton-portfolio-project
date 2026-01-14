@@ -10,6 +10,7 @@ class UserEmail(BaseModel):
     value: EmailStr
     is_verified: bool = False
 
+
 class User(BaseModel):
     """The representation of a user
     """

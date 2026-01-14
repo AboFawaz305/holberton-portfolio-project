@@ -1,5 +1,4 @@
 <script>
-import authService from '@/services/authService'
 import groupsService from '@/services/groupsService'
 
 export default {

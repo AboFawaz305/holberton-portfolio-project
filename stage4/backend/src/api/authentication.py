@@ -66,7 +66,7 @@ def register_endpoint(user: NewUser):
     is_found = db.users.find_one(
         {"$or": [
             {"username": user.username},
-            {"email.value": user.email} 
+            {"email.value": user.email}
         ]}
     )
     if is_found:
@@ -76,8 +76,8 @@ def register_endpoint(user: NewUser):
         {
             "username": user.username,
             "email": [{
-                "value":user.email,
-                "is_verified":False
+                "value": user.email,
+                "is_verified": False
             }],
             "password": password_hash.hash(user.password),
             "first_name": user.first_name,
@@ -125,6 +125,7 @@ def me_endpoint(user: AuthUser) -> User:
 
     return user
 
+
 @auth.get("/verify-email/{token}")
 def verify_email_endpoint(token: str):
     """verifying user email"""
@@ -139,7 +140,7 @@ def verify_email_endpoint(token: str):
         {"email.value": email},
         {
             "$set": {
-                "email.$.is_verified":True,
+                "email.$.is_verified": True,
             }
         }
     )

@@ -175,7 +175,6 @@ export default {
         <v-btn color="primary" block @click="onDialogClose">حسناً</v-btn>
       </v-card>
     </v-dialog>
-    
   </v-container>
 </template>
 

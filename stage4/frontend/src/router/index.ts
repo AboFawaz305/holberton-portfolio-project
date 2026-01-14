@@ -31,7 +31,7 @@ const router = createRouter({
     { path: '/profile', component: UserProfilePage, meta: { requiresAuth: true } },
     { path: '/home', component: HomePage },
     { path: '/', redirect: '/home' },
-    { path: '/verify-email/:token', component: EmailVerificationPage }
+    { path: '/verify-email/:token', component: EmailVerificationPage },
   ],
 })
 

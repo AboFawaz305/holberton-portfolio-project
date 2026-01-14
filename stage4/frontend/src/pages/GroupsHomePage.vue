@@ -39,14 +39,14 @@ export default {
     async fetchGroupInfo() {
       try {
         const data = await groupsService.getGroupById(this.id)
-        
+
         this.groupName = data.title
         this.orgId = data.org_id
         this.parentGroupId = data.parentGroupId
       } catch (error) {
         console.error('Failed to fetch group:', error.message)
         this.groupName = 'Error loading group'
-        
+
         this.onAccessDenied(error.message)
       }
     },
@@ -72,7 +72,12 @@ export default {
     <h1>{{ groupName }} #</h1>
   </v-card>
   <v-layout>
-    <SubGroupSideBar :group_id="id" :org_id="orgId" :parent_group_id="parentGroupId" @access-denied="onAccessDenied" />
+    <SubGroupSideBar
+      :group_id="id"
+      :org_id="orgId"
+      :parent_group_id="parentGroupId"
+      @access-denied="onAccessDenied"
+    />
 
     <v-main>
       <v-container class="full-page" fluid>

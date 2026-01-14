@@ -50,7 +50,7 @@ export default {
 
       try {
         await groupsService.getGroupById(subGroupId)
-        
+
         this.$router.push(`/groups/${subGroupId}`)
       } catch (error) {
         console.error('Access check failed:', error.message)
@@ -60,13 +60,13 @@ export default {
     handleBack() {
       if (this.parent_group_id) {
         // If we are in a subgroup, go to the Parent Group
-        this.$router.push(`/groups/${this.parent_group_id}`);
+        this.$router.push(`/groups/${this.parent_group_id}`)
       } else if (this.org_id) {
         // If we are in a Main Group (no parent), go to the Organization Home
-        this.$router.push(`/organizations/${this.org_id}`);
+        this.$router.push(`/organizations/${this.org_id}`)
       } else {
         // Fallback if everything fails
-        this.$router.back();
+        this.$router.back()
       }
     },
     goToOrg() {

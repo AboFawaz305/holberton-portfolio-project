@@ -18,7 +18,7 @@ export default {
       host: window.location.host,
       chatKey: 0,
       snackbar: false,
-      snackbarMessage:  '',
+      snackbarMessage: '',
     }
   },
   watch: {

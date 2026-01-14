@@ -10,10 +10,10 @@ export default {
     }
   },
   async mounted() {
-    const token = this.$route.params. token
+    const token = this.$route.params.token
     if (!token) {
       this.errorMessage = 'رابط غير صالح'
-      this. isLoading = false
+      this.isLoading = false
       return
     }
 
@@ -22,6 +22,7 @@ export default {
       this.success = true
     } catch (error) {
       this.errorMessage = 'رابط التحقق غير صالح أو منتهي'
+      console.log(`${error}`)
     } finally {
       this.isLoading = false
     }

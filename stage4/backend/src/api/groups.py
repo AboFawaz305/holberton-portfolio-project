@@ -13,7 +13,6 @@ groups = APIRouter(prefix="/groups", tags=["Groups"])
 
 def check_group_access(user: AuthUser, allowed_domains: list[str]):
     """Check if user can access group based on email domain
-    
     Returns None if access granted, raises HTTPException otherwise
     """
     # No restrictions - allow everyone
@@ -57,24 +56,24 @@ def get_all_groups_in_organization(org_id: str):
         ) from ex
 
     query = {
-    "org_id": org_obj_id,
-    "$or": [
-        {"parentGroupId": {"$exists": False}},
-        {"parentGroupId": None},
-        {"parentGroupId": ""}
-    ]
-}
+        "org_id": org_obj_id,
+        "$or": [
+            {"parentGroupId": {"$exists": False}},
+            {"parentGroupId": None},
+            {"parentGroupId": ""}
+        ]
+    }
 
     groups_data = list(db.groups.find(query))
 
     groups_list = []
     for group in groups_data:
         groups_list.append({
-        "group_id": str(group["_id"]),
-        "title": group["title"],
-        "org_id": str(group.get("org_id", "")),
-        "members_count": len(group.get("members", [])),
-    })
+            "group_id": str(group["_id"]),
+            "title": group["title"],
+            "org_id": str(group.get("org_id", "")),
+            "members_count": len(group.get("members", [])),
+        })
 
     return groups_list
 
@@ -101,7 +100,11 @@ def get_group_by_id(group_id: str, user: AuthUser):
         "group_id": str(group["_id"]),
         "title": group["title"],
         "org_id": str(group.get("org_id", "")),
-        "parentGroupId": str(group["parentGroupId"]) if group.get("parentGroupId") else None,
+        "parentGroupId": (
+            str(group["parentGroupId"])
+            if group.get("parentGroupId")
+            else None
+            ),
         "members_count": len(group.get("members", [])),
     }
 
@@ -132,7 +135,10 @@ def get_subgroups_of_group(group_id: str, user: AuthUser):
     subgroup_obj_ids = []
     for sub_id in subgroup_ids:
         try:
-            subgroup_obj_ids.append(ObjectId(sub_id) if isinstance(sub_id, str) else sub_id)
+            subgroup_obj_ids.append(ObjectId(sub_id)
+                                    if isinstance(sub_id, str)
+                                    else sub_id
+                                    )
         # pylint: disable=broad-exception-caught
         except Exception:
             continue

@@ -6,7 +6,8 @@ from core.NewPatchUser import NewPatchUser
 from core.UserAddEmailData import UserAddEmailData
 from db import get_engine_db
 from fastapi import APIRouter, HTTPException
-from services.email_service import generate_verification_token, send_verification_email
+from services.email_service import (generate_verification_token,
+                                    send_verification_email)
 
 from .authentication import AuthUser, password_hash
 
@@ -68,11 +69,11 @@ def delete_user_email(user: AuthUser, email_id: int):
     """
     if email_id < 0 or email_id >= len(user.email):
         raise HTTPException(status_code=422, detail="EMAIL_DONT_EXIST")
-    
+
     if len(user.email) == 1:
         raise HTTPException(
             status_code=422, detail="DELETE_ALL_EMAILS_NOT_ALLOWED")
-    
+
     db = get_engine_db()
     email_to_remove = user.email[email_id].value
     db.users.update_one(
