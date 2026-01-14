@@ -13,7 +13,7 @@ export default {
     filteredGroups() {
       if (!this.searchQuery) return this.resources
       const query = this.searchQuery.toLowerCase()
-      return this.resources.filter((group) => group.title.toLowerCase().includes(query))
+      return this.resources.filter((resource) => resource.name.toLowerCase().includes(query))
     },
   },
   watch: {
