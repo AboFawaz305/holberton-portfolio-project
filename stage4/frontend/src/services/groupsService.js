@@ -1,3 +1,4 @@
+import authService from '@/services/authService'
 const API_URL = '/api/groups'
 
 const groupsService = {

@@ -55,8 +55,9 @@ export default {
     <h1 start>{{ organizationName }} #</h1>
   </v-card>
   <v-layout>
-    <GroupSideBar :org_id="id" />
-
+    <v-navigation-drawer width="360" permanent>
+      <GroupSideBar class="pa-4" :org_id="id" />
+    </v-navigation-drawer>
     <v-main>
       <v-container class="full-page" fluid>
         <v-row class="top"></v-row>

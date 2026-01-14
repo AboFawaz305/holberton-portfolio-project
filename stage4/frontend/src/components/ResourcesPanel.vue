@@ -1,56 +1,45 @@
 <script>
+import groupsService from '@/services/groupsService'
+import AddResourceButton from '@/components/AddResourceButton.vue'
+
 export default {
-  name: 'GroupSideBar',
-  props: { org_id: String },
+  components: {
+    AddResourceButton,
+  },
+  props: { group_id: String },
   data() {
     return {
       searchQuery: '',
-      groups: [],
+      resources: [],
       loading: false,
     }
   },
   computed: {
     filteredGroups() {
-      if (!this.searchQuery) return this.groups
+      if (!this.searchQuery) return this.resources
       const query = this.searchQuery.toLowerCase()
-      return this.groups.filter((group) => group.title.toLowerCase().includes(query))
+      return this.resources.filter((resource) => resource.name.toLowerCase().includes(query))
     },
   },
-  watch: {
-    org_id: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.fetchGroups()
-        }
-      },
-    },
+  async mounted() {
+    await this.fetchResources()
   },
   methods: {
-    async fetchGroups() {
-      console.log('Fetching for Org ID:', this.org_id)
-      this.loading = true
-      try {
-        const response = await fetch(`/api/groups/org/${this.org_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        this.groups = data
-      } catch (error) {
-        console.error('Fetch error:', error)
-      } finally {
-        this.loading = false
-      }
+    async fetchResources() {
+      this.resources = await groupsService.getAllResources(this.group_id)
+      console.log(this.resources)
     },
   },
+  // watch: {
+  //   group_id: {
+  //     immediate: true,
+  //     handler(newVal) {
+  //       if (newVal) {
+  //         groupsService.getAllResources(this.group_id)
+  //       }
+  //     },
+  //   },
+  // },
 }
 </script>
 
@@ -62,12 +51,12 @@ export default {
   <!--   border="left" -->
   <!--   class="pa-4 bg-grey-lighten-5" -->
   <!-- > -->
-  <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
+  <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">المصادر</h2>
 
   <v-text-field
     v-model="searchQuery"
     variant="outlined"
-    placeholder="ابحث عن كلية..."
+    placeholder="أبحث عن مصدر..."
     prepend-inner-icon="mdi-magnify"
     rounded="lg"
     bg-color="white"
@@ -76,20 +65,20 @@ export default {
     hide-details
     clearable
   ></v-text-field>
+  <AddResourceButton @uploaded="fetchResources" :groupId="group_id" />
 
   <div v-if="loading" class="text-center pa-10">
     <v-progress-circular indeterminate color="primary"></v-progress-circular>
   </div>
 
-  <v-list v-else bg-color="transparent" class="pa-0">
+  <v-list v-else bg-color="transparent" class="pa-0 pt-2">
     <v-card
-      v-for="group in filteredGroups"
-      :key="group.group_id"
-      :to="`/groups/${group.group_id}`"
+      v-for="resource in filteredGroups"
+      :key="resource._id"
       variant="flat"
       class="mb-4 college-card"
       rounded="xl"
-      @click="$emit('select-group', group.group_id)"
+      @click="$emit('select-resource', resource._id)"
     >
       <v-list-item class="pa-4">
         <div class="d-flex flex-column w-100">
@@ -100,11 +89,11 @@ export default {
 
             <div class="flex-grow-1 text-center">
               <span class="text-subtitle-1 font-weight-bold">
-                {{ group.title }}
+                {{ resource.name }}
               </span>
             </div>
 
-            <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} طالب </span>
+            <a target="_blank" :href="resource.file_url">تحميل</a>
           </div>
 
           <v-divider class="mb-3"></v-divider>
@@ -117,9 +106,7 @@ export default {
       </v-list-item>
     </v-card>
 
-    <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
-      لا توجد مجموعات متاحة
-    </div>
+    <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">لا توجد مصادر</div>
   </v-list>
   <!-- </v-navigation-drawer> -->
 </template>

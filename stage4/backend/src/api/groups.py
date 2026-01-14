@@ -4,13 +4,14 @@
 import shutil
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List
 
 from bson.objectid import ObjectId
 from constants import GROUPS_RESOURCES_DIR
 from core.Group import Group
 from db import get_engine_db
-from fastapi import Form, Path, UploadFile
+from fastapi import Form, UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 
@@ -116,7 +117,7 @@ def get_subgroups_of_group(group_id: str):
     return subgroups_list
 
 
-@groups.post("{gid}/resources")
+@groups.post("/{gid}/resources")
 def add_new_resource_to_a_groupa(
     user: AuthUser,
     gid: str,
@@ -160,7 +161,7 @@ def add_new_resource_to_a_groupa(
         shutil.copyfileobj(file.file, buffer)
 
     # Create resource document
-    file_url = f"/api/static/groups/resources/{unique_filename}"
+    file_url = f"/api/{GROUPS_RESOURCES_DIR}/{unique_filename}"
     current_time = datetime.now(timezone.utc)
     new_resource = {
         "_id":  ObjectId(),
@@ -179,7 +180,7 @@ def add_new_resource_to_a_groupa(
     )
 
 
-@groups.get("{gid}/resources")
+@groups.get("/{gid}/resources")
 def get_resources(gid: str):
     db = get_engine_db()
 
@@ -192,4 +193,7 @@ def get_resources(gid: str):
     group = db.groups.find_one({"_id": group_obj_id})
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
-    return group.get("resources")
+    resources = group.get("resources")
+    for r in resources:
+        r["_id"] = str(r["_id"])
+    return resources
