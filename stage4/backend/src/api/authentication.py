@@ -64,9 +64,10 @@ def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
     is_found = db.users.find_one(
-        {"$or": [{"username": {"$eq": user.username}},
-                 {"email": {"$eq": user.email}}
-                 ]}
+        {"$or": [
+            {"username": user.username},
+            {"email.value": user.email} 
+        ]}
     )
     if is_found:
         raise HTTPException(status_code=422, detail="USER_ALREADY_EXIST")
@@ -124,7 +125,7 @@ def me_endpoint(user: AuthUser) -> User:
 
     return user
 
-@auth.get("/verify_email/{token}")
+@auth.get("/verify-email/{token}")
 def verify_email_endpoint(token: str):
     """verifying user email"""
 

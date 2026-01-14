@@ -1,5 +1,6 @@
 <script>
 import authService from '@/services/authService'
+import groupsService from '@/services/groupsService'
 
 export default {
   name: 'GroupSideBar',
@@ -34,19 +35,7 @@ export default {
       console.log('Fetching for Org ID:', this.org_id)
       this.loading = true
       try {
-        const response = await fetch(`/api/groups/org/${this.org_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        this.groups = data
+        this.groups = this.groups = await groupsService.getGroupsByOrg(this.org_id)
       } catch (error) {
         console.error('Fetch error:', error)
       } finally {
@@ -57,20 +46,11 @@ export default {
       event.preventDefault() // Stop navigation
 
       try {
-        const response = await fetch(`/api/groups/${groupId}`, {
-          headers: authService.addAuthHeader(),
-        })
+        await groupsService.getGroupById(groupId)
 
-        if (response.ok) {
-          // Access granted - navigate
-          this.$router.push(`/groups/${groupId}`)
-        } else {
-          // Access denied - emit error to parent
-          const error = await response.json()
-          this.$emit('access-denied', error.detail)
-        }
+        this.$router.push(`/groups/${groupId}`)
       } catch (error) {
-        console.error('Access check failed:', error)
+        this.$emit('access-denied', error.message)
       }
     },
   },
@@ -108,7 +88,6 @@ export default {
       <v-card
         v-for="group in filteredGroups"
         :key="group.group_id"
-        :to="`/groups/${group.group_id}`"
         variant="flat"
         class="mb-4 college-card"
         rounded="xl"

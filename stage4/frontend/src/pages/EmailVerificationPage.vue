@@ -46,7 +46,7 @@ export default {
       <!-- Success -->
       <template v-else-if="success">
         <v-icon color="success" size="64">mdi-check-circle</v-icon>
-        <h3 class="mt-4 mb-6">تم التحقق بنجاح!  🎉</h3>
+        <h3 class="mt-4 mb-6">تم التحقق بنجاح!</h3>
         <v-btn color="primary" block @click="goToLogin">تسجيل الدخول</v-btn>
       </template>
 

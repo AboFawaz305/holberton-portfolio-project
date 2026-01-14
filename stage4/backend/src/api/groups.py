@@ -56,16 +56,25 @@ def get_all_groups_in_organization(org_id: str):
             status_code=400, detail="Invalid org_id format"
         ) from ex
 
-    groups_data = list(db.groups.find({"org_id": org_obj_id}))
+    query = {
+    "org_id": org_obj_id,
+    "$or": [
+        {"parentGroupId": {"$exists": False}},
+        {"parentGroupId": None},
+        {"parentGroupId": ""}
+    ]
+}
+
+    groups_data = list(db.groups.find(query))
 
     groups_list = []
     for group in groups_data:
         groups_list.append({
-            "group_id": str(group["_id"]),
-            "title": group["title"],
-            "org_id": str(group. get("org_id")),
-            "members_count":  len(group.get("members", [])),
-        })
+        "group_id": str(group["_id"]),
+        "title": group["title"],
+        "org_id": str(group.get("org_id", "")),
+        "members_count": len(group.get("members", [])),
+    })
 
     return groups_list
 
@@ -91,13 +100,14 @@ def get_group_by_id(group_id: str, user: AuthUser):
     return {
         "group_id": str(group["_id"]),
         "title": group["title"],
-        "org_id": str(group["org_id"]),
+        "org_id": str(group.get("org_id", "")),
+        "parentGroupId": str(group["parentGroupId"]) if group.get("parentGroupId") else None,
         "members_count": len(group.get("members", [])),
     }
 
 
 @groups.get("/{group_id}/subgroups")
-def get_subgroups_of_group(group_id: str):
+def get_subgroups_of_group(group_id: str, user: AuthUser):
     """Get all subgroups of a group"""
     db = get_engine_db()
 
@@ -112,6 +122,8 @@ def get_subgroups_of_group(group_id: str):
     if not parent_group:
         raise HTTPException(status_code=404, detail="Group not found")
 
+    check_group_access(user, parent_group.get("AllowedEmailDomains", []))
+
     subgroup_ids = parent_group.get("subGroups", [])
 
     if not subgroup_ids:
@@ -120,10 +132,7 @@ def get_subgroups_of_group(group_id: str):
     subgroup_obj_ids = []
     for sub_id in subgroup_ids:
         try:
-            if isinstance(sub_id, str):
-                subgroup_obj_ids.append(ObjectId(sub_id))
-            else:
-                subgroup_obj_ids.append(sub_id)
+            subgroup_obj_ids.append(ObjectId(sub_id) if isinstance(sub_id, str) else sub_id)
         # pylint: disable=broad-exception-caught
         except Exception:
             continue
@@ -133,10 +142,10 @@ def get_subgroups_of_group(group_id: str):
     subgroups_list = []
     for group in subgroups_data:
         subgroups_list.append({
-            "group_id":  str(group["_id"]),
+            "group_id": str(group["_id"]),
             "title": group["title"],
-            "org_id":  str(group["org_id"]),
-            "members_count":  len(group.get("members", [])),
+            "org_id": str(group.get("org_id", "")),
+            "members_count": len(group.get("members", [])),
         })
 
     return subgroups_list

@@ -66,13 +66,16 @@ def add_user_email(user: AuthUser, email:  UserAddEmailData):
 def delete_user_email(user: AuthUser, email_id: int):
     """Delete an email from the user
     """
-    if email_id >= len(user.email):
+    if email_id < 0 or email_id >= len(user.email):
         raise HTTPException(status_code=422, detail="EMAIL_DONT_EXIST")
+    
     if len(user.email) == 1:
         raise HTTPException(
             status_code=422, detail="DELETE_ALL_EMAILS_NOT_ALLOWED")
+    
     db = get_engine_db()
+    email_to_remove = user.email[email_id].value
     db.users.update_one(
         {"username": user.username},
-        {"$pull": {"email": user.email[email_id]}}
+        {"$pull": {"email": {"value": email_to_remove}}}
     )

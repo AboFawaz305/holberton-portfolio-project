@@ -95,9 +95,10 @@ export default {
           this.emailAddError = 'لا تستطيع حذف أخر إيميل لديك'
           return
         }
+        const emailStr = this.user.email[email_id].value
         await usersService.deleteEmail(email_id)
         this.emailAddError = ''
-        this.emailAddSuccess = 'تم حذف تاإيميل ' + this.user.email[email_id] + ' بنجاح'
+        this.emailAddSuccess = 'تم حذف تاإيميل ' + emailStr + ' بنجاح'
         this.refreshUserData()
       } catch (error) {
         this.emailAddSuccess = ''
@@ -225,10 +226,15 @@ export default {
               <v-alert type="error" v-if="emailAddError.length">{{ emailAddError }}</v-alert>
               <v-alert type="success" v-if="emailAddSuccess.length">{{ emailAddSuccess }}</v-alert>
               <v-list>
-                <v-list-item v-for="(email, i) in user.email" :key="i">
-                  <v-btn icon="mdi-delete" @click="deleteEmail(i)"></v-btn>
-                  {{ email }}</v-list-item
-                >
+                <v-list-item v-for="(emailObj, i) in user.email" :key="i">
+                  <v-btn icon="mdi-delete" @click="deleteEmail(i)" color="error" size="small" class="me-2"></v-btn>
+
+                  {{ emailObj.value }}
+
+                  <v-chip size="x-small" :color="emailObj.is_verified ? 'success' : 'warning'" class="ms-2">
+                    {{ emailObj.is_verified ? 'موثق' : 'غير موثق' }}
+                  </v-chip>
+                </v-list-item>
               </v-list>
               <v-form @submit.prevent="onEmailAdd" ref="emailAddForm">
                 <v-text-field

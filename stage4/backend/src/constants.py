@@ -11,6 +11,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
-RESEND_API_KEY = "re_xxxxxxxxxxxx"  # resend API key
-FRONTEND_URL = "http://localhost:5173"
-FROM_EMAIL = "onboarding@resend.dev"  # domain email
+RESEND_API_KEY = "re_fnkgC5DL_NEvg53LA6egUD8fsc31Sbwry"  # resend API key
+FRONTEND_URL = "http://localhost:80"
+FROM_EMAIL = "Atrab <no-reply@atrab.app>"  # domain email
