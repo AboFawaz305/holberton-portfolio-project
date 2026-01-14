@@ -11,6 +11,7 @@ from fastapi import status
 from fastapi.routing import APIRouter
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
+from spam_model import is_spam
 
 chat = APIRouter(prefix="/ws/chat", tags=["chat"])
 manager = ConnectionManager()
@@ -125,6 +126,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
         while True:
             message_text = await websocket.receive_text()
+            if is_spam(message_text):
+                await manager.send_personal_message({
+                    "error": "MESSAGE_IS_SPAM"
+                }, websocket)
+                continue
 
             new_message = {
                 "_id": ObjectId(),

@@ -2,12 +2,14 @@
 import ChatWindow from '@/components/ChatWindow.vue'
 import authService from '@/services/authService'
 import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
+import ResourcesPanel from '@/components/ResourcesPanel.vue'
 import groupsService from '@/services/groupsService'
 
 export default {
   components: {
     ChatWindow,
     SubGroupSideBar,
+    ResourcesPanel,
   },
   props: { id: String },
   data() {
@@ -17,6 +19,7 @@ export default {
       errorMessage: '',
       groupName: 'Loading...',
       orgId: null,
+      tab: 'subgroups',
       parentGroupId: null,
       chatKey: 0,
       snackbar: false,
@@ -71,19 +74,35 @@ export default {
   <v-card flat class="pa-12 text-center gradient-bg">
     <h1>{{ groupName }} #</h1>
   </v-card>
-  <v-layout>
-    <SubGroupSideBar
-      :group_id="id"
-      :org_id="orgId"
-      :parent_group_id="parentGroupId"
-      @access-denied="onAccessDenied"
-    />
 
+  <v-layout>
+    <!-- Sidebar -->
+    <v-navigation-drawer width="360" permanent>
+      <v-tabs v-model="tab" grow>
+        <v-tab value="subgroups">القروبات</v-tab>
+        <v-tab value="resources">المصادر</v-tab>
+      </v-tabs>
+
+      <v-window v-model="tab" class="mt-4">
+        <v-window-item class="pa-4" value="subgroups">
+          <SubGroupSideBar
+            :group_id="id"
+            :org_id="orgId"
+            :parent_group_id="parentGroupId"
+            @access-denied="onAccessDenied"
+          />
+        </v-window-item>
+
+        <v-window-item class="pa-4" value="resources">
+          <ResourcesPanel :group_id="id" />
+        </v-window-item>
+      </v-window>
+    </v-navigation-drawer>
+
+    <!-- Main content -->
     <v-main>
       <v-container class="full-page" fluid>
-        <v-row class="top"></v-row>
-
-        <v-row>
+        <v-row class="top">
           <v-col cols="12">
             <ChatWindow
               :key="chatKey"

@@ -1,11 +1,18 @@
 """Group API endpoints
 """
 
+import shutil
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 
-from bson. objectid import ObjectId
+from bson.objectid import ObjectId
+from constants import GROUPS_RESOURCES_DIR
 from db import get_engine_db
-from fastapi import HTTPException
+from fastapi import Form, UploadFile
+from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+
 from .authentication import AuthUser
 
 groups = APIRouter(prefix="/groups", tags=["Groups"])
@@ -104,7 +111,7 @@ def get_group_by_id(group_id: str, user: AuthUser):
             str(group["parentGroupId"])
             if group.get("parentGroupId")
             else None
-            ),
+        ),
         "members_count": len(group.get("members", [])),
     }
 
@@ -155,3 +162,87 @@ def get_subgroups_of_group(group_id: str, user: AuthUser):
         })
 
     return subgroups_list
+
+
+@groups.post("/{gid}/resources")
+def add_new_resource_to_a_groupa(
+    user: AuthUser,
+    gid: str,
+    name: str = Form(..., min_length=3, max_length=50),
+    file: UploadFile = Form(...),
+    description: str | None = Form(None, max_length=150),
+):
+    """Add a new resource to a group"""
+
+    # Validate group ObjectId format
+    try:
+        group_obj_id = ObjectId(gid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="INVALID_GROUP_ID_FORMAT"
+        ) from ex
+
+    db = get_engine_db()
+
+    # Check if group exists
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="GROUP_NOT_FOUND")
+
+    # Check if user is a member
+    if user.username not in group.get("members", []):
+        raise HTTPException(status_code=403, detail="USER_NOT_A_MEMBER")
+
+    # Generate unique filename:  timestamp_uuid. extension
+    file_extension = Path(file.filename).suffix if file. filename else ""
+    timestamp = int(datetime.now(timezone. utc).timestamp())
+    unique_id = uuid.uuid4().hex
+    unique_filename = f"{timestamp}_{unique_id}{file_extension}"
+
+    # Ensure directory exists
+    GROUPS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Save file to disk
+    file_path = GROUPS_RESOURCES_DIR / unique_filename
+    with file_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # Create resource document
+    file_url = f"/api/{GROUPS_RESOURCES_DIR}/{unique_filename}"
+    current_time = datetime.now(timezone.utc)
+    new_resource = {
+        "_id":  ObjectId(),
+        "name":  name,
+        "description": description,
+        "file_url": file_url,
+        "uploaded_by": user.username,
+        "rating": -1,
+        "_created_at": current_time,
+    }
+
+    # Push resource to group's resources array
+    db.groups.update_one(
+        {"_id": group_obj_id},
+        {"$push":  {"resources": new_resource}}
+    )
+
+
+@groups.get("/{gid}/resources")
+def get_resources(gid: str):
+    """Get all resources belonging to a group
+    """
+    db = get_engine_db()
+
+    try:
+        group_obj_id = ObjectId(gid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="Invalid group_id format") from ex
+
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    resources = group.get("resources")
+    for r in resources:
+        r["_id"] = str(r["_id"])
+    return resources
