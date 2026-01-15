@@ -1,7 +1,7 @@
 <template>
   <div class="d-inline-flex">
     <v-btn color="primary" :loading="loading" :disabled="disabled" @click="onJoinClick">
-      {{ !joined ? 'إنضم إلى المنظمة التعليمية' : 'منضم' }}
+      {{buttonText}}
     </v-btn>
 
     <v-snackbar v-model="snackbar.open" :timeout="4000" :color="snackbar.color" location="bottom">
@@ -26,13 +26,27 @@ export default {
   data() {
     return {
       loading: false,
-      joined: this.initiallyJoined,
+      joined: false,
       snackbar: { open: false, message: '', color: 'success' },
     }
   },
   computed: {
     disabled() {
-      return this.loading || this.joined
+      return this.joined || this.disable
+    },
+    buttonText() {
+      if (this.joined) return 'منضم'
+      return this.isOrg ? 'إنضم إلى المنظمة' : 'إنضم إلى المجموعة'
+    }
+  },
+  watch: {
+    id: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.refreshJoinStatus()
+        }
+      },
     },
   },
   mounted() {
@@ -42,6 +56,22 @@ export default {
     showMsg(message, color = 'success') {
       this.snackbar = { open: true, message, color }
     },
+    async refreshJoinStatus() {
+      // If not logged in, we assume not joined
+      if (!authService.isLoggedIn()) {
+        this.joined = false
+        return
+      }
+
+      try {
+        // Fetch fresh status from backend
+        this.joined = await usersService.isUserJoinedToGroup(this.id, this.isOrg)
+      } catch (err) {
+        console.error('Failed to refresh join status:', err)
+        this.joined = false
+      }
+    },
+
     async onJoinClick() {
       if (!authService.isLoggedIn()) {
         this.showMsg('يرجى تسجيل تادخول', 'warning')
@@ -62,15 +92,18 @@ export default {
         const detail =
           (err && err.response && err.response.data && err.response.data.detail) ||
           err.message ||
-          'فشل الان ضمام'
+          'فشل الانضمام'
         this.showMsg(detail, 'error')
       } finally {
         this.loading = false
       }
     },
-    async refreshJoinStatus() {
-      this.joined = await usersService.isUserJoinedToGroup(this.id, this.isOrg)
-    },
   },
 }
 </script>
+<style scoped>
+
+.v-btn {
+  min-width: 150px;
+}
+</style>

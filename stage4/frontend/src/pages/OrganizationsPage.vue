@@ -157,7 +157,7 @@ export default {
           <v-card-title>{{ org.organization_name }}</v-card-title>
           <v-card-subtitle>
             <v-chip color="teal lighten-5" class="ma-2">{{ org.location }}</v-chip>
-            <v-chip color="orange lighten-5" class="ma-2">{{ org.user_count }} طالب</v-chip>
+            <v-chip color="orange lighten-5" class="ma-2">{{ org.members_count }} طالب</v-chip>
           </v-card-subtitle>
         </v-card>
       </v-col>

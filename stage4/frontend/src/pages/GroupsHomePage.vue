@@ -1,5 +1,6 @@
 <script>
 import ChatWindow from '@/components/ChatWindow.vue'
+import JoinGroupButton from '@/components/JoinGroupButton.vue'
 import authService from '@/services/authService'
 import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
 import ResourcesPanel from '@/components/ResourcesPanel.vue'
@@ -10,6 +11,7 @@ export default {
     ChatWindow,
     SubGroupSideBar,
     ResourcesPanel,
+    JoinGroupButton,
   },
   props: { id: String },
   data() {
@@ -56,6 +58,9 @@ export default {
     updateConnectionStatus(status) {
       this.connectionStatus = status
     },
+    onJoined() {
+      this.chatKey++ 
+    },
     onAccessDenied(errorCode) {
       if (errorCode === 'EMAIL_NOT_VERIFIED') {
         this.snackbarMessage = 'يجب تأكيد بريدك الإلكتروني للوصول لهذه المجموعة'
@@ -73,6 +78,12 @@ export default {
 <template>
   <v-card flat class="pa-12 text-center gradient-bg">
     <h1>{{ groupName }} #</h1>
+    <JoinGroupButton 
+      :id="id" 
+      :isOrg="false" 
+      class="mt-4" 
+      @joined="onJoined"
+    />
   </v-card>
 
   <v-layout>

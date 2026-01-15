@@ -82,18 +82,18 @@ def get_all_organization() -> List[Organization]:
 
     orgs_list = []
     for org in orgs_data:
-        user_count = len(org["members"])
+        member_ids_as_strings = [str(m) for m in org.get("members", [])]
+        user_count = len(member_ids_as_strings)
         orgs_list.append(
-            {
+            Organization(**{
                 "organization_id": str(org["_id"]),
                 "organization_name": org["organization_name"],
                 "email_domain": org["email_domain"],
                 "location": org["location"],
                 "photo_url": org["photo_url"],
-                # "messages": org["messages"],
-                "members": org["members"],
-                "user_count": user_count,
-            }
+                "members": member_ids_as_strings,
+                "members_count": user_count,
+            })
         )
 
     return orgs_list
@@ -114,6 +114,7 @@ def get_organization_by_id(org_id: str) -> Organization:
     if not org:
         raise HTTPException(status_code=404, detail="ORGANIZATION_NOT_FOUND")
 
+    member_ids_as_strings = [str(m) for m in org.get("members", [])]
     return Organization(**{
         "organization_id": str(org["_id"]),
         "organization_name": org["organization_name"],
@@ -121,8 +122,8 @@ def get_organization_by_id(org_id: str) -> Organization:
         "location": org["location"],
         "photo_url": org["photo_url"],
         "messages": org["messages"],
-        "members": org["members"],
-        "user_count": len(org["members"]),
+        "members": member_ids_as_strings,
+        "members_count": len(org["members"]),
     })
 
 
@@ -289,7 +290,7 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                         "in": {
                             "group_id": {"$toString": "$$sg._id"},
                             "title": "$$sg.title",
-                            "admin": "$$sg.admin",
+                            "admin": {"$toString": "$$sg.admin"},
                             "members_count": {"$size": "$$sg.members"},
                         },
                     }

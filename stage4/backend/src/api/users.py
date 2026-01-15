@@ -14,6 +14,8 @@ from .authentication import AuthUser, password_hash
 
 users = APIRouter(prefix="/users", tags=["Users"])
 
+def get_user_obj_id(user):
+    return ObjectId(user.user_id)
 
 @users.patch("")
 def patch_update_user(user: AuthUser, new_user: NewPatchUser):
@@ -88,22 +90,26 @@ def join_group(user: AuthUser, gid: str, is_org: bool):
     """Join a user to a group
     """
     db = get_engine_db()
-    found = True
-    if is_org:
-        found = db.organizations.find_one({"_id": ObjectId(gid)})
-    else:
-        found = db.groups.find_one({"_id": ObjectId(gid)})
-    if not found:
-        raise HTTPException(
-            status_code=422, detail="ORGANIZATION_NOT_FOUND")
-    if user.username in found["members"]:
+    user_obj_id = get_user_obj_id(user)
+
+    # 1. Select collection
+    collection = db.organizations if is_org else db.groups
+    
+    # 2. Find target
+    target = collection.find_one({"_id": ObjectId(gid)})
+    if not target:
+        detail = "ORGANIZATION_NOT_FOUND" if is_org else "GROUP_NOT_FOUND"
+        raise HTTPException(status_code=404, detail=detail)
+
+    # 3. Check membership using ObjectId
+    if user_obj_id in target.get("members", []):
         raise HTTPException(status_code=422, detail="USER_ALREADY_JOINED")
-    if is_org:
-        db.organizations.update_one(
-            {"_id": ObjectId(gid)}, {"$addToSet": {"members": user.username}})
-    else:
-        db.groups.update_one(
-            {"_id": ObjectId(gid)}, {"$addToSet": {"members": user.username}})
+
+    # 4. Perform the Join
+    collection.update_one(
+        {"_id": ObjectId(gid)}, 
+        {"$addToSet": {"members": user_obj_id}}
+    )
 
 
 @users.get("/groups/{gid}/join_status")
@@ -111,14 +117,16 @@ def is_joined_to_group(user: AuthUser, gid: str, is_org: bool):
     """Join a user to a group
     """
     db = get_engine_db()
-    found = True
-    if is_org:
-        found = db.organizations.find_one({"_id": ObjectId(gid)})
-    else:
-        found = db.groups.find_one({"_id": ObjectId(gid)})
-    if not found:
-        raise HTTPException(
-            status_code=422, detail="ORGANIZATION_NOT_FOUND")
-    if user.username in found["members"]:
+    user_obj_id = get_user_obj_id(user)
+
+    collection = db.organizations if is_org else db.groups
+    
+    target = collection.find_one({"_id": ObjectId(gid)})
+    if not target:
+        return {"msg": "no"}
+
+    # Compare ObjectIds
+    if user_obj_id in target.get("members", []):
         return {"msg": "yes"}
+    
     return {"msg": "no"}
