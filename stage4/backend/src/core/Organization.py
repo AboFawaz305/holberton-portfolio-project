@@ -11,5 +11,5 @@ class Organization(BaseModel):
     location: str = Field(min_length=3, max_length=25)
     photo_url: str | None = None
     # messages: list
-    users: list
-    user_count: int
+    members: list
+    members_count: int

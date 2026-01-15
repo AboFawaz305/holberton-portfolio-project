@@ -7,14 +7,15 @@ from typing import List
 
 from bson.objectid import ObjectId
 from constants import ORG_PHOTOS_DIR
+from core.NewGroupData import NewGroupData
 from core.NewOrganizationForm import NewOrganizationForm
 from core.Organization import Organization
 from db import get_engine_db
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+
 from .authentication import AuthUser
-from core.NewGroupData import NewGroupData
 
 orgs = APIRouter(prefix="/organizations", tags=["Organizations"])
 
@@ -61,9 +62,9 @@ async def create_education_organization(
             "email_domain": form.email_domain,
             "location": form.location,
             "photo_url": photo_url,
-            "users": [],
+            "members": [],
             "messages": [],
-            "_banned_users": [],
+            "_banned_members": [],
             "_created_at": current_time,
             "_updated_at": current_time,
         }
@@ -81,7 +82,7 @@ def get_all_organization() -> List[Organization]:
 
     orgs_list = []
     for org in orgs_data:
-        user_count = len(org["users"])
+        user_count = len(org["members"])
         orgs_list.append(
             {
                 "organization_id": str(org["_id"]),
@@ -90,8 +91,8 @@ def get_all_organization() -> List[Organization]:
                 "location": org["location"],
                 "photo_url": org["photo_url"],
                 # "messages": org["messages"],
-                "users": org["users"],
-                "user_count": user_count,
+                "members": org["members"],
+                "members_count": user_count,
             }
         )
 
@@ -120,8 +121,8 @@ def get_organization_by_id(org_id: str) -> Organization:
         "location": org["location"],
         "photo_url": org["photo_url"],
         "messages": org["messages"],
-        "users": org["users"],
-        "user_count": len(org["users"]),
+        "members": org["members"],
+        "members_count": len(org["members"]),
     })
 
 
@@ -206,7 +207,8 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
             }
         )
         if not parent:
-            raise HTTPException(status_code=404, detail="PARENT_GROUP_NOT_FOUND")
+            raise HTTPException(
+                status_code=404, detail="PARENT_GROUP_NOT_FOUND")
 
         # user must be member (entered the group)
         if user.username not in parent.get("members", []):
@@ -221,7 +223,8 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
             }
         )
         if found:
-            raise HTTPException(status_code=422, detail="SUBGROUP_ALREADY_EXIST")
+            raise HTTPException(
+                status_code=422, detail="SUBGROUP_ALREADY_EXIST")
 
         inserted = db.groups.insert_one(
             {
