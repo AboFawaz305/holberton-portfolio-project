@@ -16,6 +16,9 @@ from fastapi.security.oauth2 import (OAuth2PasswordBearer,
                                      OAuth2PasswordRequestForm)
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from pwdlib import PasswordHash
+from services.email_service import (generate_verification_token,
+                                    decode_verification_token,
+                                    send_verification_email)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 auth = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -61,9 +64,10 @@ def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
     is_found = db.users.find_one(
-        {"$or": [{"username": {"$eq": user.username}},
-                 {"email": {"$eq": user.email}}
-                 ]}
+        {"$or": [
+            {"username": user.username},
+            {"email.value": user.email}
+        ]}
     )
     if is_found:
         raise HTTPException(status_code=422, detail="USER_ALREADY_EXIST")
@@ -71,7 +75,10 @@ def register_endpoint(user: NewUser):
     db.users.insert_one(
         {
             "username": user.username,
-            "email": [user.email],
+            "email": [{
+                "value": user.email,
+                "is_verified": False
+            }],
             "password": password_hash.hash(user.password),
             "first_name": user.first_name,
             "last_name": user.last_name,
@@ -79,6 +86,10 @@ def register_endpoint(user: NewUser):
             "_updated_at": current_time,
         }
     )
+    token = generate_verification_token(user.email)
+    send_verification_email(user.email, token, user.username)
+
+    return {"message": "USER_REGISTERED"}
 
 
 @auth.post("/login")
@@ -113,3 +124,28 @@ def me_endpoint(user: AuthUser) -> User:
     """route to return user info"""
 
     return user
+
+
+@auth.get("/verify-email/{token}")
+def verify_email_endpoint(token: str):
+    """verifying user email"""
+
+    email = decode_verification_token(token)
+    if not email:
+        raise HTTPException(status_code=404, detail="INVALID_TOKEN")
+
+    db = get_engine_db()
+
+    result = db.users.update_one(
+        {"email.value": email},
+        {
+            "$set": {
+                "email.$.is_verified": True,
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="EMAIL_NOT_FOUND")
+
+    return {"message": "EMAIL_VERIFIED"}

@@ -44,12 +44,35 @@ export default {
       method: 'DELETE',
       headers: authService.addAuthHeader({}),
     })
-
     if (!response.ok) {
       const error = await response.json()
       throw new Error(error.detail || 'Failed to delete email')
     }
+    // Add a new email to the user's account
+    return await response.json()
+  },
 
+  async joinGroup(id, isOrg) {
+    const response = await fetch(`/api/users/groups/${id}?is_org=${isOrg}`, {
+      method: 'POST',
+      headers: authService.addAuthHeader({}),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to join group')
+    }
     return await response.json() // Return success response
+  },
+
+  async isUserJoinedToGroup(id, isOrg) {
+    const response = await fetch(`/api/users/groups/${id}/join_status?is_org=${isOrg}`, {
+      headers: authService.addAuthHeader({}),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to join group')
+    }
+    const msg = await response.json()
+    return msg['msg'] === 'yes'
   },
 }

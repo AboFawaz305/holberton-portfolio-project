@@ -53,7 +53,7 @@ async def create_education_organization(
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(form.photo.file, buffer)
 
-        photo_url = f"/api/static/organizations/{unique_name}"
+        photo_url = f"/api/api/static/organizations/{unique_name}"
 
     current_time = datetime.now(timezone.utc)
     org_id = db.organizations.insert_one(
@@ -92,7 +92,7 @@ def get_all_organization() -> List[Organization]:
                 "photo_url": org["photo_url"],
                 # "messages": org["messages"],
                 "members": org["members"],
-                "members_count": user_count,
+                "user_count": user_count,
             }
         )
 
@@ -122,7 +122,7 @@ def get_organization_by_id(org_id: str) -> Organization:
         "photo_url": org["photo_url"],
         "messages": org["messages"],
         "members": org["members"],
-        "members_count": len(org["members"]),
+        "user_count": len(org["members"]),
     })
 
 

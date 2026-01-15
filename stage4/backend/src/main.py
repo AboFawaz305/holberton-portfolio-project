@@ -7,12 +7,14 @@ from fastapi.staticfiles import StaticFiles
 
 from api.authentication import auth
 from api.chat import chat
+from api.groups import groups
 from api.organizations import orgs
 from api.users import users
-from api.groups import groups
-from constants import ORG_PHOTOS_DIR, UPLOAD_DIR
+from constants import GROUPS_RESOURCES_DIR, ORG_PHOTOS_DIR, UPLOAD_DIR
 
 ORG_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
+# Add after ORG_PHOTOS_DIR. mkdir(...)
+GROUPS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
 
 load_dotenv("../../.env", verbose=True)
 
