@@ -18,7 +18,7 @@ export default {
       errorMessage: '',
       organizationName: 'Loading...',
       host: window.location.host,
-      isOrg: window.history.state?.isOrg || false,
+      isOrg: true,
       chatKey: 0,
       snackbar: false,
       snackbarMessage: '',

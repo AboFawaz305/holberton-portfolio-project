@@ -12,4 +12,4 @@ class Organization(BaseModel):
     photo_url: str | None = None
     # messages: list
     members: list
-    user_count: int
+    members_count: int

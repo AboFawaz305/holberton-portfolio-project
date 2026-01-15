@@ -92,6 +92,19 @@ const groupsService = {
     if (!response.ok) throw new Error('Failed to fetch resources')
     return response.json()
   },
+
+  async updateAllowedDomains(orgId, groupId, domains) {
+    const response = await fetch(`/api/organizations/${orgId}/groups/${groupId}/domains`, {
+      method: 'PATCH',
+      headers: authService.addAuthHeader({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(domains),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to update domains')
+    }
+    return await response.json()
+  },
 }
 
 export default groupsService

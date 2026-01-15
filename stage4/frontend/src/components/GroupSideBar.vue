@@ -1,8 +1,11 @@
 <script>
 import groupsService from '@/services/groupsService'
+import authService from '@/services/authService'
+import ManageDomainsDialog from '@/components/GroupManageDialog.vue'
 
 export default {
   name: 'GroupSideBar',
+  components: { ManageDomainsDialog },
   props: { org_id: String },
   emits: ['access-denied'],
   data() {
@@ -10,6 +13,19 @@ export default {
       searchQuery: '',
       groups: [],
       loading: false,
+      currentUser: null,
+      domainDialog: {
+        open: false,
+        groupId: null,
+        domains: [],
+      },
+    }
+  },
+  async created() {
+    try {
+      this.currentUser = await authService.getCurrentUser()
+    } catch (error) {
+      console.error('Could not fetch user info:', error)
     }
   },
   computed: {
@@ -17,6 +33,9 @@ export default {
       if (!this.searchQuery) return this.groups
       const query = this.searchQuery.toLowerCase()
       return this.groups.filter((group) => group.title.toLowerCase().includes(query))
+    },
+    currentUserId() {
+      return this.currentUser ? String(this.currentUser.user_id) : null
     },
   },
   watch: {
@@ -40,6 +59,14 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    openSettings(group) {
+      this.domainDialog.groupId = group.group_id
+      this.domainDialog.domains = group.AllowedEmailDomains || []
+      this.domainDialog.open = true
+    },
+    onDomainsSaved() {
+      this.fetchGroups()
     },
     async onGroupClick(event, groupId) {
       event.preventDefault() // Stop navigation
@@ -104,6 +131,25 @@ export default {
           <v-divider class="mb-3"></v-divider>
 
           <div class="d-flex justify-space-between align-center">
+            <div class="d-flex align-center">
+              <v-btn
+                v-if="group.admin === currentUserId"
+                icon="mdi-shield-edit-outline"
+                variant="tonal"
+                color="primary"
+                size="x-small"
+                @click.stop="openSettings(group)"
+              ></v-btn>
+
+              <v-icon
+                v-if="group.AllowedEmailDomains?.length"
+                color="orange-darken-2"
+                size="small"
+                class="ms-2"
+                title="دخول مقيد"
+                >mdi-lock-outline</v-icon
+              >
+            </div>
             <div class="d-flex align-center"></div>
             <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
           </div>
@@ -115,6 +161,14 @@ export default {
       لا توجد مجموعات متاحة
     </div>
   </v-list>
+
+  <ManageDomainsDialog
+    v-model="domainDialog.open"
+    :group-id="domainDialog.groupId"
+    :org-id="org_id"
+    :initial-domains="domainDialog.domains"
+    @saved="onDomainsSaved"
+  />
 </template>
 
 <style scoped>
