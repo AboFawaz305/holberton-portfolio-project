@@ -301,3 +301,32 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
 
     result = list(db.groups.aggregate(pipeline))
     return result[0] if result else {}
+
+
+@orgs.patch("/{org_id}/groups/{gid}/domains")
+def update_group_domains(org_id: str, gid: str,
+                         user: AuthUser, domains: list[str]):
+    """ route to update groups allowed domains"""
+    db = get_engine_db()
+
+    # 1. Find the group
+    group = db.groups.find_one({"_id": ObjectId(gid),
+                                "org_id": ObjectId(org_id)})
+    if not group:
+        raise HTTPException(status_code=404, detail="GROUP_NOT_FOUND")
+
+    # 2. Security: Only admin can change domains
+    if str(group.get("admin")) != user.user_id:
+        raise HTTPException(status_code=403,
+                            detail="ONLY_ADMIN_CAN_EDIT_DOMAINS")
+
+    # 3. Update (Clean whitespace and lower case for consistency)
+    cleaned_domains = [d.strip().lower() for d in domains if d.strip()]
+
+    db.groups.update_one(
+        {"_id": ObjectId(gid)},
+        {"$set": {"AllowedEmailDomains": cleaned_domains,
+                  "_updated_at": datetime.now(timezone.utc)}}
+    )
+
+    return {"msg": "DOMAINS_UPDATED", "domains": cleaned_domains}

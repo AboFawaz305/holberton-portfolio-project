@@ -14,8 +14,11 @@ from .authentication import AuthUser, password_hash
 
 users = APIRouter(prefix="/users", tags=["Users"])
 
+
 def get_user_obj_id(user):
+    """get user obj id from a string"""
     return ObjectId(user.user_id)
+
 
 @users.patch("")
 def patch_update_user(user: AuthUser, new_user: NewPatchUser):
@@ -94,7 +97,7 @@ def join_group(user: AuthUser, gid: str, is_org: bool):
 
     # 1. Select collection
     collection = db.organizations if is_org else db.groups
-    
+
     # 2. Find target
     target = collection.find_one({"_id": ObjectId(gid)})
     if not target:
@@ -107,7 +110,7 @@ def join_group(user: AuthUser, gid: str, is_org: bool):
 
     # 4. Perform the Join
     collection.update_one(
-        {"_id": ObjectId(gid)}, 
+        {"_id": ObjectId(gid)},
         {"$addToSet": {"members": user_obj_id}}
     )
 
@@ -120,7 +123,7 @@ def is_joined_to_group(user: AuthUser, gid: str, is_org: bool):
     user_obj_id = get_user_obj_id(user)
 
     collection = db.organizations if is_org else db.groups
-    
+
     target = collection.find_one({"_id": ObjectId(gid)})
     if not target:
         return {"msg": "no"}
@@ -128,5 +131,5 @@ def is_joined_to_group(user: AuthUser, gid: str, is_org: bool):
     # Compare ObjectIds
     if user_obj_id in target.get("members", []):
         return {"msg": "yes"}
-    
+
     return {"msg": "no"}

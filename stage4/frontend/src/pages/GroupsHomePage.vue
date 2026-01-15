@@ -19,6 +19,7 @@ export default {
       token: authService.getToken(),
       connectionStatus: 'connecting',
       errorMessage: '',
+      groupData: null,
       groupName: 'Loading...',
       orgId: null,
       tab: 'subgroups',
@@ -45,6 +46,7 @@ export default {
       try {
         const data = await groupsService.getGroupById(this.id)
 
+        this.groupData = data
         this.groupName = data.title
         this.orgId = data.org_id
         this.parentGroupId = data.parentGroupId
@@ -59,7 +61,7 @@ export default {
       this.connectionStatus = status
     },
     onJoined() {
-      this.chatKey++ 
+      this.chatKey++
     },
     onAccessDenied(errorCode) {
       if (errorCode === 'EMAIL_NOT_VERIFIED') {
@@ -78,12 +80,7 @@ export default {
 <template>
   <v-card flat class="pa-12 text-center gradient-bg">
     <h1>{{ groupName }} #</h1>
-    <JoinGroupButton 
-      :id="id" 
-      :isOrg="false" 
-      class="mt-4" 
-      @joined="onJoined"
-    />
+    <JoinGroupButton :id="id" :isOrg="false" class="mt-4" @joined="onJoined" />
   </v-card>
 
   <v-layout>
@@ -100,7 +97,9 @@ export default {
             :group_id="id"
             :org_id="orgId"
             :parent_group_id="parentGroupId"
+            :current_group_data="groupData"
             @access-denied="onAccessDenied"
+            @refresh-parent="fetchGroupInfo"
           />
         </v-window-item>
 

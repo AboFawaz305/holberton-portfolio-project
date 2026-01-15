@@ -79,7 +79,9 @@ def get_all_groups_in_organization(org_id: str):
             "group_id": str(group["_id"]),
             "title": group["title"],
             "org_id": str(group.get("org_id", "")),
+            "admin": str(group.get("admin", "")),
             "members_count": len(group.get("members", [])),
+            "AllowedEmailDomains": group.get("AllowedEmailDomains", [])
         })
 
     return groups_list
@@ -101,18 +103,24 @@ def get_group_by_id(group_id: str, user: AuthUser):
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
 
-    check_group_access(user, group.get("AllowedEmailDomains", []))
+    is_admin = str(group.get("admin")) == user.user_id
+
+    if not is_admin:
+        # Only check domains if the user is NOT the admin
+        check_group_access(user, group.get("AllowedEmailDomains", []))
 
     return {
         "group_id": str(group["_id"]),
         "title": group["title"],
         "org_id": str(group.get("org_id", "")),
+        "admin": str(group.get("admin", "")),
         "parentGroupId": (
             str(group["parentGroupId"])
             if group.get("parentGroupId")
             else None
         ),
         "members_count": len(group.get("members", [])),
+        "AllowedEmailDomains": group.get("AllowedEmailDomains", [])
     }
 
 
@@ -158,7 +166,9 @@ def get_subgroups_of_group(group_id: str, user: AuthUser):
             "group_id": str(group["_id"]),
             "title": group["title"],
             "org_id": str(group.get("org_id", "")),
+            "admin": str(group.get("admin", "")),
             "members_count": len(group.get("members", [])),
+            "AllowedEmailDomains": group.get("AllowedEmailDomains", [])
         })
 
     return subgroups_list

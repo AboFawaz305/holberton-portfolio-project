@@ -1,7 +1,7 @@
 <template>
   <div class="d-inline-flex">
     <v-btn color="primary" :loading="loading" :disabled="disabled" @click="onJoinClick">
-      {{buttonText}}
+      {{ buttonText }}
     </v-btn>
 
     <v-snackbar v-model="snackbar.open" :timeout="4000" :color="snackbar.color" location="bottom">
@@ -37,7 +37,7 @@ export default {
     buttonText() {
       if (this.joined) return 'منضم'
       return this.isOrg ? 'إنضم إلى المنظمة' : 'إنضم إلى المجموعة'
-    }
+    },
   },
   watch: {
     id: {
@@ -102,7 +102,6 @@ export default {
 }
 </script>
 <style scoped>
-
 .v-btn {
   min-width: 150px;
 }
