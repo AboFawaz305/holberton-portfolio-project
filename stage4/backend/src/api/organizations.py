@@ -156,13 +156,15 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
 
     current_time = datetime.now(timezone.utc)
 
+    user_obj_id = ObjectId(user.user_id)
+
     # -------------------------
     # CASE A: Create Group in Org
     # -------------------------
     if not new_group.parent_group_id:
         found = db.groups.find_one(
             {
-                "orgId": org_obj_id,
+                "org_id": org_obj_id,
                 "title": title,
                 "parentGroupId": {"$exists": False},
             }
@@ -173,13 +175,13 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
         inserted = db.groups.insert_one(
             {
                 "title": title,
-                "orgId": org_obj_id,
+                "org_id": org_obj_id,
                 "messages": [],
                 "resources": [],
-                "members": [user.username],
+                "members": [user_obj_id],
                 "subGroups": [],
                 "AllowedEmailDomains": [],
-                "admin": user.username,
+                "admin": user_obj_id,
                 "_created_at": current_time,
                 "_updated_at": current_time,
             }
@@ -203,7 +205,7 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
         parent = db.groups.find_one(
             {
                 "_id": parent_obj_id,
-                "orgId": org_obj_id,
+                "org_id": org_obj_id,
             }
         )
         if not parent:
@@ -211,13 +213,13 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                 status_code=404, detail="PARENT_GROUP_NOT_FOUND")
 
         # user must be member (entered the group)
-        if user.username not in parent.get("members", []):
+        if user_obj_id not in parent.get("members", []):
             raise HTTPException(status_code=403, detail="NOT_A_MEMBER")
 
         # unique subgroup title under same parent
         found = db.groups.find_one(
             {
-                "orgId": org_obj_id,
+                "org_id": org_obj_id,
                 "parentGroupId": parent_obj_id,
                 "title": title,
             }
@@ -229,14 +231,14 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
         inserted = db.groups.insert_one(
             {
                 "title": title,
-                "orgId": org_obj_id,
+                "org_id": org_obj_id,
                 "parentGroupId": parent_obj_id,
                 "messages": [],
                 "resources": [],
-                "members": [user.username],
+                "members": [user_obj_id],
                 "subGroups": [],
                 "AllowedEmailDomains": [],
-                "admin": user.username,
+                "admin": user_obj_id,
                 "_created_at": current_time,
                 "_updated_at": current_time,
             }
@@ -270,16 +272,16 @@ def create_group(org_id: str, user: AuthUser, new_group: NewGroupData):
                 "_id": 0,
                 "group_id": {"$toString": "$_id"},
                 "title": 1,
-                "org_id": {"$toString": "$orgId"},
-                "parent_group_id": {
-                    "$cond": [
-                        {"$ifNull": ["$parentGroupId", False]},
-                        {"$toString": "$parentGroupId"},
-                        None,
-                    ]
+                "org_id": {"$toString": "$org_id"},
+                "parent_group_id": {"$toString": "$parentGroupId"},
+                "admin": {"$toString": "$admin"},
+                "members": {
+                    "$map": {
+                        "input": "$members",
+                        "as": "m",
+                        "in": {"$toString": "$$m"}
+                    }
                 },
-                "admin": 1,
-                "members": 1,
                 "subGroups": {
                     "$map": {
                         "input": "$subGroupsData",
