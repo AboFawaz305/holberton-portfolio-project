@@ -31,4 +31,22 @@ const groupsService = {
   },
 }
 
+async createGroup(orgId, groupData) {
+  const groupsService = {
+  async createGroup(orgId, groupData, token) {
+    const response = await fetch(`${API_URL}/organizations/${orgId}/groups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(groupData),
+    })
+
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.detail || 'Failed to create group')
+    return data
+  },
+}
+
 export default groupsService
