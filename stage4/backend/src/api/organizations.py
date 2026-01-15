@@ -53,7 +53,7 @@ async def create_education_organization(
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(form.photo.file, buffer)
 
-        photo_url = f"/api/static/organizations/{unique_name}"
+        photo_url = f"/api/api/static/organizations/{unique_name}"
 
     current_time = datetime.now(timezone.utc)
     org_id = db.organizations.insert_one(

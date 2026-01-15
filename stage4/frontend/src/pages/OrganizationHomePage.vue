@@ -1,12 +1,14 @@
 <script>
-import ChatWindow from '@/components/ChatWindow.vue'
+import ChatWindow from '@/components/ChatWindow.vue' // The child component for chat functionality
+import JoinGroupButton from '@/components/JoinGroupButton.vue' // The child component for chat functionality
 import authService from '@/services/authService'
 import GroupSideBar from '@/components/GroupSideBar.vue'
 
 export default {
   components: {
-    ChatWindow,
     GroupSideBar,
+    ChatWindow, // Make sure the component is registered
+    JoinGroupButton,
   },
   props: { id: String },
   data() {
@@ -16,7 +18,10 @@ export default {
       errorMessage: '',
       organizationName: 'Loading...',
       host: window.location.host,
+      isOrg: window.history.state?.isOrg || false,
       chatKey: 0,
+      snackbar: false,
+      snackbarMessage: '',
     }
   },
   watch: {
@@ -45,6 +50,16 @@ export default {
     updateConnectionStatus(status) {
       this.connectionStatus = status
     },
+    onAccessDenied(errorCode) {
+      if (errorCode === 'EMAIL_NOT_VERIFIED') {
+        this.snackbarMessage = 'يجب تأكيد بريدك الإلكتروني للوصول لهذه المجموعة'
+      } else if (errorCode === 'EMAIL_DOMAIN_NOT_ALLOWED') {
+        this.snackbarMessage = 'بريدك الإلكتروني غير مسموح له بالوصول لهذه المجموعة'
+      } else {
+        this.snackbarMessage = 'لا يمكنك الوصول لهذه المجموعة'
+      }
+      this.snackbar = true
+    },
   },
 }
 </script>
@@ -52,10 +67,12 @@ export default {
 <template>
   <v-card flat class="pa-12 text-center gradient-bg">
     <h1 start>{{ organizationName }} #</h1>
+    <JoinGroupButton :isOrg="isOrg" :id="id" />
   </v-card>
   <v-layout>
-    <GroupSideBar :org_id="id" />
-
+    <v-navigation-drawer width="360" permanent>
+      <GroupSideBar class="pa-4" :org_id="id" @access-denied="onAccessDenied" />
+    </v-navigation-drawer>
     <v-main>
       <v-container class="full-page" fluid>
         <v-row class="top"></v-row>
@@ -75,6 +92,9 @@ export default {
       </v-container>
     </v-main>
   </v-layout>
+  <v-snackbar v-model="snackbar" color="error" timeout="4000">
+    {{ snackbarMessage }}
+  </v-snackbar>
 </template>
 
 <style scoped>

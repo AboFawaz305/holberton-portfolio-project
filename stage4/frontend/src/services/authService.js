@@ -46,6 +46,15 @@ export default {
     return await response.json() // Return user data if registration is successful
   },
 
+  async verifyEmail(token) {
+    const response = await fetch(`/api/auth/verify-email/${token}`)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Verification failed')
+    }
+    return await response.json()
+  },
+
   // Check if the user is logged in
   async isLoggedIn() {
     const token = localStorage.getItem('token')

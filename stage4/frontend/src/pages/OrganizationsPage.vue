@@ -87,6 +87,7 @@ export default {
           path: `/organizations/${org.organization_id}`,
           state: {
             name: org.organization_name,
+            isOrg: true,
           },
         })
       }
