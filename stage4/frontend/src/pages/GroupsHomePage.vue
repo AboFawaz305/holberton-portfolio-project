@@ -32,29 +32,29 @@ export default {
   },
   computed: {
     breadcrumbItems() {
-    const items = [];
+      const items = []
 
-    // 1. Root is the specific Organization Name
-    if (this.orgId) {
-      items.push({
-        title: this.orgName,
-        disabled: false,
-        to: `/organizations/${this.orgId}`,
-      });
-    }
+      // 1. Root is the specific Organization Name
+      if (this.orgId) {
+        items.push({
+          title: this.orgName,
+          disabled: false,
+          to: `/organizations/${this.orgId}`,
+        })
+      }
 
-    // 2. Add each group in the hierarchy path
-    this.breadcrumbChain.forEach((group, index) => {
-      const isLast = index === this.breadcrumbChain.length - 1;
-      items.push({
-        title: group.title,
-        disabled: isLast,
-        to: `/groups/${group.group_id}`,
-      });
-    });
+      // 2. Add each group in the hierarchy path
+      this.breadcrumbChain.forEach((group, index) => {
+        const isLast = index === this.breadcrumbChain.length - 1
+        items.push({
+          title: group.title,
+          disabled: isLast,
+          to: `/groups/${group.group_id}`,
+        })
+      })
 
-    return items;
-  },
+      return items
+    },
   },
   watch: {
     id: {
@@ -73,16 +73,16 @@ export default {
       try {
         const [pathResponse, groupData] = await Promise.all([
           groupsService.getGroupPath(this.id),
-          groupsService.getGroupById(this.id)
-        ]);
+          groupsService.getGroupById(this.id),
+        ])
 
-        this.orgName = pathResponse.org_name;
-        this.breadcrumbChain = pathResponse.path;
+        this.orgName = pathResponse.org_name
+        this.breadcrumbChain = pathResponse.path
 
-        this.groupData = groupData;
-        this.groupName = groupData.title;
-        this.orgId = groupData.org_id;
-        this.parentGroupId = groupData.parentGroupId;
+        this.groupData = groupData
+        this.groupName = groupData.title
+        this.orgId = groupData.org_id
+        this.parentGroupId = groupData.parentGroupId
       } catch (error) {
         console.error('Failed to fetch group:', error.message)
         this.groupName = 'Error loading group'
