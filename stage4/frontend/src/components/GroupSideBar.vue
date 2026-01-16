@@ -4,12 +4,11 @@ import CreateGroupButton from '@/components/CreateGroupButton.vue'
 import authService from '@/services/authService'
 import ManageDomainsDialog from '@/components/GroupManageDialog.vue'
 
-
 export default {
   name: 'GroupSideBar',
-  components: { 
-    ManageDomainsDialog ,
-    CreateGroupButton ,
+  components: {
+    ManageDomainsDialog,
+    CreateGroupButton,
   },
   props: { org_id: String },
   emits: ['access-denied'],
