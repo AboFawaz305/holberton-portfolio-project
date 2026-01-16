@@ -1,23 +1,29 @@
 <template>
-  <v-container id="resources" class="band text-center">
-    <!-- <v-card id="card" class="py-12" flat> -->
+  <v-container fluid class="cta text-center">
     <!-- Title -->
     <h2 class="text-h4 font-weight-bold mb-4">لماذا أتراب؟</h2>
 
     <!-- Subtitle -->
-    <p class="text-subtitle-1">نوفر لك كل ما تحتاجه للتواصل مع زملائك ومشاركة المعرفة</p>
-    <!-- </v-card> -->
+    <p class="text-subtitle-1 mb-8">
+      نوفر لك كل ما تحتاجه للتواصل مع زملائك ومشاركة المعرفة
+    </p>
   </v-container>
 </template>
 
 <script setup></script>
+
 <style scoped>
-#resources {
-  margin: 0;
-  min-width: 100%;
-}
-.band {
-  background: linear-gradient(180deg, #3b90a0, #2f7f90); /* Gradient to match the design */
-  color: #ffffff; /* Light text color for accessibility */
+.cta {
+  width: 100%;
+  padding: 80px 24px;
+
+  background: linear-gradient(
+    to bottom,
+    #04809F 0%,
+    #3F9FB2 50%,
+    #75B9C4 100%
+  );
+
+  color: #ffffff;
 }
 </style>

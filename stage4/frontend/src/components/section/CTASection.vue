@@ -1,13 +1,23 @@
 <template>
-  <v-container class="cta text-center">
+  <v-container fluid class="cta text-center">
     <!-- Title -->
     <h2 class="text-h4 font-weight-bold mb-4">جاهز للبدء؟</h2>
 
     <!-- Subtitle -->
-    <p class="text-subtitle-1 mb-8">انضم إلى آلاف الطلاب الذين يستفيدون من أتراب كل يوم</p>
+    <p class="text-subtitle-1 mb-8">
+      انضم إلى آلاف الطلاب الذين يستفيدون من أتراب كل يوم
+    </p>
 
     <!-- Call-to-Action Button -->
-    <v-btn large color="light" class="px-8 text-grey-darken-4 font-weight-bold"> سجّل الآن </v-btn>
+   <v-btn
+  size="large"
+  class="px-8 font-weight-bold cta-btn"
+  elevation="4"
+  to="/register"
+>
+  سجّل الآن
+</v-btn>
+
   </v-container>
 </template>
 
@@ -15,12 +25,24 @@
 
 <style scoped>
 .cta {
+  width: 100%;
+  padding: 80px 24px;
+
+  /* التدرج من فوق لتحت */
   background: linear-gradient(
-    180deg,
-    #3b90a0,
-    #2f7f90
-  ); /* Gradient background for the CTA section */
-  color: #ffffff; /* Light text color for accessibility */
-  min-width: 100%;
+    to bottom,
+    #04809F 0%,
+    #3F9FB2 50%,
+    #75B9C4 100%
+  );
+
+  color: #ffffff;
+}
+
+/* زر أبيض مثل الصورة */
+.cta-btn {
+  background-color: #ffffff;
+  color: #04809F;
+  border-radius: 12px;
 }
 </style>

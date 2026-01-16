@@ -51,7 +51,7 @@ export default {
 </script>
 
 <template>
-  <v-container class="justify-center">
+<v-container fluid class="justify-center">
     <v-card class="pa-8" outlined>
       <v-form ref="loginForm" @submit.prevent="onSubmit">
         <!-- Title -->
@@ -117,5 +117,85 @@ export default {
 </template>
 
 <style scoped>
-/* Add custom styles if needed */
+/* يغطي الصفحة بالكامل */
+.v-container {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* تدرج ناعم ومريح */
+  background: linear-gradient(
+    180deg,
+    #5fb0be 0%,
+    #6fbac6 45%,
+    #84c7d0 100%
+  );
+}
+
+/* الكارد الرئيسي */
+.v-card {
+  background: #f1f1f1;
+  border-radius: 36px;
+
+  /* حجم مناسب للابتوب */
+  width: 640px;
+  max-width: 92%;
+
+  padding: 56px 48px;
+
+  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.2);
+}
+
+/* العنوان */
+h2 {
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+/* الحقول */
+.v-text-field {
+  margin-bottom: 22px;
+}
+
+.v-text-field .v-field {
+  border-radius: 14px;
+  background: #eaeaea;
+}
+
+/* Checkbox */
+.v-checkbox {
+  margin-top: 18px;
+  margin-bottom: 32px;
+}
+
+/* زر إنشاء حساب */
+.gradient-bg {
+  height: 72px;
+  border-radius: 22px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  background: linear-gradient(
+    90deg,
+    #6fb6c4 0%,
+    #2f6f7c 100%
+  );
+
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.gradient-bg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-bg:active {
+  transform: translateY(0);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+}
 </style>
