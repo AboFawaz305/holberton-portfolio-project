@@ -27,7 +27,34 @@ export default {
       chatKey: 0,
       snackbar: false,
       snackbarMessage: '',
+      breadcrumbChain: [],
     }
+  },
+  computed: {
+    breadcrumbItems() {
+    const items = [];
+
+    // 1. Root is the specific Organization Name
+    if (this.orgId) {
+      items.push({
+        title: this.orgName,
+        disabled: false,
+        to: `/organizations/${this.orgId}`,
+      });
+    }
+
+    // 2. Add each group in the hierarchy path
+    this.breadcrumbChain.forEach((group, index) => {
+      const isLast = index === this.breadcrumbChain.length - 1;
+      items.push({
+        title: group.title,
+        disabled: isLast,
+        to: `/groups/${group.group_id}`,
+      });
+    });
+
+    return items;
+  },
   },
   watch: {
     id: {
@@ -44,12 +71,18 @@ export default {
   methods: {
     async fetchGroupInfo() {
       try {
-        const data = await groupsService.getGroupById(this.id)
+        const [pathResponse, groupData] = await Promise.all([
+          groupsService.getGroupPath(this.id),
+          groupsService.getGroupById(this.id)
+        ]);
 
-        this.groupData = data
-        this.groupName = data.title
-        this.orgId = data.org_id
-        this.parentGroupId = data.parentGroupId
+        this.orgName = pathResponse.org_name;
+        this.breadcrumbChain = pathResponse.path;
+
+        this.groupData = groupData;
+        this.groupName = groupData.title;
+        this.orgId = groupData.org_id;
+        this.parentGroupId = groupData.parentGroupId;
       } catch (error) {
         console.error('Failed to fetch group:', error.message)
         this.groupName = 'Error loading group'
@@ -78,8 +111,14 @@ export default {
 </script>
 
 <template>
-  <v-card flat class="pa-12 text-center gradient-bg">
-    <h1>{{ groupName }} #</h1>
+  <v-card flat class="pa-8 text-center gradient-bg">
+    <v-breadcrumbs :items="breadcrumbItems" class="justify-center mb-4 pa-0">
+      <template v-slot:divider>
+        <v-icon icon="mdi-chevron-left" size="small"></v-icon>
+      </template>
+    </v-breadcrumbs>
+
+    <h1 class="text-h4 font-weight-bold">{{ groupName }} #</h1>
     <JoinGroupButton :id="id" :isOrg="false" class="mt-4" @joined="onJoined" />
   </v-card>
 

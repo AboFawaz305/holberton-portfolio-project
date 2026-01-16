@@ -45,12 +45,7 @@
       </v-card>
     </v-form>
   </v-dialog>
-  <v-snackbar
-    v-model="snackbar.show"
-    :color="snackbar.color"
-    timeout="3000"
-    location="bottom"
-  >
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" location="bottom">
     {{ snackbar.message }}
 
     <template v-slot:actions>
@@ -84,14 +79,11 @@ export default {
       domainRules: [
         (v) => {
           if (!v || v.length === 0) return true
-          
+
           const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i
           const invalidDomains = v.filter((domain) => !domainRegex.test(domain))
 
-          return (
-            invalidDomains.length === 0 ||
-            'بعض النطاقات غير صالحة (مثال: seu.edu.sa)'
-          )
+          return invalidDomains.length === 0 || 'بعض النطاقات غير صالحة (مثال: seu.edu.sa)'
         },
       ],
     }
@@ -120,7 +112,7 @@ export default {
   methods: {
     normalizeDomains(val) {
       if (!val) return
-      this.internalDomains = val.map(d => d.toLowerCase().trim())
+      this.internalDomains = val.map((d) => d.toLowerCase().trim())
     },
     async save() {
       const { valid } = await this.$refs.domainForm.validate()

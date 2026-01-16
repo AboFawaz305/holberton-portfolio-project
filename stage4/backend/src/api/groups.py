@@ -256,3 +256,44 @@ def get_resources(gid: str):
     for r in resources:
         r["_id"] = str(r["_id"])
     return resources
+
+@groups.get("/{group_id}/path")
+def get_group_breadcrumb_path(group_id: str):
+    db = get_engine_db()
+    path = []
+    
+    # 1. Get the current group to find the Org ID
+    group = db.groups.find_one({"_id": ObjectId(group_id)})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    
+    org_id = group.get("org_id")
+    
+    # 2. Fetch the Organization Name (Using the correct field: organization_name)
+    org = db.organizations.find_one(
+        {"_id": ObjectId(org_id)}, 
+        {"organization_name": 1}
+    )
+    org_name = org["organization_name"] if org else "منظمة غير معروفة"
+
+    # 3. Walk up the group tree
+    current_id = ObjectId(group_id)
+    while current_id:
+        g = db.groups.find_one({"_id": current_id}, {"title": 1, "parentGroupId": 1})
+        if not g: 
+            break
+            
+        path.insert(0, {
+            "group_id": str(g["_id"]),
+            "title": g["title"]
+        })
+        
+        parent_id = g.get("parentGroupId")
+        # Ensure we don't loop if parentGroupId is empty string or null
+        current_id = ObjectId(parent_id) if parent_id and parent_id != "" else None
+
+    return {
+        "org_name": org_name,
+        "org_id": str(org_id),
+        "path": path
+    }
