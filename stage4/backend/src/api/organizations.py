@@ -35,7 +35,7 @@ async def create_education_organization(
             status_code=422, detail="Organization already added"
         )
 
-    photo_url = "/api/static/organizations/RR.gif"
+    photo_url = "/api/api/static/organizations/RR.gif"
     if form.photo and form.photo.filename:
 
         if form.photo.content_type not in ["image/jpeg", "image/png",
