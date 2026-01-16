@@ -9,7 +9,7 @@ from pathlib import Path
 from bson.objectid import ObjectId
 from constants import GROUPS_RESOURCES_DIR
 from db import get_engine_db
-from fastapi import Form, UploadFile
+from fastapi import File, Form, UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 
@@ -179,7 +179,7 @@ def add_new_resource_to_a_groupa(
     user: AuthUser,
     gid: str,
     name: str = Form(..., min_length=3, max_length=50),
-    file: UploadFile = Form(...),
+    file: UploadFile = File(...),
     description: str | None = Form(None, max_length=150),
 ):
     """Add a new resource to a group"""
@@ -200,7 +200,7 @@ def add_new_resource_to_a_groupa(
         raise HTTPException(status_code=404, detail="GROUP_NOT_FOUND")
 
     # Check if user is a member
-    if user.username not in group.get("members", []):
+    if ObjectId(user.user_id) not in group.get("members", []):
         raise HTTPException(status_code=403, detail="USER_NOT_A_MEMBER")
 
     # Generate unique filename:  timestamp_uuid. extension
@@ -209,16 +209,13 @@ def add_new_resource_to_a_groupa(
     unique_id = uuid.uuid4().hex
     unique_filename = f"{timestamp}_{unique_id}{file_extension}"
 
-    # Ensure directory exists
-    GROUPS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
-
     # Save file to disk
     file_path = GROUPS_RESOURCES_DIR / unique_filename
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     # Create resource document
-    file_url = f"/api/{GROUPS_RESOURCES_DIR}/{unique_filename}"
+    file_url = f"{GROUPS_RESOURCES_DIR}/{unique_filename}"
     current_time = datetime.now(timezone.utc)
     new_resource = {
         "_id":  ObjectId(),
