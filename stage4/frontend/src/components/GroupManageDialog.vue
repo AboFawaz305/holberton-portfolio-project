@@ -24,6 +24,7 @@
             variant="outlined"
             color="primary"
             prepend-inner-icon="mdi-at"
+            @update:model-value="normalizeDomains"
           ></v-combobox>
         </v-card-text>
 
@@ -77,16 +78,12 @@ export default {
       // Validation Logic
       domainRules: [
         (v) => {
-          if (!v || v.length === 0) return true // Allowed to be empty (public group)
+          if (!v || v.length === 0) return true
 
-          // Regex to check if each entry has a dot and no spaces
-          const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/
+          const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i
           const invalidDomains = v.filter((domain) => !domainRegex.test(domain))
 
-          return (
-            invalidDomains.length === 0 ||
-            'بعض النطاقات غير صالحة (يجب أن تحتوي على . وتكون بدون مسافات)'
-          )
+          return invalidDomains.length === 0 || 'بعض النطاقات غير صالحة (مثال: seu.edu.sa)'
         },
       ],
     }
@@ -113,6 +110,10 @@ export default {
     },
   },
   methods: {
+    normalizeDomains(val) {
+      if (!val) return
+      this.internalDomains = val.map((d) => d.toLowerCase().trim())
+    },
     async save() {
       const { valid } = await this.$refs.domainForm.validate()
       if (!valid || !this.groupId || !this.orgId) return

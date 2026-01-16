@@ -93,6 +93,19 @@ const groupsService = {
     return response.json()
   },
 
+  async getGroupPath(groupId) {
+    const response = await fetch(`${API_URL}/${groupId}/path`, {
+      method: 'GET',
+      headers: authService.addAuthHeader({}),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to fetch group path')
+    }
+    return response.json()
+  },
+
   async updateAllowedDomains(orgId, groupId, domains) {
     const response = await fetch(`/api/organizations/${orgId}/groups/${groupId}/domains`, {
       method: 'PATCH',
