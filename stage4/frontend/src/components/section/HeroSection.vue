@@ -1,7 +1,6 @@
 <template>
   <v-container id="universities" class="hero text-center">
     <v-card class="py-16 px-8" flat>
-
       <!-- Hero Pill -->
       <v-chip color="teal lighten-5" outlined class="mb-4 hero-pill">
         <span class="spark-wrapper">
@@ -18,15 +17,12 @@
 
       <!-- Subtitle -->
       <p class="text-subtitle-1 text-grey-darken-1 mb-6">
-        منصة تجمع طلاب الجامعة في مجموعات حسب المواد، لمشاركة المصادر،
-        تبادل الأسئلة، وبناء بيئة تعلّم تعاونية.
+        منصة تجمع طلاب الجامعة في مجموعات حسب المواد، لمشاركة المصادر، تبادل الأسئلة، وبناء بيئة
+        تعلّم تعاونية.
       </p>
 
       <!-- CTA -->
-      <AppButton to="/register" class="hero-btn">
-        أنضم لنا الآن
-      </AppButton>
-
+      <AppButton to="/register" class="hero-btn"> أنضم لنا الآن </AppButton>
     </v-card>
   </v-container>
 </template>
@@ -75,11 +71,6 @@ import AppButton from '@/components/AppButton.vue'
 /* ---------- CTA Button override (هنا التعديل المهم) ---------- */
 .hero-btn {
   color: #ffffff !important; /* لون النص أبيض */
-  background: linear-gradient(
-    135deg,
-    #04809f 0%,
-    #3f9fb2 50%,
-    #75b9c4 100%
-  ) !important;
+  background: linear-gradient(135deg, #04809f 0%, #3f9fb2 50%, #75b9c4 100%) !important;
 }
 </style>

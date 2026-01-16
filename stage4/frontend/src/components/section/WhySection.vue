@@ -4,9 +4,7 @@
     <h2 class="text-h4 font-weight-bold mb-4">لماذا أتراب؟</h2>
 
     <!-- Subtitle -->
-    <p class="text-subtitle-1 mb-8">
-      نوفر لك كل ما تحتاجه للتواصل مع زملائك ومشاركة المعرفة
-    </p>
+    <p class="text-subtitle-1 mb-8">نوفر لك كل ما تحتاجه للتواصل مع زملائك ومشاركة المعرفة</p>
   </v-container>
 </template>
 
@@ -17,12 +15,7 @@
   width: 100%;
   padding: 80px 24px;
 
-  background: linear-gradient(
-    to bottom,
-    #04809F 0%,
-    #3F9FB2 50%,
-    #75B9C4 100%
-  );
+  background: linear-gradient(to bottom, #04809f 0%, #3f9fb2 50%, #75b9c4 100%);
 
   color: #ffffff;
 }

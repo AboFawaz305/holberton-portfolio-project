@@ -61,11 +61,7 @@ export default {
 <template>
   <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
 
-  <CreateGroupButton
-    :org-id="org_id"
-    class="mb-4"
-    @created="fetchGroups"
-  />
+  <CreateGroupButton :org-id="org_id" class="mb-4" @created="fetchGroups" />
   <v-text-field
     v-model="searchQuery"
     variant="outlined"

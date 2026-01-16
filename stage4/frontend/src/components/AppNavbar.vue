@@ -1,31 +1,16 @@
 <template>
-  <v-app-bar
-    flat
-    height="72"
-    color="white"
-    class="app-navbar"
-  >
+  <v-app-bar flat height="72" color="white" class="app-navbar">
     <v-container class="nav-container">
-
       <!-- يسار: بروفايل + تنبيه (فقط للمسجل دخول) -->
       <div class="nav-left" v-if="isAuthed">
         <!-- ملفك الشخصي -->
-        <v-btn
-          icon
-          class="icon-btn"
-          to="/UserProfilePage"
-        >
+        <v-btn icon class="icon-btn" to="/UserProfilePage">
           <v-icon>mdi-account</v-icon>
         </v-btn>
 
         <!-- الإشعارات -->
         <v-btn icon class="icon-btn">
-          <v-badge
-            dot
-            color="primary"
-            offset-x="6"
-            offset-y="6"
-          >
+          <v-badge dot color="primary" offset-x="6" offset-y="6">
             <v-icon>mdi-bell-outline</v-icon>
           </v-badge>
         </v-btn>
@@ -45,10 +30,7 @@
           class="nav-item"
           :class="{ active: isActive(item.to) }"
         >
-          <v-icon
-            v-if="item.icon"
-            size="18"
-          >
+          <v-icon v-if="item.icon" size="18">
             {{ item.icon }}
           </v-icon>
           <span>{{ item.label }}</span>
@@ -57,7 +39,6 @@
 
       <!-- إذا مو مسجل دخول: فراغ (بس اللوغو ظاهر) -->
       <div v-else class="nav-center-empty"></div>
-
     </v-container>
   </v-app-bar>
 </template>

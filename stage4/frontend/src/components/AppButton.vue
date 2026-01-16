@@ -20,7 +20,9 @@
   align-items: center;
   justify-content: center;
 
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }

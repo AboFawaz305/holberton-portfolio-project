@@ -65,7 +65,7 @@ export default {
 </script>
 
 <template>
-<v-container fluid class="justify-center">
+  <v-container fluid class="justify-center">
     <v-card outlined class="pa-8">
       <v-form ref="registerationForm">
         <!-- Title -->
@@ -189,12 +189,7 @@ export default {
   justify-content: center;
 
   /* تدرج ناعم ومريح */
-  background: linear-gradient(
-    180deg,
-    #5fb0be 0%,
-    #6fbac6 45%,
-    #84c7d0 100%
-  );
+  background: linear-gradient(180deg, #5fb0be 0%, #6fbac6 45%, #84c7d0 100%);
 }
 
 /* الكارد الرئيسي */
@@ -241,11 +236,7 @@ h2 {
   font-size: 20px;
   font-weight: 700;
 
-  background: linear-gradient(
-    90deg,
-    #6fb6c4 0%,
-    #2f6f7c 100%
-  );
+  background: linear-gradient(90deg, #6fb6c4 0%, #2f6f7c 100%);
 
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
