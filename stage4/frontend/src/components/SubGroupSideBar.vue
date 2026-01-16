@@ -1,19 +1,29 @@
 <script>
 import groupsService from '@/services/groupsService'
+import authService from '@/services/authService'
+import GroupManageDialog from '@/components/GroupManageDialog.vue'
 
 export default {
   name: 'SubGroupSideBar',
+  components: { GroupManageDialog },
   props: {
     group_id: String,
     org_id: String,
     parent_group_id: String,
+    current_group_data: Object,
   },
-  emits: ['access-denied'],
+  emits: ['access-denied', 'refresh-parent'],
   data() {
     return {
       searchQuery: '',
       subGroups: [],
       loading: false,
+      currentUser: null,
+      dialog: {
+        open: false,
+        groupId: null,
+        domains: [],
+      },
     }
   },
   computed: {
@@ -21,6 +31,9 @@ export default {
       if (!this.searchQuery) return this.subGroups
       const query = this.searchQuery.toLowerCase()
       return this.subGroups.filter((group) => group.title.toLowerCase().includes(query))
+    },
+    currentUserId() {
+      return this.currentUser ? String(this.currentUser.user_id) : null
     },
   },
   watch: {
@@ -32,6 +45,13 @@ export default {
         }
       },
     },
+  },
+  async created() {
+    try {
+      this.currentUser = await authService.getCurrentUser()
+    } catch (error) {
+      console.error('Auth error:', error)
+    }
   },
   methods: {
     async fetchSubGroups() {
@@ -45,18 +65,31 @@ export default {
         this.loading = false
       }
     },
+    openSubGroupSettings(subgroup) {
+      this.dialog.groupId = subgroup.group_id
+      this.dialog.domains = subgroup.AllowedEmailDomains || []
+      this.dialog.open = true
+    },
+    openCurrentGroupSettings() {
+      if (!this.current_group_data) return
+      this.dialog.groupId = this.current_group_data.group_id
+      this.dialog.domains = this.current_group_data.AllowedEmailDomains || []
+      this.dialog.open = true
+    },
+    onSaved() {
+      this.fetchSubGroups()
+      this.$emit('refresh-parent')
+    },
     async onGroupClick(event, subGroupId) {
       event.preventDefault()
-
       try {
         await groupsService.getGroupById(subGroupId)
-
         this.$router.push(`/groups/${subGroupId}`)
       } catch (error) {
-        console.error('Access check failed:', error.message)
         this.$emit('access-denied', error.message)
       }
     },
+
     handleBack() {
       if (this.parent_group_id) {
         // If we are in a subgroup, go to the Parent Group
@@ -79,7 +112,19 @@ export default {
 </script>
 
 <template>
-  <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">المجموعات</h2>
+  <div class="d-flex align-center justify-space-between mb-4">
+    <h2 class="text-h6 font-weight-bold" style="color: #333">المجموعات</h2>
+
+    <v-btn
+      v-if="current_group_data?.admin === currentUserId"
+      icon="mdi-cog"
+      variant="tonal"
+      size="small"
+      color="primary"
+      @click="openCurrentGroupSettings"
+      title="إعدادات المجموعة الحالية"
+    ></v-btn>
+  </div>
 
   <!-- Navigation buttons -->
   <div class="d-flex mb-4 gap-2">
@@ -119,7 +164,7 @@ export default {
         <div class="d-flex flex-column w-100">
           <div class="d-flex align-center w-100 mb-4">
             <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="elevation-1 ms-3">
-              <v-icon color="indigo-darken-2" size="28">mdi-folder-outline</v-icon>
+              <v-icon color="indigo-darken-2" size="28">mdi-forum</v-icon>
             </v-avatar>
 
             <div class="flex-grow-1 text-center">
@@ -134,7 +179,24 @@ export default {
           <v-divider class="mb-3"></v-divider>
 
           <div class="d-flex justify-space-between align-center">
-            <div class="d-flex align-center"></div>
+            <div class="d-flex align-center">
+              <v-btn
+                v-if="group.admin === currentUserId"
+                icon="mdi-shield-edit-outline"
+                variant="plain"
+                color="primary"
+                size="x-small"
+                @click.stop="openSubGroupSettings(group)"
+              ></v-btn>
+
+              <v-icon
+                v-if="group.AllowedEmailDomains?.length"
+                color="orange-darken-2"
+                size="small"
+                class="ms-2"
+                >mdi-lock-outline</v-icon
+              >
+            </div>
             <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
           </div>
         </div>
@@ -145,6 +207,14 @@ export default {
       لا توجد مجموعات فرعية
     </div>
   </v-list>
+
+  <GroupManageDialog
+    v-model="dialog.open"
+    :group-id="dialog.groupId"
+    :org-id="org_id"
+    :initial-domains="dialog.domains"
+    @saved="onSaved"
+  />
 </template>
 
 <style scoped>
