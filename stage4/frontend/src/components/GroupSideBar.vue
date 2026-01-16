@@ -1,11 +1,15 @@
 <script>
 import groupsService from '@/services/groupsService'
+import CreateGroupButton from '@/components/CreateGroupButton.vue'
 import authService from '@/services/authService'
 import ManageDomainsDialog from '@/components/GroupManageDialog.vue'
 
 export default {
   name: 'GroupSideBar',
-  components: { ManageDomainsDialog },
+  components: {
+    ManageDomainsDialog,
+    CreateGroupButton,
+  },
   props: { org_id: String },
   emits: ['access-denied'],
   data() {
@@ -86,6 +90,7 @@ export default {
 <template>
   <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
 
+  <CreateGroupButton :org-id="org_id" class="mb-4" @created="fetchGroups" />
   <v-text-field
     v-model="searchQuery"
     variant="outlined"
