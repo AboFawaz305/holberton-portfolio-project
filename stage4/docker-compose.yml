@@ -13,6 +13,8 @@ services:
 
   database:
     build: database
+    volumes:
+      - db_data:/data/db
 
   proxy:
     depends_on:
@@ -26,3 +28,4 @@ services:
 
 volumes:
   uploads:
+  db_data:
