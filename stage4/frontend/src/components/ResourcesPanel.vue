@@ -29,6 +29,14 @@ export default {
       this.resources = await groupsService.getAllResources(this.group_id)
       console.log(this.resources)
     },
+    async upvoteResource(resourceId) {
+      await groupsService.upvoteResource(this.group_id, resourceId)
+      await this.fetchResources()
+    },
+    async downvoteResource(resourceId) {
+      await groupsService.downvoteResource(this.group_id, resourceId)
+      await this.fetchResources() 
+    },
   },
   // watch: {
   //   group_id: {
@@ -80,7 +88,6 @@ export default {
       rounded="xl"
       @click="$emit('select-resource', resource._id)"
     >
-    <a target="_blank" :href="resource.file_url">
       <v-list-item class="pa-4">
         <div class="d-flex flex-column w-100">
           <div class="d-flex align-center w-100 mb-4">
@@ -89,6 +96,13 @@ export default {
             </v-avatar>
 
             <div class="flex-grow-1 text-center">
+              <!-- Download button -->
+               <a :href="resource.file_url" target="_blank" rel="noopener">
+                <v-btn color="primary" small rounded="lg">
+                  <v-icon left>mdi-download</v-icon>
+                  تحميل
+                </v-btn>
+              </a>
               <span class="text-subtitle-1 font-weight-bold">
                 {{ resource.name }}
               </span>
@@ -102,16 +116,15 @@ export default {
             <!-- Upvote and downvote buttons -->
              <div class="d-flex align-center justify-center mt-2">
                 <v-btn icon small>
-                  <v-icon @click="groupsService.upvoteResource(group_id, resource._id)" color="green">mdi-thumb-up</v-icon>
+                  <v-icon @click="upvoteResource(resource._id)" color="green">mdi-thumb-up</v-icon>
                 </v-btn>
                 <span class="mx-2">{{ resource.upvotes }}</span>
                 <v-btn icon small>
-                  <v-icon @click="groupsService.downvoteResource(group_id, resource._id)" color="red">mdi-thumb-down</v-icon>
+                  <v-icon @click="downvoteResource(resource._id)" color="red">mdi-thumb-down</v-icon>
                 </v-btn>
                 <span class="mx-2">{{ resource.downvotes }}</span>
               </div>
           </div>
-            </a>
           <v-divider class="mb-3"></v-divider>
 
           <div class="d-flex justify-space-between align-center">
