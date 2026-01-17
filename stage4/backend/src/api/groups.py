@@ -226,7 +226,8 @@ def add_new_resource_to_a_groupa(
         "description": description,
         "file_url": file_url,
         "uploaded_by": user.username,
-        "rating": -1,
+        "upvotes": [],
+        "downvotes": [],
         "_created_at": current_time,
     }
 
@@ -255,6 +256,8 @@ def get_resources(gid: str):
     resources = group.get("resources")
     for r in resources:
         r["_id"] = str(r["_id"])
+        r["upvotes"] = len(r.get("upvotes", []))
+        r["downvotes"] = len(r.get("downvotes", []))
     return resources
 
 
@@ -303,4 +306,116 @@ def get_group_breadcrumb_path(group_id: str):
         "org_name": org_name,
         "org_id": str(org_id),
         "path": path
+    }
+
+# get a resource set and get upvote and downvote endpoints the user must either downvote or upvote but not both and only once each add the user id
+@groups.post("/{gid}/resources/{rid}/upvote")
+def upvote_resource(gid: str, rid: str, user: AuthUser):
+    """Upvote a resource in a group"""
+    db = get_engine_db()
+
+    try:
+        group_obj_id = ObjectId(gid)
+        resource_obj_id = ObjectId(rid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="Invalid ID format"
+        ) from ex
+
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    resource = next(
+        (res for res in group.get("resources", [])
+         if res["_id"] == resource_obj_id),
+        None
+    )
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+
+    user_id = user.user_id
+
+    # Remove downvote if exists
+    db.groups.update_one(
+        {"_id": group_obj_id, "resources._id": resource_obj_id},
+        {"$pull": {"resources.$.downvotes": user_id}}
+    )
+
+    # Add upvote if not already upvoted
+    db.groups.update_one(
+        {"_id": group_obj_id, "resources._id": resource_obj_id},
+        {"$addToSet": {"resources.$.upvotes": user_id}}
+    )
+
+@groups.post("/{gid}/resources/{rid}/downvote")
+def downvote_resource(gid: str, rid: str, user: AuthUser):
+    """Downvote a resource in a group"""
+    db = get_engine_db()
+
+    try:
+        group_obj_id = ObjectId(gid)
+        resource_obj_id = ObjectId(rid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="Invalid ID format"
+        ) from ex
+
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    resource = next(
+        (res for res in group.get("resources", [])
+         if res["_id"] == resource_obj_id),
+        None
+    )
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+
+    user_id = user.user_id
+
+    # Remove upvote if exists
+    db.groups.update_one(
+        {"_id": group_obj_id, "resources._id": resource_obj_id},
+        {"$pull": {"resources.$.upvotes": user_id}}
+    )
+
+    # Add downvote if not already downvoted
+    db.groups.update_one(
+        {"_id": group_obj_id, "resources._id": resource_obj_id},
+        {"$addToSet": {"resources.$.downvotes": user_id}}
+    )
+
+@groups.get("/{gid}/resources/{rid}/votes")
+def get_resource_votes(gid: str, rid: str):
+    """Get upvote and downvote counts for a resource in a group"""
+    db = get_engine_db()
+
+    try:
+        group_obj_id = ObjectId(gid)
+        resource_obj_id = ObjectId(rid)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=400, detail="Invalid ID format"
+        ) from ex
+
+    group = db.groups.find_one({"_id": group_obj_id})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    resource = next(
+        (res for res in group.get("resources", [])
+         if res["_id"] == resource_obj_id),
+        None
+    )
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+
+    upvotes_count = len(resource.get("upvotes", []))
+    downvotes_count = len(resource.get("downvotes", []))
+
+    return {
+        "upvotes": upvotes_count,
+        "downvotes": downvotes_count
     }
