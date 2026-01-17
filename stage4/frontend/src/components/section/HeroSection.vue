@@ -17,25 +17,17 @@
 
       <!-- Subtitle -->
       <p class="text-subtitle-1 text-grey-darken-1 mb-6">
-        منصة تجمع طلاب الجامعة في مجموعات حسب المواد، لمشاركة المصادر، تبادل الأسئلة،
-        وبناء بيئة تعلّم تعاونية.
+        منصة تجمع طلاب الجامعة في مجموعات حسب المواد، لمشاركة المصادر، تبادل الأسئلة، وبناء بيئة
+        تعلّم تعاونية.
       </p>
 
       <!-- CTA Button (بدون AppButton) -->
-      <v-btn
-        to="/register"
-        class="hero-btn"
-        elevation="6"
-        size="large"
-      >
-        انضم لنا الآن
-      </v-btn>
+      <v-btn to="/register" class="hero-btn" elevation="6" size="large"> انضم لنا الآن </v-btn>
     </v-card>
   </v-container>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
 
 <style scoped>
 /* ---------- Hero pill ---------- */
@@ -82,12 +74,7 @@
   padding: 14px 36px;
   font-size: 18px;
 
-  background: linear-gradient(
-    135deg,
-    #04809f 0%,
-    #3f9fb2 50%,
-    #75b9c4 100%
-  ) !important;
+  background: linear-gradient(135deg, #04809f 0%, #3f9fb2 50%, #75b9c4 100%) !important;
 
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
   transition: all 0.2s ease;
@@ -97,5 +84,4 @@
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
 }
-
 </style>

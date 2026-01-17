@@ -1,13 +1,14 @@
 <template>
-  <v-container fluid class="cta text-center">    <!-- Title -->
-   <!-- Title -->
+  <v-container fluid class="cta text-center">
+    <!-- Title -->
+    <!-- Title -->
     <h2 class="text-h4 font-weight-bold mb-4">جاهز للبدء؟</h2>
 
     <!-- Subtitle -->
     <p class="text-subtitle-1 mb-8">انضم إلى آلاف الطلاب الذين يستفيدون من أتراب كل يوم</p>
 
     <!-- Call-to-Action Button -->
-      <v-btn size="large" class="px-8 font-weight-bold cta-btn" elevation="4" to="/register">
+    <v-btn size="large" class="px-8 font-weight-bold cta-btn" elevation="4" to="/register">
       سجّل الآن
     </v-btn>
   </v-container>
