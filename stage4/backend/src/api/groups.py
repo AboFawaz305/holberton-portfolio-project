@@ -140,7 +140,10 @@ def get_subgroups_of_group(group_id: str, user: AuthUser):
     if not parent_group:
         raise HTTPException(status_code=404, detail="Group not found")
 
-    check_group_access(user, parent_group.get("AllowedEmailDomains", []))
+    is_admin = str(parent_group.get("admin")) == user.user_id
+
+    if not is_admin:
+        check_group_access(user, parent_group.get("AllowedEmailDomains", []))
 
     subgroup_ids = parent_group.get("subGroups", [])
 

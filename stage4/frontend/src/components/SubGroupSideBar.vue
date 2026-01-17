@@ -2,10 +2,14 @@
 import groupsService from '@/services/groupsService'
 import authService from '@/services/authService'
 import GroupManageDialog from '@/components/GroupManageDialog.vue'
+import CreateGroupButton from '@/components/CreateGroupButton.vue'
 
 export default {
   name: 'SubGroupSideBar',
-  components: { GroupManageDialog },
+  components: {
+    GroupManageDialog,
+    CreateGroupButton,
+  },
   props: {
     group_id: String,
     org_id: String,
@@ -203,8 +207,16 @@ export default {
       </v-list-item>
     </v-card>
 
-    <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
-      لا توجد مجموعات فرعية
+    <CreateGroupButton
+      :org-id="org_id"
+      :parent-group-id="group_id"
+      button-label="إضافة مجموعة فرعية"
+      @created="fetchSubGroups"
+    />
+
+    <div v-if="filteredGroups.length === 0 && !loading" class="text-center pa-4 text-grey">
+      <v-icon size="40" class="mb-2">mdi-folder-open-outline</v-icon>
+      <p>لا توجد مجموعات متاحة</p>
     </div>
   </v-list>
 

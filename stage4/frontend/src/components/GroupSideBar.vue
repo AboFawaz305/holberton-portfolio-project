@@ -25,13 +25,6 @@ export default {
       },
     }
   },
-  async created() {
-    try {
-      this.currentUser = await authService.getCurrentUser()
-    } catch (error) {
-      console.error('Could not fetch user info:', error)
-    }
-  },
   computed: {
     filteredGroups() {
       if (!this.searchQuery) return this.groups
@@ -51,6 +44,13 @@ export default {
         }
       },
     },
+  },
+  async created() {
+    try {
+      this.currentUser = await authService.getCurrentUser()
+    } catch (error) {
+      console.error('Could not fetch user info:', error)
+    }
   },
   methods: {
     async fetchGroups() {
@@ -90,7 +90,6 @@ export default {
 <template>
   <h2 class="text-h6 mb-4 text-right font-weight-bold" style="color: #333">الكليات</h2>
 
-  <CreateGroupButton :org-id="org_id" class="mb-4" @created="fetchGroups" />
   <v-text-field
     v-model="searchQuery"
     variant="outlined"
@@ -162,8 +161,14 @@ export default {
       </v-list-item>
     </v-card>
 
-    <div v-if="filteredGroups.length === 0" class="text-center pa-4 text-grey">
-      لا توجد مجموعات متاحة
+    <CreateGroupButton :org-id="org_id" button-label="إضافة كلية جديدة" @created="fetchGroups" />
+
+    <div
+      v-if="filteredGroups.length === 0 && !loading"
+      class="text-center pa-8 text-grey-lighten-1"
+    >
+      <v-icon size="48" class="mb-2">mdi-folder-open-outline</v-icon>
+      <p>لا توجد مجموعات متاحة</p>
     </div>
   </v-list>
 
