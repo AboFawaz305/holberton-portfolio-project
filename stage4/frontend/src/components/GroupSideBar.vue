@@ -161,16 +161,15 @@ export default {
       </v-list-item>
     </v-card>
 
-      <CreateGroupButton 
-        :org-id="org_id" 
-        button-label="إضافة كلية جديدة" 
-        @created="fetchGroups" 
-      />
+    <CreateGroupButton :org-id="org_id" button-label="إضافة كلية جديدة" @created="fetchGroups" />
 
-      <div v-if="filteredGroups.length === 0 && !loading" class="text-center pa-8 text-grey-lighten-1">
-        <v-icon size="48" class="mb-2">mdi-folder-open-outline</v-icon>
-        <p>لا توجد مجموعات متاحة</p>
-      </div>
+    <div
+      v-if="filteredGroups.length === 0 && !loading"
+      class="text-center pa-8 text-grey-lighten-1"
+    >
+      <v-icon size="48" class="mb-2">mdi-folder-open-outline</v-icon>
+      <p>لا توجد مجموعات متاحة</p>
+    </div>
   </v-list>
 
   <ManageDomainsDialog

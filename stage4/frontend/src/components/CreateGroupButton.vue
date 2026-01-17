@@ -26,12 +26,14 @@ export default {
     }
   },
   methods: {
-    hideAlert() { this.showAlert = false },
+    hideAlert() {
+      this.showAlert = false
+    },
     closeDialog() {
-      this.dialog = false;
-      this.title = '';
-      this.hideAlert();
-      if (this.$refs.createForm) this.$refs.createForm.resetValidation();
+      this.dialog = false
+      this.title = ''
+      this.hideAlert()
+      if (this.$refs.createForm) this.$refs.createForm.resetValidation()
     },
     async submitForm() {
       const { valid } = await this.$refs.createForm.validate()
@@ -46,26 +48,26 @@ export default {
         }
 
         await groupsService.createGroup(this.orgId, payload)
-        
+
         this.snackbar.message = 'تم إنشاء المجموعة بنجاح'
         this.snackbar.show = true
-        
+
         this.$emit('created')
         this.closeDialog()
       } catch (error) {
         // Map backend errors to simple Arabic messages
         const errorMap = {
-          'GROUP_ALREADY_EXIST': 'اسم المجموعة موجود بالفعل',
-          'SUBGROUP_ALREADY_EXIST': 'اسم المجموعة موجود بالفعل في هذا القسم',
-          'NOT_A_MEMBER': 'ليس لديك صلاحية للإنشاء هنا'
+          GROUP_ALREADY_EXIST: 'اسم المجموعة موجود بالفعل',
+          SUBGROUP_ALREADY_EXIST: 'اسم المجموعة موجود بالفعل في هذا القسم',
+          NOT_A_MEMBER: 'ليس لديك صلاحية للإنشاء هنا',
         }
         this.alertMessage = errorMap[error.message] || 'حدث خطأ غير متوقع'
         this.showAlert = true
       } finally {
         this.isCreating = false
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -129,12 +131,7 @@ export default {
 
           <v-card-actions class="px-0 mt-4">
             <v-spacer />
-            <v-btn 
-              variant="text" 
-              color="grey-darken-1" 
-              @click="closeDialog"
-              :disabled="isCreating"
-            >
+            <v-btn variant="text" color="grey-darken-1" @click="closeDialog" :disabled="isCreating">
               إلغاء
             </v-btn>
             <v-btn
@@ -152,12 +149,7 @@ export default {
       </v-form>
     </v-dialog>
 
-    <v-snackbar 
-      v-model="snackbar.show" 
-      color="success" 
-      location="bottom"
-      rounded="pill"
-    >
+    <v-snackbar v-model="snackbar.show" color="success" location="bottom" rounded="pill">
       <v-icon start>mdi-check-circle</v-icon>
       {{ snackbar.message }}
     </v-snackbar>

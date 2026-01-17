@@ -6,7 +6,7 @@ import CreateGroupButton from '@/components/CreateGroupButton.vue'
 
 export default {
   name: 'SubGroupSideBar',
-  components: { 
+  components: {
     GroupManageDialog,
     CreateGroupButton,
   },
@@ -207,11 +207,11 @@ export default {
       </v-list-item>
     </v-card>
 
-    <CreateGroupButton 
-      :org-id="org_id" 
+    <CreateGroupButton
+      :org-id="org_id"
       :parent-group-id="group_id"
-      button-label="إضافة مجموعة فرعية" 
-      @created="fetchSubGroups" 
+      button-label="إضافة مجموعة فرعية"
+      @created="fetchSubGroups"
     />
 
     <div v-if="filteredGroups.length === 0 && !loading" class="text-center pa-4 text-grey">
