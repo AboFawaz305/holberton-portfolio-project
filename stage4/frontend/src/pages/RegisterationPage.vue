@@ -31,6 +31,9 @@ export default {
   },
   methods: {
     async onSubmit() {
+      this.registerationErrorMessage = ''
+      this.registerationSucccessMessage = ''
+
       const { valid } = await this.$refs.registerationForm.validate()
       if (!valid) return
 
@@ -93,6 +96,7 @@ export default {
                 rounded="lg"
                 class="mb-6"
                 closable
+                @click:close="registerationErrorMessage = ''"
               >
                 {{ registerationErrorMessage }}
               </v-alert>
@@ -105,6 +109,7 @@ export default {
                 variant="tonal"
                 rounded="lg"
                 class="mb-6"
+                @click:close="registerationSucccessMessage = ''"
               >
                 {{ registerationSucccessMessage }}
               </v-alert>
