@@ -154,7 +154,7 @@ export default {
           </div>
 
           <!-- Download Button -->
-          <a :href="resource.file_url" target="_blank" rel="noopener" @click.stop>
+          <a :href="resource.file_url" :download="resource.name" rel="noopener" @click.stop>
             <v-btn 
               color="primary" 
               variant="flat"
