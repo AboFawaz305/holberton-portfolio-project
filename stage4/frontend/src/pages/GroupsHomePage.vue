@@ -20,7 +20,7 @@ export default {
       connectionStatus: 'connecting',
       errorMessage: '',
       groupData: null,
-      groupName: 'Loading...',
+      groupName: '',
       orgId: null,
       tab: 'subgroups',
       parentGroupId: null,
@@ -28,6 +28,7 @@ export default {
       snackbar: false,
       snackbarMessage: '',
       breadcrumbChain: [],
+      loading: true,
     }
   },
   computed: {
@@ -61,7 +62,7 @@ export default {
       immediate: true,
       async handler(newId) {
         if (newId) {
-          this.groupName = 'Loading...'
+          this.groupName = ''
           await this.fetchGroupInfo()
           this.chatKey++
         }
@@ -88,6 +89,8 @@ export default {
         this.groupName = 'Error loading group'
 
         this.onAccessDenied(error.message)
+      } finally {
+        this.loading = false
       }
     },
     updateConnectionStatus(status) {
@@ -111,68 +114,214 @@ export default {
 </script>
 
 <template>
-  <v-card flat class="pa-8 text-center gradient-bg">
-    <v-breadcrumbs :items="breadcrumbItems" class="justify-center mb-4 pa-0">
-      <template v-slot:divider>
-        <v-icon icon="mdi-chevron-left" size="small"></v-icon>
-      </template>
-    </v-breadcrumbs>
+  <div class="main-dashboard-wrapper">
+    <v-card
+      flat
+      class="px-8 py-10 gradient-bg d-flex align-center justify-space-between header-section"
+      rounded="0"
+    >
+      <div class="d-flex flex-column align-start" style="min-width: 320px">
+        <template v-if="loading">
+          <v-skeleton-loader
+            type="text"
+            width="180"
+            bg-color="transparent"
+            class="mb-2 opacity-50"
+          ></v-skeleton-loader>
+          <v-skeleton-loader type="heading" width="250" bg-color="transparent"></v-skeleton-loader>
+        </template>
 
-    <h1 class="text-h4 font-weight-bold">{{ groupName }} #</h1>
-    <JoinGroupButton :id="id" :isOrg="false" class="mt-4" @joined="onJoined" />
-  </v-card>
+        <template v-else>
+          <v-breadcrumbs :items="breadcrumbItems" class="pa-0 mb-2 text-white opacity-70">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-left" size="small" color="white"></v-icon>
+            </template>
+          </v-breadcrumbs>
 
-  <v-layout>
-    <!-- Sidebar -->
-    <v-navigation-drawer width="360" permanent>
-      <v-tabs v-model="tab" grow>
-        <v-tab value="subgroups">القروبات</v-tab>
-        <v-tab value="resources">المصادر</v-tab>
-      </v-tabs>
+          <h1 class="text-h3 font-weight-bold text-white">
+            <span class="opacity-50 text-h4 ms-2">#</span>{{ groupName }}
+          </h1>
+        </template>
+      </div>
 
-      <v-window v-model="tab" class="mt-4">
-        <v-window-item class="pa-4" value="subgroups">
-          <SubGroupSideBar
-            :group_id="id"
-            :org_id="orgId"
-            :parent_group_id="parentGroupId"
-            :current_group_data="groupData"
-            @access-denied="onAccessDenied"
-            @refresh-parent="fetchGroupInfo"
-          />
-        </v-window-item>
+      <div class="d-flex flex-column align-center flex-grow-1">
+        <template v-if="loading">
+          <v-skeleton-loader
+            type="avatar"
+            size="70"
+            bg-color="transparent"
+            class="mb-4 opacity-30"
+          ></v-skeleton-loader>
+          <v-skeleton-loader type="button" width="120" bg-color="transparent"></v-skeleton-loader>
+        </template>
+        <template v-else>
+          <v-icon color="white" size="70" class="opacity-70 mb-4">mdi-account-group-outline</v-icon>
+          <JoinGroupButton :id="id" :isOrg="false" @joined="onJoined" />
+        </template>
+      </div>
 
-        <v-window-item class="pa-4" value="resources">
-          <ResourcesPanel :group_id="id" />
-        </v-window-item>
-      </v-window>
-    </v-navigation-drawer>
+      <div style="min-width: 320px"></div>
+    </v-card>
 
-    <!-- Main content -->
-    <v-main>
-      <v-container class="full-page" fluid>
-        <v-row class="top">
-          <v-col cols="12">
+    <v-layout class="flex-grow-1 page-background overflow-hidden" style="min-height: 0">
+      <v-navigation-drawer
+        width="400"
+        permanent
+        elevation="0"
+        class="sidebar-border"
+        color="#f8fafd"
+        style="direction: ltr"
+      >
+        <div class="d-flex flex-column h-100 overflow-hidden" style="direction: rtl; min-height: 0">
+          <v-tabs
+            v-model="tab"
+            grow
+            color="primary"
+            class="flex-shrink-0 border-b"
+            height="48"
+            density="compact"
+          >
+            <v-tab value="subgroups">القروبات</v-tab>
+            <v-tab value="resources">المصادر</v-tab>
+          </v-tabs>
+
+          <div class="flex-grow-1 overflow-hidden" style="min-height: 0; position: relative">
+            <v-window
+              v-model="tab"
+              :touch="false"
+              :transition="false"
+              :reverse-transition="false"
+              class="h-100 sidebar-scroll-container overflow-y-auto"
+            >
+              <v-window-item value="subgroups" class="h-100 pa-6" style="direction: rtl">
+                <SubGroupSideBar
+                  :group_id="id"
+                  :org_id="orgId"
+                  :parent_group_id="parentGroupId"
+                  :current_group_data="groupData"
+                  @access-denied="onAccessDenied"
+                  @refresh-parent="fetchGroupInfo"
+                />
+              </v-window-item>
+
+              <v-window-item value="resources" class="h-100 pa-6" style="direction: rtl">
+                <ResourcesPanel :group_id="id" />
+              </v-window-item>
+            </v-window>
+          </div>
+        </div>
+      </v-navigation-drawer>
+
+      <v-main class="flex-grow-1 d-flex flex-column overflow-hidden" style="min-height: 0">
+        <v-container fluid class="pa-6 pb-12 d-flex flex-column flex-grow-1" style="min-height: 0">
+          <div
+            class="chat-outer-box bg-white rounded-xl layered-shadow overflow-hidden flex-grow-1 d-flex flex-column"
+          >
             <ChatWindow
+              class="h-100"
               :key="chatKey"
               :id="id"
               :token="token"
               :isOrg="false"
               @status-update="updateConnectionStatus"
             />
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </v-layout>
+          </div>
+        </v-container>
+      </v-main>
+    </v-layout>
+  </div>
 
-  <v-snackbar v-model="snackbar" color="error" timeout="4000">
+  <v-snackbar v-model="snackbar" color="error" timeout="4000" rounded="pill">
+    <v-icon start>mdi-alert-circle-outline</v-icon>
     {{ snackbarMessage }}
   </v-snackbar>
 </template>
 
 <style scoped>
-.full-page {
-  height: 100vh;
+.main-dashboard-wrapper {
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header-section {
+  flex: 0 0 250px;
+  z-index: 10;
+}
+
+.page-background {
+  background-color: #f4f7fa;
+}
+
+.sidebar-border {
+  border-inline-end: 1px solid #edf2f7 !important;
+}
+
+.chat-outer-box {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+}
+.sidebar-scroll-container:hover::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+}
+
+:deep(.v-skeleton-loader) {
+  background: transparent !important;
+}
+
+.v-window::-webkit-scrollbar {
+  width: 6px;
+}
+.v-window::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+}
+.v-window:hover::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+}
+
+:deep(.v-slide-group__container) {
+  height: 48px !important;
+  min-height: 48px !important;
+}
+
+:deep(.v-slide-group__wrapper) {
+  height: 48px !important;
+}
+
+.v-tabs {
+  max-height: 48px !important;
+  flex: 0 0 48px !important;
+  border-bottom: 1px solid #edf2f7 !important;
+}
+
+:deep(.v-window__container) {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.v-window {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.opacity-30 {
+  opacity: 0.3;
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+.opacity-70 {
+  opacity: 0.7;
 }
 </style>

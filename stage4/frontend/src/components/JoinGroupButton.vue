@@ -1,13 +1,41 @@
+To make this snackbar match the "premium" look we've established in your OrgHome and GroupHome
+pages, we need to add the rounded="pill" attribute and include an icon that changes based on the
+message type (success or error). Updated JoinGroupButton.vue Here is the updated template. I’ve
+added the pill shape and a dynamic icon section to ensure it feels consistent with your other
+alerts. Code snippet
+
 <template>
   <div class="d-inline-flex">
-    <v-btn color="primary" :loading="loading" :disabled="disabled" @click="onJoinClick">
+    <v-btn
+      color="primary"
+      :loading="loading"
+      :disabled="disabled"
+      @click="onJoinClick"
+      rounded="lg"
+      elevation="2"
+    >
       {{ buttonText }}
     </v-btn>
 
-    <v-snackbar v-model="snackbar.open" :timeout="4000" :color="snackbar.color" location="bottom">
-      {{ snackbar.message }}
+    <v-snackbar
+      v-model="snackbar.open"
+      :timeout="4000"
+      :color="snackbar.color"
+      rounded="pill"
+      elevation="24"
+    >
+      <div class="d-flex align-center">
+        <v-icon start class="me-2">
+          {{ snackbar.color === 'error' ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline' }}
+        </v-icon>
+
+        <span class="text-body-2 font-weight-medium">
+          {{ snackbar.message }}
+        </span>
+      </div>
+
       <template #actions>
-        <v-btn variant="text" @click="snackbar.open = false">إغلاق</v-btn>
+        <v-btn variant="text" density="comfortable" @click="snackbar.open = false"> إغلاق </v-btn>
       </template>
     </v-snackbar>
   </div>

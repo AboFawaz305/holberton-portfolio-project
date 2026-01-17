@@ -171,7 +171,8 @@ export default {
                     size="small"
                     class="ms-2"
                     title="دخول مقيد"
-                  >mdi-lock-outline</v-icon>
+                    >mdi-lock-outline</v-icon
+                  >
                 </div>
                 <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
               </div>
@@ -180,7 +181,11 @@ export default {
         </v-card>
 
         <div class="mt-2">
-          <CreateGroupButton :org-id="org_id" button-label="إضافة قسم جديدة" @created="fetchGroups" />
+          <CreateGroupButton
+            :org-id="org_id"
+            button-label="إضافة قسم جديد"
+            @created="fetchGroups"
+          />
         </div>
 
         <div
@@ -205,7 +210,7 @@ export default {
 
 <style scoped>
 .sidebar-main-wrapper {
-  padding: 0 8px; 
+  padding: 0 8px;
 }
 
 .groups-list-wrapper {
@@ -214,9 +219,10 @@ export default {
 
 .college-card {
   border: 1px solid #ececec !important;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-              border-color 0.2s ease;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s ease;
   cursor: pointer;
   position: relative;
   z-index: 1;
