@@ -35,7 +35,7 @@ export default {
     },
     async downvoteResource(resourceId) {
       await groupsService.downvoteResource(this.group_id, resourceId)
-      await this.fetchResources() 
+      await this.fetchResources()
     },
   },
   // watch: {
@@ -97,7 +97,7 @@ export default {
 
             <div class="flex-grow-1 text-center">
               <!-- Download button -->
-               <a :href="resource.file_url" target="_blank" rel="noopener">
+              <a :href="resource.file_url" target="_blank" rel="noopener">
                 <v-btn color="primary" small rounded="lg">
                   <v-icon left>mdi-download</v-icon>
                   تحميل
@@ -107,29 +107,30 @@ export default {
                 {{ resource.name }}
               </span>
               <!-- description -->
-               <div class="text-body-2 text-grey-darken-1">
+              <div class="text-body-2 text-grey-darken-1">
                 {{ resource.description }}
               </div>
-              <div class="text-body-2 text-grey-darken-1">
-                بواسطة {{ resource.uploaded_by }}
-            </div>
-            <!-- Upvote and downvote buttons -->
-             <div class="d-flex align-center justify-center mt-2">
+              <div class="text-body-2 text-grey-darken-1">بواسطة {{ resource.uploaded_by }}</div>
+              <!-- Upvote and downvote buttons -->
+              <div class="d-flex align-center justify-center mt-2">
                 <v-btn icon small>
                   <v-icon @click="upvoteResource(resource._id)" color="green">mdi-thumb-up</v-icon>
                 </v-btn>
                 <span class="mx-2">{{ resource.upvotes }}</span>
                 <v-btn icon small>
-                  <v-icon @click="downvoteResource(resource._id)" color="red">mdi-thumb-down</v-icon>
+                  <v-icon @click="downvoteResource(resource._id)" color="red"
+                    >mdi-thumb-down</v-icon
+                  >
                 </v-btn>
                 <span class="mx-2">{{ resource.downvotes }}</span>
               </div>
-          </div>
-          <v-divider class="mb-3"></v-divider>
+            </div>
+            <v-divider class="mb-3"></v-divider>
 
-          <div class="d-flex justify-space-between align-center">
-            <div class="d-flex align-center"></div>
-            <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
+            <div class="d-flex justify-space-between align-center">
+              <div class="d-flex align-center"></div>
+              <v-icon color="grey-lighten-1" size="small">mdi-chevron-left</v-icon>
+            </div>
           </div>
         </div>
       </v-list-item>
