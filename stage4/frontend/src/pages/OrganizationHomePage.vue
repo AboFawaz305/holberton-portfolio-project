@@ -87,7 +87,7 @@ export default {
       </div>
 
       <div class="d-flex flex-column align-center flex-grow-1">
-        <v-icon color="white" size="70" class="opacity-70 mb-4">mdi-school-outline</v-icon>
+        <v-icon color="white" size="70" class="opacity-90 mb-4">mdi-school-outline</v-icon>
         <JoinGroupButton :isOrg="isOrg" :id="id" />
       </div>
 
@@ -164,6 +164,10 @@ export default {
 }
 .opacity-70 {
   opacity: 0.7;
+}
+
+.opacity-90 {
+  opacity: 0.9;
 }
 
 .sidebar-scroll-container {

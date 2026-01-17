@@ -93,6 +93,15 @@ export default {
         this.loading = false
       }
     },
+    handleBack() {
+      if (this.parentGroupId) {
+        this.$router.push(`/groups/${this.parentGroupId}`)
+      } else if (this.orgId) {
+        this.$router.push(`/organizations/${this.orgId}`)
+      } else {
+        this.$router.back()
+      }
+    },
     updateConnectionStatus(status) {
       this.connectionStatus = status
     },
@@ -132,6 +141,16 @@ export default {
         </template>
 
         <template v-else>
+          <!-- <v-btn
+            variant="text"
+            color="white"
+            prepend-icon="mdi-arrow-right"
+            class="pa-0 mb-1 back-btn-header"
+            density="compact"
+            @click="handleBack"
+          >
+          </v-btn> -->
+
           <v-breadcrumbs :items="breadcrumbItems" class="pa-0 mb-2 text-white opacity-70">
             <template v-slot:divider>
               <v-icon icon="mdi-chevron-left" size="small" color="white"></v-icon>
