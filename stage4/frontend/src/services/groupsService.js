@@ -144,8 +144,8 @@ const groupsService = {
     }
     return response.json()
   },
-  
-  async downvoteResource(gid, rid) { 
+
+  async downvoteResource(gid, rid) {
     const response = await fetch(`${API_URL}/${gid}/resources/${rid}/downvote`, {
       method: 'POST',
       headers: authService.addAuthHeader({}),

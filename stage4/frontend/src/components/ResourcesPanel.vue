@@ -17,13 +17,13 @@ export default {
   computed: {
     filteredGroups() {
       let filtered = this.resources
-      
+
       // Filter by search query if present
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase()
         filtered = filtered.filter((resource) => resource.name.toLowerCase().includes(query))
       }
-      
+
       // Sort by net votes (upvotes - downvotes) in descending order
       return filtered.slice().sort((a, b) => {
         const netVotesA = (a.upvotes || 0) - (a.downvotes || 0)
@@ -101,15 +101,10 @@ export default {
       <v-card-text class="pa-4">
         <!-- Header Section -->
         <div class="d-flex align-start mb-3">
-          <v-avatar 
-            color="primary" 
-            size="56" 
-            rounded="lg" 
-            class="elevation-2"
-          >
+          <v-avatar color="primary" size="56" rounded="lg" class="elevation-2">
             <v-icon color="white" size="32">mdi-file-document</v-icon>
           </v-avatar>
-          
+
           <div class="flex-grow-1 mr-4">
             <h3 class="text-h6 font-weight-bold mb-1 text-right">
               {{ resource.name }}
@@ -140,7 +135,7 @@ export default {
               <v-icon size="18" class="ml-1">mdi-thumb-up</v-icon>
               {{ resource.upvotes }}
             </v-btn>
-            
+
             <v-btn
               size="small"
               variant="tonal"
@@ -155,13 +150,7 @@ export default {
 
           <!-- Download Button -->
           <a :href="resource.file_url" :download="resource.name" rel="noopener" @click.stop>
-            <v-btn 
-              color="primary" 
-              variant="flat"
-              size="default"
-              rounded="lg"
-              class="download-btn"
-            >
+            <v-btn color="primary" variant="flat" size="default" rounded="lg" class="download-btn">
               <v-icon class="ml-2">mdi-download</v-icon>
               تحميل
             </v-btn>

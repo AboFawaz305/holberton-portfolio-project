@@ -300,13 +300,14 @@ def get_group_breadcrumb_path(group_id: str):
             ObjectId(parent_id)
             if parent_id and parent_id != ""
             else None
-            )
+        )
 
     return {
         "org_name": org_name,
         "org_id": str(org_id),
         "path": path
     }
+
 
 @groups.post("/{gid}/resources/{rid}/upvote")
 def upvote_resource(gid: str, rid: str, user: AuthUser):
@@ -357,6 +358,7 @@ def upvote_resource(gid: str, rid: str, user: AuthUser):
             {"$addToSet": {"resources.$.upvotes": user_id}}
         )
 
+
 @groups.post("/{gid}/resources/{rid}/downvote")
 def downvote_resource(gid: str, rid: str, user: AuthUser):
     """Downvote a resource in a group"""
@@ -405,6 +407,7 @@ def downvote_resource(gid: str, rid: str, user: AuthUser):
             {"_id": group_obj_id, "resources._id": resource_obj_id},
             {"$addToSet": {"resources.$.downvotes": user_id}}
         )
+
 
 @groups.get("/{gid}/resources/{rid}/votes")
 def get_resource_votes(gid: str, rid: str):

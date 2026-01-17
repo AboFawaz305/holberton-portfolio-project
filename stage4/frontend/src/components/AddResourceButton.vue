@@ -160,9 +160,7 @@ export default {
         <v-avatar color="primary" size="40" class="mb-2 shadow-sm">
           <v-icon color="white" size="24">mdi-plus</v-icon>
         </v-avatar>
-        <div class="text-subtitle-2 font-weight-bold text-primary">
-          إضافة مصدر
-        </div>
+        <div class="text-subtitle-2 font-weight-bold text-primary">إضافة مصدر</div>
       </div>
     </v-card>
 
