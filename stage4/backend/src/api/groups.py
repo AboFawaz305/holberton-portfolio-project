@@ -308,7 +308,6 @@ def get_group_breadcrumb_path(group_id: str):
         "path": path
     }
 
-# get a resource set and get upvote and downvote endpoints the user must either downvote or upvote but not both and only once each add the user id
 @groups.post("/{gid}/resources/{rid}/upvote")
 def upvote_resource(gid: str, rid: str, user: AuthUser):
     """Upvote a resource in a group"""
@@ -336,17 +335,27 @@ def upvote_resource(gid: str, rid: str, user: AuthUser):
 
     user_id = user.user_id
 
-    # Remove downvote if exists
-    db.groups.update_one(
-        {"_id": group_obj_id, "resources._id": resource_obj_id},
-        {"$pull": {"resources.$.downvotes": user_id}}
-    )
+    # Check if user already upvoted
+    already_upvoted = user_id in resource.get("upvotes", [])
 
-    # Add upvote if not already upvoted
-    db.groups.update_one(
-        {"_id": group_obj_id, "resources._id": resource_obj_id},
-        {"$addToSet": {"resources.$.upvotes": user_id}}
-    )
+    if already_upvoted:
+        # Remove upvote if already upvoted
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$pull": {"resources.$.upvotes": user_id}}
+        )
+    else:
+        # Remove downvote if exists
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$pull": {"resources.$.downvotes": user_id}}
+        )
+
+        # Add upvote
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$addToSet": {"resources.$.upvotes": user_id}}
+        )
 
 @groups.post("/{gid}/resources/{rid}/downvote")
 def downvote_resource(gid: str, rid: str, user: AuthUser):
@@ -375,17 +384,27 @@ def downvote_resource(gid: str, rid: str, user: AuthUser):
 
     user_id = user.user_id
 
-    # Remove upvote if exists
-    db.groups.update_one(
-        {"_id": group_obj_id, "resources._id": resource_obj_id},
-        {"$pull": {"resources.$.upvotes": user_id}}
-    )
+    # Check if user already downvoted
+    already_downvoted = user_id in resource.get("downvotes", [])
 
-    # Add downvote if not already downvoted
-    db.groups.update_one(
-        {"_id": group_obj_id, "resources._id": resource_obj_id},
-        {"$addToSet": {"resources.$.downvotes": user_id}}
-    )
+    if already_downvoted:
+        # Remove downvote if already downvoted
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$pull": {"resources.$.downvotes": user_id}}
+        )
+    else:
+        # Remove upvote if exists
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$pull": {"resources.$.upvotes": user_id}}
+        )
+
+        # Add downvote
+        db.groups.update_one(
+            {"_id": group_obj_id, "resources._id": resource_obj_id},
+            {"$addToSet": {"resources.$.downvotes": user_id}}
+        )
 
 @groups.get("/{gid}/resources/{rid}/votes")
 def get_resource_votes(gid: str, rid: str):
