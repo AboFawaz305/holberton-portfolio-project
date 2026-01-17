@@ -80,6 +80,7 @@ export default {
       rounded="xl"
       @click="$emit('select-resource', resource._id)"
     >
+    <a target="_blank" :href="resource.file_url">
       <v-list-item class="pa-4">
         <div class="d-flex flex-column w-100">
           <div class="d-flex align-center w-100 mb-4">
@@ -91,11 +92,26 @@ export default {
               <span class="text-subtitle-1 font-weight-bold">
                 {{ resource.name }}
               </span>
+              <!-- description -->
+               <div class="text-body-2 text-grey-darken-1">
+                {{ resource.description }}
+              </div>
+              <div class="text-body-2 text-grey-darken-1">
+                بواسطة {{ resource.uploaded_by }}
             </div>
-
-            <a target="_blank" :href="resource.file_url">تحميل</a>
+            <!-- Upvote and downvote buttons -->
+             <div class="d-flex align-center justify-center mt-2">
+                <v-btn icon small>
+                  <v-icon @click="groupsService.upvoteResource(group_id, resource._id)" color="green">mdi-thumb-up</v-icon>
+                </v-btn>
+                <span class="mx-2">{{ resource.upvotes }}</span>
+                <v-btn icon small>
+                  <v-icon @click="groupsService.downvoteResource(group_id, resource._id)" color="red">mdi-thumb-down</v-icon>
+                </v-btn>
+                <span class="mx-2">{{ resource.downvotes }}</span>
+              </div>
           </div>
-
+            </a>
           <v-divider class="mb-3"></v-divider>
 
           <div class="d-flex justify-space-between align-center">
