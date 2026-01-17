@@ -81,8 +81,8 @@ export default {
         >
           <v-icon size="36">mdi-arrow-right</v-icon>
         </v-btn>
-        <h1 class="text-h2 font-weight-bold text-white">
-          <span class="opacity-50 text-h3 ms-2">#</span>{{ organizationName }}
+        <h1 class="text-h3 font-weight-bold text-white">
+          <span class="opacity-50 text-h4 ms-2">#</span>{{ organizationName }}
         </h1>
       </div>
 
@@ -108,7 +108,7 @@ export default {
       </v-navigation-drawer>
 
       <v-main class="flex-grow-1 d-flex flex-column overflow-hidden" style="min-height: 0">
-        <v-container fluid class="pa-6 d-flex flex-column flex-grow-1" style="min-height: 0">
+        <v-container fluid class="pa-6 pb-12 d-flex flex-column flex-grow-1" style="min-height: 0">
           <div
             class="chat-outer-box bg-white rounded-xl layered-shadow overflow-hidden flex-grow-1 d-flex flex-column"
           >
