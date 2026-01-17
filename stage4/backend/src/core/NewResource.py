@@ -1,12 +1,11 @@
 """New Resource schema
 """
-from dataclasses import dataclass
 
 from fastapi import UploadFile
+from pydantic import BaseModel
 
 
-@dataclass
-class NewResource:
+class NewResource(BaseModel):
     """New Resource schema
     """
     name: str
