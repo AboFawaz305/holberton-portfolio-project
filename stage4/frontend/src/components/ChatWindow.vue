@@ -13,6 +13,7 @@ export default {
   data() {
     return {
       messages: [],
+      loadingHistory: true,
       messageText: '',
       connectionStatus: 'connecting',
       colors: [
@@ -94,6 +95,7 @@ export default {
     },
     initChat() {
       if (!this.id || !this.token) return
+      this.loadingHistory = true
       chatService.init({
         host: this.host,
         token: this.token,
@@ -102,6 +104,7 @@ export default {
         onMessage: (event) => {
           if (event.type === 'history') {
             this.messages = event.data
+            this.loadingHistory = false
             this.scrollToBottom()
           } else if (event.data && event.data.error === 'MESSAGE_IS_SPAM') {
             this.showMessage('لم يتم الإرسال بنجاح الرسالة مزعجة')
@@ -148,46 +151,69 @@ export default {
     </v-card-title>
 
     <div class="messages-container flex-grow-1" ref="messageBox">
-      <div
-        v-for="(msg, index) in messages"
-        :key="index"
-        class="d-flex message-row px-4"
-        :class="shouldShowAvatar(index) ? 'mt-4' : 'mt-1'"
-      >
-        <div style="width: 50px" class="flex-shrink-0 d-flex justify-center">
-          <v-avatar
-            v-if="shouldShowAvatar(index)"
-            size="40"
-            rounded="lg"
-            :style="{ backgroundColor: getUserColor(msg.user?.username || msg.username) }"
-          >
-            <span class="text-white font-weight-bold two-letter-initials">{{
-              getInitials(msg.user?.username || msg.username)
-            }}</span>
-          </v-avatar>
+      <template v-if="loadingHistory">
+        <div v-for="n in 6" :key="'shimmer-' + n" class="d-flex px-4 mb-6">
+          <div style="width: 50px" class="flex-shrink-0 d-flex justify-center">
+            <v-skeleton-loader type="avatar" size="40" bg-color="transparent"></v-skeleton-loader>
+          </div>
+          <div class="flex-grow-1">
+            <v-skeleton-loader
+              type="text"
+              width="80"
+              class="mb-2"
+              bg-color="transparent"
+            ></v-skeleton-loader>
+            <v-skeleton-loader
+              type="paragraph"
+              class="shimmer-bubble"
+              bg-color="white"
+            ></v-skeleton-loader>
+          </div>
         </div>
+      </template>
 
-        <div class="flex-grow-1 min-width-0">
-          <div v-if="shouldShowAvatar(index)" class="d-flex align-center mb-1">
-            <span
-              class="font-weight-bold text-subtitle-2"
-              :style="{ color: getUserColor(msg.user?.username || msg.username) }"
+      <template v-else>
+        <div
+          v-for="(msg, index) in messages"
+          :key="index"
+          class="d-flex message-row px-4"
+          :class="shouldShowAvatar(index) ? 'mt-4' : 'mt-1'"
+        >
+          <div style="width: 50px" class="flex-shrink-0 d-flex justify-center">
+            <v-avatar
+              v-if="shouldShowAvatar(index)"
+              size="40"
+              rounded="lg"
+              :style="{ backgroundColor: getUserColor(msg.user?.username || msg.username) }"
             >
-              {{ msg.user?.username || msg.username || 'مستخدم' }}
-            </span>
-            <span class="ms-2 text-caption opacity-40">{{ formatTime(msg.timestamp) }}</span>
+              <span class="text-white font-weight-bold two-letter-initials">{{
+                getInitials(msg.user?.username || msg.username)
+              }}</span>
+            </v-avatar>
           </div>
 
-          <div class="d-flex align-center bubble-container">
-            <div class="message-bubble">
-              <div class="text-body-2 text-grey-darken-3">{{ msg.content }}</div>
+          <div class="flex-grow-1 min-width-0">
+            <div v-if="shouldShowAvatar(index)" class="d-flex align-center mb-1">
+              <span
+                class="font-weight-bold text-subtitle-2"
+                :style="{ color: getUserColor(msg.user?.username || msg.username) }"
+              >
+                {{ msg.user?.username || msg.username || 'مستخدم' }}
+              </span>
+              <span class="ms-2 text-caption opacity-40">{{ formatTime(msg.timestamp) }}</span>
             </div>
-            <span v-if="!shouldShowAvatar(index)" class="ms-2 text-caption time-on-hover">
-              {{ formatTime(msg.timestamp) }}
-            </span>
+
+            <div class="d-flex align-center bubble-container">
+              <div class="message-bubble">
+                <div class="text-body-2 text-grey-darken-3">{{ msg.content }}</div>
+              </div>
+              <span v-if="!shouldShowAvatar(index)" class="ms-2 text-caption time-on-hover">
+                {{ formatTime(msg.timestamp) }}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </div>
 
     <v-divider></v-divider>
@@ -208,7 +234,6 @@ export default {
               class="me-1"
             />
           </template>
-
           <v-sheet rounded="lg" elevation="12" width="300">
             <EmojiPicker
               :native="true"
@@ -249,6 +274,9 @@ export default {
 </template>
 
 <style scoped>
+:deep(.v-skeleton-loader) {
+  background: transparent !important;
+}
 .chat-window-card {
   height: 100% !important;
   max-height: 100% !important;

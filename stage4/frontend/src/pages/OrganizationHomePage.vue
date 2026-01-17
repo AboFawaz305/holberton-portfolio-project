@@ -1,13 +1,13 @@
 <script>
-import ChatWindow from '@/components/ChatWindow.vue' // The child component for chat functionality
-import JoinGroupButton from '@/components/JoinGroupButton.vue' // The child component for chat functionality
+import ChatWindow from '@/components/ChatWindow.vue'
+import JoinGroupButton from '@/components/JoinGroupButton.vue'
 import authService from '@/services/authService'
 import GroupSideBar from '@/components/GroupSideBar.vue'
 
 export default {
   components: {
     GroupSideBar,
-    ChatWindow, // Make sure the component is registered
+    ChatWindow,
     JoinGroupButton,
   },
   props: { id: String },
@@ -102,8 +102,8 @@ export default {
         class="sidebar-border"
         color="#f8fafd"
       >
-        <div class="pa-0 h-100 overflow-y-auto">
-          <GroupSideBar class="pa-2" :org_id="id" @access-denied="onAccessDenied" />
+        <div class="pa-6 h-100 overflow-y-auto sidebar-scroll-container">
+          <GroupSideBar :org_id="id" @access-denied="onAccessDenied" />
         </div>
       </v-navigation-drawer>
 
@@ -134,7 +134,6 @@ export default {
 
 <style scoped>
 .main-dashboard-wrapper {
-  /* Set total height to what's left under your top navbar */
   height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
@@ -142,7 +141,6 @@ export default {
 }
 
 .header-section {
-  /* Use flex-basis to lock the header height */
   flex: 0 0 250px;
   z-index: 10;
 }
@@ -166,5 +164,29 @@ export default {
 }
 .opacity-70 {
   opacity: 0.7;
+}
+
+.sidebar-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-scroll-container:hover::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+}
+
+.sidebar-scroll-container:hover {
+  scrollbar-color: #cbd5e1 transparent;
 }
 </style>
