@@ -16,9 +16,20 @@ export default {
   },
   computed: {
     filteredGroups() {
-      if (!this.searchQuery) return this.resources
-      const query = this.searchQuery.toLowerCase()
-      return this.resources.filter((resource) => resource.name.toLowerCase().includes(query))
+      let filtered = this.resources
+      
+      // Filter by search query if present
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase()
+        filtered = filtered.filter((resource) => resource.name.toLowerCase().includes(query))
+      }
+      
+      // Sort by net votes (upvotes - downvotes) in descending order
+      return filtered.slice().sort((a, b) => {
+        const netVotesA = (a.upvotes || 0) - (a.downvotes || 0)
+        const netVotesB = (b.upvotes || 0) - (b.downvotes || 0)
+        return netVotesB - netVotesA
+      })
     },
   },
   async mounted() {
