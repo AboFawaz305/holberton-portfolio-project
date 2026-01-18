@@ -66,16 +66,16 @@ def register_endpoint(user: NewUser):
 
     if db.users.find_one({"username": user.username}):
         raise HTTPException(
-            status_code=422, 
+            status_code=422,
             detail="USERNAME_ALREADY_EXIST"
         )
 
     if db.users.find_one({"email.value": user.email}):
         raise HTTPException(
-            status_code=422, 
+            status_code=422,
             detail="EMAIL_ALREADY_EXIST"
         )
-    
+
     current_time = datetime.now(timezone.utc)
     db.users.insert_one(
         {
