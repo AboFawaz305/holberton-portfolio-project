@@ -72,11 +72,13 @@ export default {
     },
     formatTime(ts) {
       const date = new Date(ts)
-      return date.toLocaleTimeString('en-US', {
+      const timeString = date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       })
+      // \u200E (LTR Mark) ensures the time stays "10:30 PM" in RTL layouts
+      return `\u200E${timeString}`
     },
     shouldShowDateDivider(index) {
       if (index === 0) return true
@@ -106,6 +108,10 @@ export default {
     },
     shouldShowAvatar(index) {
       if (index === 0) return true
+
+      // Reset context if the date changed
+      if (this.shouldShowDateDivider(index)) return true
+
       const currentMsg = this.messages[index]
       const prevMsg = this.messages[index - 1]
       return (
@@ -129,7 +135,8 @@ export default {
         isOrg: this.isOrg,
         onMessage: (event) => {
           if (event.type === 'history') {
-            this.messages = event.data
+            // Sort history oldest to newest
+            this.messages = event.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
             this.loadingHistory = false
             this.scrollToBottom()
           } else if (event.data && event.data.error === 'MESSAGE_IS_SPAM') {
@@ -203,12 +210,7 @@ export default {
           <v-row v-if="shouldShowDateDivider(index)" align="center" class="my-6 px-4 no-gutters">
             <v-col><v-divider class="border-opacity-25"></v-divider></v-col>
             <v-col cols="auto" class="px-4">
-              <span
-                class="text-caption font-weight-bold text-grey-darken-1 text-uppercase"
-                style="letter-spacing: 1px"
-              >
-                {{ formatDateDivider(msg.timestamp) }}
-              </span>
+              <span class="date-label">{{ formatDateDivider(msg.timestamp) }}</span>
             </v-col>
             <v-col><v-divider class="border-opacity-25"></v-divider></v-col>
           </v-row>
@@ -324,6 +326,7 @@ export default {
   opacity: 0.15 !important;
   border-color: #000 !important;
 }
+
 :deep(.chat-input-field input) {
   text-align: right !important;
   unicode-bidi: plaintext;
@@ -333,9 +336,6 @@ export default {
   text-align: right !important;
 }
 
-:deep(.v-skeleton-loader) {
-  background: transparent !important;
-}
 .chat-window-card {
   height: 100% !important;
   max-height: 100% !important;
@@ -345,7 +345,7 @@ export default {
 .message-text {
   text-align: right;
   unicode-bidi: plaintext;
-  direction: ltr;
+  direction: ltr; /* English-logical reading order within Arabic container */
   display: block;
   width: 100%;
 }
@@ -359,19 +359,24 @@ export default {
   color: #64748b;
   margin: 0 12px;
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
 .time-fix {
   direction: ltr !important;
   display: inline-block;
   unicode-bidi: isolate;
 }
+
 .v-avatar {
   border-radius: 8px !important;
   overflow: hidden;
 }
+
 .ms-4 {
-  margin-right: 16px !important;
+  margin-right: 16px !important; /* Forces spacing in RTL */
 }
+
 .ms-3 {
   margin-right: 12px !important;
 }
@@ -385,6 +390,7 @@ export default {
   padding: 16px;
   min-height: 0;
 }
+
 .message-bubble {
   background: white;
   padding: 8px 14px;
@@ -394,26 +400,32 @@ export default {
   max-width: 85%;
   border: 1px solid #f1f5f9;
 }
+
 .mt-1 .message-bubble {
   border-top-right-radius: 4px;
 }
+
 .time-on-hover {
   opacity: 0;
   transition: opacity 0.2s;
   color: #94a3b8;
 }
+
 .message-row:hover .time-on-hover {
   opacity: 1;
 }
+
 .two-letter-initials {
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .messages-container::-webkit-scrollbar {
   width: 5px;
 }
+
 .messages-container::-webkit-scrollbar-thumb {
   background: #eee;
   border-radius: 10px;
