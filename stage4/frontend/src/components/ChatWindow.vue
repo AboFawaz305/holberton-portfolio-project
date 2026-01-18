@@ -205,7 +205,9 @@ export default {
 
             <div class="d-flex align-center bubble-container">
               <div class="message-bubble">
-                <div class="text-body-2 text-grey-darken-3">{{ msg.content }}</div>
+                <div class="text-body-2 text-grey-darken-3 message-text" dir="auto">
+                  {{ msg.content }}
+                </div>
               </div>
               <span v-if="!shouldShowAvatar(index)" class="ms-2 text-caption time-on-hover">
                 {{ formatTime(msg.timestamp) }}
@@ -250,7 +252,8 @@ export default {
           variant="plain"
           hide-details
           density="compact"
-          class="flex-grow-1"
+          class="flex-grow-1 chat-input-field"
+          dir="auto"
           :disabled="connectionStatus !== 'connected'"
           @keyup.enter="sendMessage"
         />
@@ -274,6 +277,15 @@ export default {
 </template>
 
 <style scoped>
+:deep(.chat-input-field input) {
+  text-align: right !important;
+  unicode-bidi: plaintext;
+}
+
+:deep(.chat-input-field input::placeholder) {
+  text-align: right !important;
+}
+
 :deep(.v-skeleton-loader) {
   background: transparent !important;
 }
@@ -282,7 +294,19 @@ export default {
   max-height: 100% !important;
   overflow: hidden;
 }
+
+.message-text {
+  text-align: right;
+  unicode-bidi: plaintext;
+  direction: ltr;
+  display: block;
+  width: 100%;
+}
+
 .messages-container {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: isolate;
   overflow-y: auto;
   background-color: #fcfcfc;
   padding: 16px;

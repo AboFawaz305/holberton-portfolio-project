@@ -141,15 +141,9 @@ export default {
         </template>
 
         <template v-else>
-          <!-- <v-btn
-            variant="text"
-            color="white"
-            prepend-icon="mdi-arrow-right"
-            class="pa-0 mb-1 back-btn-header"
-            density="compact"
-            @click="handleBack"
-          >
-          </v-btn> -->
+          <v-btn icon variant="text" color="white" @click="handleBack" class="mb-2 me-n2">
+            <v-icon size="36">mdi-arrow-right</v-icon>
+          </v-btn>
 
           <v-breadcrumbs :items="breadcrumbItems" class="pa-0 mb-2 text-white opacity-70">
             <template v-slot:divider>
@@ -158,7 +152,11 @@ export default {
           </v-breadcrumbs>
 
           <h1 class="text-h3 font-weight-bold text-white">
-            <span class="opacity-50 text-h4 ms-2">#</span>{{ groupName }}
+            <span dir="ltr" class="d-inline-flex align-center">
+              {{ groupName }}
+
+              <span class="opacity-50 text-h4 me-2">#</span>
+            </span>
           </h1>
         </template>
       </div>

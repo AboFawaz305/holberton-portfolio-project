@@ -156,9 +156,8 @@ export default {
 
             <v-card-subtitle class="pa-5 d-flex justify-space-between align-center">
               <v-chip
-                color="orange-lighten-3"
-                text-color="orange-darken-4"
-                class="font-weight-bold"
+                color="orange-lighten-4"
+                class="font-weight-bold text-orange-darken-4"
                 size="small"
                 label
               >

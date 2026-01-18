@@ -108,7 +108,7 @@ export default {
 
       try {
         await usersService.addEmail(this.emailForm.email)
-        this.emailAddSuccess = 'تمت إضافة الإيميل بنجاح: ' + this.emailForm.email
+        this.emailAddSuccess = 'تمت إضافة الإيميل بنجاح: ' + '\u200E' + this.emailForm.email
         this.showEmailSuccess = true
         this.showEmailError = false
         this.emailForm.email = ''
@@ -364,13 +364,7 @@ export default {
                     />
                   </v-col>
                 </v-row>
-                <v-btn
-                  color="primary"
-                  variant="tonal"
-                  type="submit"
-                  rounded="lg"
-                  size="large"
-                  class="px-8 mt-2"
+                <v-btn color="primary" type="submit" rounded="lg" size="large" class="px-8 mt-2"
                   >تحديث كلمة السر</v-btn
                 >
               </v-form>
@@ -411,9 +405,9 @@ export default {
                   :key="i"
                   class="email-item rounded-lg mb-2 border shadow-sm"
                 >
-                  <v-list-item-title class="text-body-2 ms-2">{{
-                    emailObj.value
-                  }}</v-list-item-title>
+                  <v-list-item-title class="text-body-2 ms-2 email-display-text">
+                    {{ emailObj.value }}
+                  </v-list-item-title>
                   <template v-slot:append>
                     <v-chip
                       size="x-small"
@@ -441,8 +435,9 @@ export default {
                   variant="outlined"
                   rounded="lg"
                   density="comfortable"
+                  dir="ltr"
                   :rules="[rules.required, rules.email]"
-                  class="mb-2"
+                  class="mb-2 right-input"
                 />
                 <v-btn block color="primary" type="submit" rounded="lg" class="font-weight-bold"
                   >أضف بريد</v-btn
@@ -465,6 +460,17 @@ export default {
 </template>
 
 <style scoped>
+.email-display-text {
+  direction: ltr !important;
+  display: block !important;
+  text-align: right !important;
+  unicode-bidi: isolate;
+}
+
+:deep(.right-input input) {
+  text-align: right !important;
+}
+
 .page-background {
   background-color: #f4f7fa;
   min-height: 100vh;
@@ -499,6 +505,7 @@ export default {
   font-weight: bold;
   opacity: 0.9;
 }
+
 :deep(.v-skeleton-loader) {
   background: transparent !important;
 }

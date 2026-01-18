@@ -63,14 +63,19 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 def register_endpoint(user: NewUser):
     """Registeration endpoint to create a new user"""
     db = get_engine_db()
-    is_found = db.users.find_one(
-        {"$or": [
-            {"username": user.username},
-            {"email.value": user.email}
-        ]}
-    )
-    if is_found:
-        raise HTTPException(status_code=422, detail="USER_ALREADY_EXIST")
+
+    if db.users.find_one({"username": user.username}):
+        raise HTTPException(
+            status_code=422, 
+            detail="USERNAME_ALREADY_EXIST"
+        )
+
+    if db.users.find_one({"email.value": user.email}):
+        raise HTTPException(
+            status_code=422, 
+            detail="EMAIL_ALREADY_EXIST"
+        )
+    
     current_time = datetime.now(timezone.utc)
     db.users.insert_one(
         {
