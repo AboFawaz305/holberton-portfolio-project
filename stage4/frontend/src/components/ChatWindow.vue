@@ -72,7 +72,33 @@ export default {
     },
     formatTime(ts) {
       const date = new Date(ts)
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      })
+    },
+    shouldShowDateDivider(index) {
+      if (index === 0) return true
+      const currentMsgDate = new Date(this.messages[index].timestamp).toDateString()
+      const prevMsgDate = new Date(this.messages[index - 1].timestamp).toDateString()
+      return currentMsgDate !== prevMsgDate
+    },
+    formatDateDivider(ts) {
+      const date = new Date(ts)
+      const today = new Date().toDateString()
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const yesterdayStr = yesterday.toDateString()
+
+      if (date.toDateString() === today) return 'Today'
+      if (date.toDateString() === yesterdayStr) return 'Yesterday'
+
+      return date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
     },
     showMessage(text) {
       this.msg = text
@@ -173,52 +199,68 @@ export default {
       </template>
 
       <template v-else>
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          class="d-flex message-row px-4"
-          :class="shouldShowAvatar(index) ? 'mt-4' : 'mt-1'"
-        >
-          <div style="width: 50px" class="flex-shrink-0 d-flex justify-center">
-            <v-avatar
-              v-if="shouldShowAvatar(index)"
-              size="40"
-              rounded="lg"
-              :style="{ backgroundColor: getUserColor(msg.user?.username || msg.username) }"
-            >
-              <span class="text-white font-weight-bold two-letter-initials">{{
-                getInitials(msg.user?.username || msg.username)
-              }}</span>
-            </v-avatar>
-          </div>
-
-          <div class="flex-grow-1 min-width-0">
-            <div v-if="shouldShowAvatar(index)" class="d-flex align-center mb-1">
+        <template v-for="(msg, index) in messages" :key="index">
+          <v-row v-if="shouldShowDateDivider(index)" align="center" class="my-6 px-4 no-gutters">
+            <v-col><v-divider class="border-opacity-25"></v-divider></v-col>
+            <v-col cols="auto" class="px-4">
               <span
-                class="font-weight-bold text-subtitle-2"
-                :style="{ color: getUserColor(msg.user?.username || msg.username) }"
+                class="text-caption font-weight-bold text-grey-darken-1 text-uppercase"
+                style="letter-spacing: 1px"
               >
-                {{ msg.user?.username || msg.username || 'مستخدم' }}
+                {{ formatDateDivider(msg.timestamp) }}
               </span>
-              <span class="ms-2 text-caption opacity-40">{{ formatTime(msg.timestamp) }}</span>
+            </v-col>
+            <v-col><v-divider class="border-opacity-25"></v-divider></v-col>
+          </v-row>
+
+          <div class="d-flex message-row px-4" :class="shouldShowAvatar(index) ? 'mt-4' : 'mt-1'">
+            <div style="width: 50px" class="flex-shrink-0 d-flex justify-center">
+              <v-avatar
+                v-if="shouldShowAvatar(index)"
+                size="40"
+                rounded="lg"
+                :style="{ backgroundColor: getUserColor(msg.user?.username || msg.username) }"
+              >
+                <span class="text-white font-weight-bold two-letter-initials">
+                  {{ getInitials(msg.user?.username || msg.username) }}
+                </span>
+              </v-avatar>
             </div>
 
-            <div class="d-flex align-center bubble-container">
-              <div class="message-bubble">
-                <div class="text-body-2 text-grey-darken-3 message-text" dir="auto">
-                  {{ msg.content }}
-                </div>
+            <div class="flex-grow-1 min-width-0">
+              <div v-if="shouldShowAvatar(index)" class="d-flex align-center mb-1">
+                <span
+                  class="font-weight-bold text-subtitle-2"
+                  :style="{ color: getUserColor(msg.user?.username || msg.username) }"
+                >
+                  {{ msg.user?.username || msg.username || 'مستخدم' }}
+                </span>
+                <span class="ms-3 text-caption opacity-40 time-fix">
+                  {{ formatTime(msg.timestamp) }}
+                </span>
               </div>
-              <span v-if="!shouldShowAvatar(index)" class="ms-2 text-caption time-on-hover">
-                {{ formatTime(msg.timestamp) }}
-              </span>
+
+              <div class="d-flex align-center bubble-container">
+                <div class="message-bubble">
+                  <div class="text-body-2 text-grey-darken-3 message-text" dir="auto">
+                    {{ msg.content }}
+                  </div>
+                </div>
+                <span
+                  v-if="!shouldShowAvatar(index)"
+                  class="ms-4 text-caption time-on-hover time-fix"
+                >
+                  {{ formatTime(msg.timestamp) }}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </template>
     </div>
 
     <v-divider></v-divider>
+
     <div class="chat-footer pa-4 flex-shrink-0 bg-white">
       <div class="d-flex align-center bg-grey-lighten-4 rounded-pill px-4">
         <v-menu
@@ -257,6 +299,7 @@ export default {
           :disabled="connectionStatus !== 'connected'"
           @keyup.enter="sendMessage"
         />
+
         <v-btn
           color="primary"
           icon="mdi-send-variant"
@@ -277,6 +320,10 @@ export default {
 </template>
 
 <style scoped>
+.v-divider {
+  opacity: 0.15 !important;
+  border-color: #000 !important;
+}
 :deep(.chat-input-field input) {
   text-align: right !important;
   unicode-bidi: plaintext;
@@ -301,6 +348,32 @@ export default {
   direction: ltr;
   display: block;
   width: 100%;
+}
+
+.date-label {
+  background-color: #f1f5f9;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  margin: 0 12px;
+  text-transform: uppercase;
+}
+.time-fix {
+  direction: ltr !important;
+  display: inline-block;
+  unicode-bidi: isolate;
+}
+.v-avatar {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+.ms-4 {
+  margin-right: 16px !important;
+}
+.ms-3 {
+  margin-right: 12px !important;
 }
 
 .messages-container {
