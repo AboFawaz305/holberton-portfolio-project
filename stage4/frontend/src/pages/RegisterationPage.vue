@@ -13,6 +13,10 @@ export default {
         password: '',
         repeatPassword: '',
       },
+      fieldErrors: {
+        username: '',
+        email: '',
+      },
       registerationErrorMessage: '',
       registerationSucccessMessage: '',
       isTheUserAgreeToTermsAndConditions: false,
@@ -26,13 +30,23 @@ export default {
         email: (value) => /.+@.+\..+/.test(value) || 'يجب أن يكون الإيميل صالحا',
         passwordsMatch: (confirmPassword) => (value) =>
           confirmPassword === value || 'كلمات السر لا تتطابق',
+        isRealDomain: (value) => {
+          const forbidden = ['.test', '.local', '.example']
+          const isForbidden = forbidden.some((ext) => value.toLowerCase().endsWith(ext))
+          const ltrMark = '\u200E'
+          return (
+            !isForbidden ||
+            `هذا النطاق غير مدعوم، يرجى استخدام بريد حقيقي مثل (${ltrMark}.com${ltrMark})`
+          )
+        },
       },
     }
   },
   methods: {
     async onSubmit() {
       this.registerationErrorMessage = ''
-      this.registerationSucccessMessage = ''
+      this.fieldErrors.username = ''
+      this.fieldErrors.email = ''
 
       const { valid } = await this.$refs.registerationForm.validate()
       if (!valid) return
@@ -54,14 +68,17 @@ export default {
         this.registerationSucccessMessage = 'تم إنشاء الحساب بنجاح'
         this.showVerificationDialog = true
       } catch (error) {
-        // Error handling
-        const errorMap = {
-          USER_ALREADY_EXIST: 'اسم المستخدم أو البريد الإلكتروني مسجل مسبقاً',
-          'Registration failed': 'فشل الاتصال بالخادم، يرجى المحاولة لاحقاً',
-        }
+        const errorCode = error.response?.data?.detail || error.message
 
-        this.registerationErrorMessage =
-          errorMap[error.message] || 'الرجاء التحقق من المعلومات المدخلة'
+        if (errorCode === 'USERNAME_ALREADY_EXIST') {
+          this.fieldErrors.username = 'اسم المستخدم هذا مستخدم بالفعل'
+        } else if (errorCode === 'EMAIL_ALREADY_EXIST') {
+          this.fieldErrors.email = 'البريد الإلكتروني مسجل بالفعل'
+        } else if (errorCode === 'Registration failed') {
+          this.registerationErrorMessage = 'فشل الاتصال بالخادم، يرجى المحاولة لاحقاً'
+        } else {
+          this.registerationErrorMessage = 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى'
+        }
       } finally {
         this.isRequestInProgress = false
       }
@@ -146,25 +163,26 @@ export default {
             <v-text-field
               v-model="registerationForm.username"
               :rules="[rules.required, rules.min(3), rules.max(25)]"
+              :error-messages="fieldErrors.username"
+              @input="fieldErrors.username = ''"
               label="إسم المستخدم"
               variant="outlined"
               rounded="lg"
-              color="primary"
               prepend-inner-icon="mdi-at"
-              required
-              class="mb-4"
+              class="mb-2"
             />
 
             <v-text-field
               v-model="registerationForm.email"
-              :rules="[rules.required, rules.email]"
+              :rules="[rules.required, rules.email, rules.isRealDomain]"
+              :error-messages="fieldErrors.email"
+              @input="fieldErrors.email = ''"
               label="البريد الإلكتروني"
               variant="outlined"
               rounded="lg"
-              color="primary"
+              dir="ltr"
+              class="mb-2 right-input"
               prepend-inner-icon="mdi-email-outline"
-              required
-              class="mb-4"
             />
 
             <v-text-field
@@ -271,6 +289,9 @@ export default {
 </template>
 
 <style scoped>
+:deep(.right-input input) {
+  text-align: right !important;
+}
 .auth-bg {
   background-color: #f8fafd;
 }
