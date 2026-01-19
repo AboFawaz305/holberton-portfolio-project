@@ -1,9 +1,3 @@
-To make this snackbar match the "premium" look we've established in your OrgHome and GroupHome
-pages, we need to add the rounded="pill" attribute and include an icon that changes based on the
-message type (success or error). Updated JoinGroupButton.vue Here is the updated template. I’ve
-added the pill shape and a dynamic icon section to ensure it feels consistent with your other
-alerts. Code snippet
-
 <template>
   <div class="d-inline-flex">
     <v-btn
