@@ -16,6 +16,19 @@
             منصة أكاديمية تجمع طلاب الجامعات السعودية في مكان واحد لمشاركة المعرفة والتفوق معاً.
           </p>
 
+          <div class="d-flex justify-center gap-4 mb-12" data-aos="fade-up">
+            <v-btn
+              v-for="icon in socialIcons"
+              :key="icon"
+              icon
+              variant="flat"
+              class="social-btn glass-card"
+              size="large"
+            >
+              <v-icon color="primary" size="24">{{ icon }}</v-icon>
+            </v-btn>
+          </div>
+
           <div
             class="footer-nav d-flex flex-wrap justify-center align-center gap-8 mb-8"
             data-aos="fade-up"
