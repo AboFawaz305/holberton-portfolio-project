@@ -76,4 +76,6 @@ jobs:
         env:
             MONGO_DB_HOST: localhost
         run: |
+          sudo mkdir /static
+          sudo chmod 777 /static
           pytest -q

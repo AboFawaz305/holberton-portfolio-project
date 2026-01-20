@@ -11,5 +11,6 @@ class Resource(BaseModel):
     description: str | None = Field(max_length=150, default=None)
     file_url:  str
     uploaded_by: str
-    rating: int = Field(ge=-1, le=5, default=-1)  # -1 means unrated
+    upvotes: int = Field(ge=0, default=0)
+    downvotes: int = Field(ge=0, default=0)
     created_at: PastDatetime

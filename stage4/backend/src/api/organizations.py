@@ -35,7 +35,7 @@ async def create_education_organization(
             status_code=422, detail="Organization already added"
         )
 
-    photo_url = "/api/api/static/organizations/RR.gif"
+    photo_url = "/static/uploads/organizations/RR.gif"
     if form.photo and form.photo.filename:
 
         if form.photo.content_type not in ["image/jpeg", "image/png",
@@ -53,7 +53,7 @@ async def create_education_organization(
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(form.photo.file, buffer)
 
-        photo_url = f"/api/api/static/organizations/{unique_name}"
+        photo_url = f"{ORG_PHOTOS_DIR}/{unique_name}"
 
     current_time = datetime.now(timezone.utc)
     org_id = db.organizations.insert_one(

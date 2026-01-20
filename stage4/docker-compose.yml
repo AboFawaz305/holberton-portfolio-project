@@ -7,15 +7,25 @@ services:
       - database
     environment:
       MONGO_DB_HOST: "database"
+    volumes:
+      - uploads:/static
     build: backend
 
   database:
     build: database
+    volumes:
+      - db_data:/data/db
 
   proxy:
     depends_on:
       - frontend
       - backend
+    volumes:
+      - uploads:/static
     build: proxy
     ports:
       - "80:80"
+
+volumes:
+  uploads:
+  db_data:

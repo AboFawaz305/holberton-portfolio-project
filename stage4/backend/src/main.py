@@ -3,7 +3,6 @@
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 
 from api.authentication import auth
 from api.chat import chat
@@ -15,6 +14,7 @@ from constants import GROUPS_RESOURCES_DIR, ORG_PHOTOS_DIR, UPLOAD_DIR
 ORG_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 # Add after ORG_PHOTOS_DIR. mkdir(...)
 GROUPS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 load_dotenv("../../.env", verbose=True)
 
@@ -25,4 +25,3 @@ app.include_router(orgs)
 app.include_router(chat)
 app.include_router(users)
 app.include_router(groups)
-app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")

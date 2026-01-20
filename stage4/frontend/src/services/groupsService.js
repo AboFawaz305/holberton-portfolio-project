@@ -118,6 +118,56 @@ const groupsService = {
     }
     return await response.json()
   },
+
+  async createGroup(orgId, payload) {
+    const response = await fetch(`/api/organizations/${orgId}/groups`, {
+      method: 'POST',
+      headers: authService.addAuthHeader({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'FAILED_TO_CREATE_GROUP')
+    }
+    return response.json()
+  },
+  // Upvote and downvote a resource
+  async upvoteResource(gid, rid) {
+    const response = await fetch(`${API_URL}/${gid}/resources/${rid}/upvote`, {
+      method: 'POST',
+      headers: authService.addAuthHeader({}),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to upvote resource')
+    }
+    return response.json()
+  },
+
+  async downvoteResource(gid, rid) {
+    const response = await fetch(`${API_URL}/${gid}/resources/${rid}/downvote`, {
+      method: 'POST',
+      headers: authService.addAuthHeader({}),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to downvote resource')
+    }
+    return response.json()
+  },
+  // Get resource votes
+  async getResourceVotes(gid, rid) {
+    const response = await fetch(`${API_URL}/${gid}/resources/${rid}/votes`, {
+      method: 'GET',
+      headers: authService.addAuthHeader({}),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to fetch resource votes')
+    }
+    return response.json()
+  },
 }
 
 export default groupsService
