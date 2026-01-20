@@ -5,7 +5,7 @@ const chatService = {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const wsUrl = `${protocol}//${host}/ws/chat`
     this.socket = new WebSocket(wsUrl)
-   this.socket.onopen = () => {
+    this.socket.onopen = () => {
       const authData = {
         token,
         room_id: roomId,
