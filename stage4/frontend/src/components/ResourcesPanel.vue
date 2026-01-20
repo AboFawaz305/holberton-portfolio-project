@@ -56,7 +56,7 @@ export default {
   <v-text-field
     v-model="searchQuery"
     variant="outlined"
-    placeholder="أبحث عن مصدر..."
+    placeholder="أبحث عن مصدر"
     prepend-inner-icon="mdi-magnify"
     rounded="lg"
     bg-color="white"

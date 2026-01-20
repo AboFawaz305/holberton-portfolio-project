@@ -94,7 +94,7 @@ export default {
   <v-text-field
     v-model="searchQuery"
     variant="outlined"
-    placeholder="ابحث عن كلية..."
+    placeholder="ابحث عن كلية"
     prepend-inner-icon="mdi-magnify"
     rounded="lg"
     bg-color="white"

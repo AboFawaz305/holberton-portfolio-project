@@ -1,33 +1,36 @@
 <template>
-  <v-container id="courses" class="section">
-    <!-- Title and Subtitle -->
-    <v-card class="py-8 text-center" flat>
-      <h2 class="text-h4 font-weight-bold mb-4">كيف يعمل أتراب؟</h2>
-      <p class="text-subtitle-1 text-grey-darken-1">ثلاث خطوات بسيطة للبدء</p>
-    </v-card>
+  <v-container class="section-padding overflow-visible">
+    <v-row align="center">
+      <v-col cols="12" md="6" class="d-none d-md-flex justify-center" data-aos="fade-right">
+        <div class="steps-container">
+          <div class="step-visual-card glass-card top-card">
+            <v-icon color="primary" class="mb-3">mdi-school-outline</v-icon>
+            <div class="skeleton-bar w-75"></div>
+          </div>
+          <div class="step-visual-card glass-card bottom-card shadow-xl">
+            <v-icon color="secondary" class="mb-3">mdi-book-multiple</v-icon>
+            <div class="skeleton-line w-50"></div>
+          </div>
+        </div>
+      </v-col>
 
-    <!-- Steps Section -->
-    <v-row class="mt-8">
-      <v-col
-        v-for="(step, i) in steps"
-        :key="i"
-        cols="12"
-        sm="6"
-        md="4"
-        class="d-flex justify-center"
-      >
-        <!-- Each Step as a Card -->
-        <v-card outlined class="howStep pa-6 text-center d-flex flex-column align-center">
-          <v-avatar size="64" class="mb-4" color="primary">
-            <span class="text-h5 text-white">{{ step.icon }}</span>
+      <v-col cols="12" md="6" class="text-right" data-aos="fade-left">
+        <h2 class="text-h3 font-weight-black mb-12 text-grey-darken-4">كيف يعمل أتراب؟</h2>
+
+        <div v-for="(step, i) in steps" :key="i" class="step-item d-flex align-start mb-12">
+          <v-avatar
+            color="primary"
+            size="56"
+            class="text-white font-weight-black elevation-4 flex-shrink-0"
+          >
+            {{ i + 1 }}
           </v-avatar>
 
-          <!-- Step Title -->
-          <h3 class="text-h6 font-weight-bold mt-0 mb-2">{{ step.title }}</h3>
-
-          <!-- Step Description -->
-          <p class="text-body-2 text-grey-darken-1 mt-0">{{ step.desc }}</p>
-        </v-card>
+          <div class="flex-grow-1 ms-10 ps-2">
+            <h3 class="text-h5 font-weight-bold mb-2">{{ step.title }}</h3>
+            <p class="text-body-1 text-grey-darken-2 lh-relaxed">{{ step.desc }}</p>
+          </div>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -35,23 +38,48 @@
 
 <script setup>
 const steps = [
-  { icon: '🎓', title: 'اختر جامعتك', desc: 'ابدأ باختيار جامعتك من قائمة الجامعات المدعومة.' },
-  { icon: '📘', title: 'اختر موادك', desc: 'حدد الكلية والمواد التي تدرسها لهذا الفصل.' },
-  { icon: '🤝', title: 'تواصل وشارك', desc: 'ابدأ التواصل مع زملائك وشارك المعرفة والموارد.' },
+  { title: 'اختر جامعتك وكليتك', desc: 'ابدأ بتحديد مؤسستك التعليمية لتصل إلى مجتمعك الخاص.' },
+  { title: 'حدد المواد الدراسية', desc: 'اختر المواد التي تدرسها لتنضم تلقائياً لمجموعات النقاش.' },
+  { title: 'ابدأ التواصل والتعاون', desc: 'شارك الموارد، اطرح الأسئلة، وتفاعل مع زملائك فوراً.' },
 ]
 </script>
 
 <style scoped>
-.section {
-  padding: 46px 0; /* Optional: Maintain visual spacing */
+.lh-relaxed {
+  line-height: 1.7 !important;
 }
-.howStep {
-  width: 270px; /* To maintain uniform card width */
-  height: auto; /* Dynamic height based on content */
-  border-radius: 16px; /* Rounded corners */
-  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06); /* Optional for card shadow effect */
+.steps-container {
+  position: relative;
+  width: 320px;
+  height: 350px;
 }
-.text-h5 {
-  font-size: 24px; /* Icon or number size */
+.step-visual-card {
+  position: absolute;
+  width: 200px;
+  padding: 25px;
+  border-radius: 28px;
+}
+.top-card {
+  top: 0;
+  right: 0;
+  transform: rotate(5deg);
+}
+.bottom-card {
+  bottom: 0;
+  left: -40px;
+  transform: rotate(-5deg);
+  z-index: 10;
+}
+.skeleton-bar,
+.skeleton-line {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+/* Smooth scaling effect on hover */
+.step-item:hover .v-avatar {
+  transform: scale(1.15) rotate(5deg);
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 </style>
