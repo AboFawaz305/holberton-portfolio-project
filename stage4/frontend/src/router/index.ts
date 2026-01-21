@@ -9,6 +9,7 @@ import UserProfilePage from '@/pages/UserProfilePage.vue'
 import HomePage from '@/pages/HomePage.vue'
 import GroupsHomePage from '@/pages/GroupsHomePage.vue'
 import EmailVerificationPage from '@/pages/EmailVerificationPage.vue'
+import TermsPage from '@/pages/TermsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,7 @@ const router = createRouter({
     { path: '/home', component: HomePage },
     { path: '/', redirect: '/home' },
     { path: '/verify-email/:token', component: EmailVerificationPage },
+    { path: '/terms', component: TermsPage },
   ],
 })
 
