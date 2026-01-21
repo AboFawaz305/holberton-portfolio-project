@@ -34,18 +34,32 @@
           </template>
 
           <v-list class="account-card" density="comfortable">
-            <v-list-item class="account-item" to="/login">
+            <v-list-item v-if="!isLoggedIn" class="account-item" to="/login">
               <template #prepend>
                 <v-icon class="account-icon">mdi-login-variant</v-icon>
               </template>
               <v-list-item-title class="account-title">تسجيل الدخول</v-list-item-title>
             </v-list-item>
 
-            <v-list-item class="account-item" to="/register">
+            <v-list-item v-if="!isLoggedIn" class="account-item" to="/register">
               <template #prepend>
                 <v-icon class="account-icon">mdi-account-plus-outline</v-icon>
               </template>
               <v-list-item-title class="account-title">إنشاء حساب</v-list-item-title>
+            </v-list-item>
+
+            <v-list-item v-if="isLoggedIn" class="account-item" to="/profile">
+              <template #prepend>
+                <v-icon class="account-icon">mdi-account-edit-outline</v-icon>
+              </template>
+              <v-list-item-title class="account-title">تعديل المف الشخصي</v-list-item-title>
+            </v-list-item>
+
+            <v-list-item v-if="isLoggedIn" class="account-item" @click="logout">
+              <template #prepend>
+                <v-icon class="account-icon">mdi-logout</v-icon>
+              </template>
+              <v-list-item-title class="account-title">تسجيل الخروج</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -55,9 +69,36 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import authService from '@/services/authService'
+import { ref, onMounted, watch } from 'vue'
 
 const route = useRoute()
+const router = useRouter()
+
+const isLoggedIn = ref(false)
+
+const checkAuth = async () => {
+  isLoggedIn.value = await authService.isLoggedIn()
+}
+
+const logout = () => {
+  authService.logout()
+  router.push('/')
+}
+
+/* Run on initial mount */
+onMounted(() => {
+  checkAuth()
+})
+
+/* Run on every route change */
+watch(
+  () => route.fullPath,
+  () => {
+    checkAuth()
+  },
+)
 
 const navItems = [
   { key: 'about', label: 'الرئيسية', to: '/' }, // بدون أيقونة
