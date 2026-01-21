@@ -10,5 +10,5 @@ SECRET_KEY = "wow_secret_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 RESEND_API_KEY = "re_ffffffffffffff"  # resend API key
-FRONTEND_URL = "http://localhost:80"
+FRONTEND_URL = "atrab.app"
 FROM_EMAIL = "Atrab <no-reply@atrab.app>"  # domain email

@@ -222,7 +222,7 @@ export default {
               </v-window-item>
 
               <v-window-item value="resources" class="h-100 pa-6" style="direction: rtl">
-                <ResourcesPanel :group_id="id" />
+                <ResourcesPanel :key="id" :group_id="id" />
               </v-window-item>
             </v-window>
           </div>

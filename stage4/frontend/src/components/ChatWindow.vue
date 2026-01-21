@@ -305,6 +305,7 @@ export default {
         <v-btn
           color="primary"
           icon="mdi-send-variant"
+          class="flip-horizontal"
           variant="text"
           :disabled="connectionStatus !== 'connected'"
           @click="sendMessage"
@@ -403,6 +404,10 @@ export default {
 
 .mt-1 .message-bubble {
   border-top-right-radius: 4px;
+}
+
+.flip-horizontal {
+  transform: scaleX(-1);
 }
 
 .time-on-hover {
