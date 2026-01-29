@@ -5,6 +5,7 @@ import authService from '@/services/authService'
 import SubGroupSideBar from '@/components/SubGroupSideBar.vue'
 import ResourcesPanel from '@/components/ResourcesPanel.vue'
 import groupsService from '@/services/groupsService'
+import { useDisplay } from 'vuetify'
 
 export default {
   components: {
@@ -14,6 +15,10 @@ export default {
     JoinGroupButton,
   },
   props: { id: String },
+  setup() {
+    const { mobile, mdAndUp } = useDisplay()
+    return { mobile, mdAndUp }
+  },
   data() {
     return {
       token: authService.getToken(),
@@ -29,6 +34,7 @@ export default {
       snackbarMessage: '',
       breadcrumbChain: [],
       loading: true,
+      sidebarOpen: false,
     }
   },
   computed: {
@@ -182,8 +188,10 @@ export default {
 
     <v-layout class="flex-grow-1 page-background overflow-hidden" style="min-height: 0">
       <v-navigation-drawer
-        width="400"
-        permanent
+        v-model="sidebarOpen"
+        :width="mobile ? 300 : 400"
+        :permanent="mdAndUp"
+        :temporary="mobile"
         elevation="0"
         class="sidebar-border"
         color="#f8fafd"
@@ -246,6 +254,20 @@ export default {
         </v-container>
       </v-main>
     </v-layout>
+
+    <!-- Floating Action Button for Mobile Sidebar -->
+    <v-btn
+      v-if="mobile"
+      icon
+      color="primary"
+      size="large"
+      class="mobile-fab"
+      elevation="4"
+      aria-label="فتح الشريط الجانبي"
+      @click="sidebarOpen = !sidebarOpen"
+    >
+      <v-icon>mdi-menu</v-icon>
+    </v-btn>
   </div>
 
   <v-snackbar v-model="snackbar" color="error" timeout="4000" rounded="pill">
@@ -340,5 +362,39 @@ export default {
 }
 .opacity-70 {
   opacity: 0.7;
+}
+
+.mobile-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+}
+
+/* Mobile-first adjustments */
+@media (max-width: 959px) {
+  .header-section {
+    flex-direction: column;
+    padding: 16px !important;
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  .header-section > div:first-child,
+  .header-section > div:last-child {
+    min-width: auto !important;
+  }
+
+  .text-h3 {
+    font-size: 1.5rem !important;
+  }
+
+  .text-h4 {
+    font-size: 1.25rem !important;
+  }
+
+  :deep(.v-breadcrumbs) {
+    font-size: 0.875rem !important;
+  }
 }
 </style>
