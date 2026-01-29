@@ -141,6 +141,7 @@ export default {
       size="large"
       class="mobile-fab"
       elevation="4"
+      aria-label="فتح الشريط الجانبي"
       @click="sidebarOpen = !sidebarOpen"
     >
       <v-icon>mdi-menu</v-icon>

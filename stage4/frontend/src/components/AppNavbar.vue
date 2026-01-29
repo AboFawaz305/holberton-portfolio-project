@@ -173,6 +173,7 @@ const checkAuth = async () => {
 
 const logout = () => {
   authService.logout()
+  drawer.value = false
   router.push('/')
 }
 
