@@ -105,21 +105,39 @@
       <v-divider class="my-3"></v-divider>
 
       <!-- Account Menu Items -->
-      <v-list-item v-if="!isLoggedIn" class="drawer-nav-item mb-1" rounded="lg" to="/login" @click="handleNavClick">
+      <v-list-item
+        v-if="!isLoggedIn"
+        class="drawer-nav-item mb-1"
+        rounded="lg"
+        to="/login"
+        @click="handleNavClick"
+      >
         <template #prepend>
           <v-icon class="drawer-icon">mdi-login-variant</v-icon>
         </template>
         <v-list-item-title class="drawer-title">تسجيل الدخول</v-list-item-title>
       </v-list-item>
 
-      <v-list-item v-if="!isLoggedIn" class="drawer-nav-item mb-1" rounded="lg" to="/register" @click="handleNavClick">
+      <v-list-item
+        v-if="!isLoggedIn"
+        class="drawer-nav-item mb-1"
+        rounded="lg"
+        to="/register"
+        @click="handleNavClick"
+      >
         <template #prepend>
           <v-icon class="drawer-icon">mdi-account-plus-outline</v-icon>
         </template>
         <v-list-item-title class="drawer-title">إنشاء حساب</v-list-item-title>
       </v-list-item>
 
-      <v-list-item v-if="isLoggedIn" class="drawer-nav-item mb-1" rounded="lg" to="/profile" @click="handleNavClick">
+      <v-list-item
+        v-if="isLoggedIn"
+        class="drawer-nav-item mb-1"
+        rounded="lg"
+        to="/profile"
+        @click="handleNavClick"
+      >
         <template #prepend>
           <v-icon class="drawer-icon">mdi-account-edit-outline</v-icon>
         </template>
