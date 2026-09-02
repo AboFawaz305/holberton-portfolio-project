@@ -1,8 +1,8 @@
 <template>
   <v-dialog v-model="internalOpen" max-width="500px" persistent>
     <v-form ref="domainForm" v-model="isFormValid" @submit.prevent="save">
-      <v-card rounded="xl" class="pa-4">
-        <v-card-title class="text-h5 font-weight-bold d-flex align-center">
+      <v-card rounded="xl" class="pa-4 domains-dialog-card">
+        <v-card-title class="text-h5 font-weight-bold d-flex align-center domains-dialog-title">
           <v-icon start color="primary">mdi-shield-lock</v-icon>
           إدارة النطاقات المسموحة
         </v-card-title>
@@ -28,7 +28,7 @@
           ></v-combobox>
         </v-card-text>
 
-        <v-card-actions class="mt-4">
+        <v-card-actions class="mt-4 dialog-actions">
           <v-spacer></v-spacer>
           <v-btn variant="text" color="grey" @click="close" :disabled="loading">إلغاء</v-btn>
           <v-btn
@@ -145,3 +145,32 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+@media (max-width: 600px) {
+  .domains-dialog-card {
+    padding: 12px !important;
+  }
+
+  .domains-dialog-title {
+    overflow: visible;
+    white-space: normal;
+    font-size: 1.2rem !important;
+    line-height: 1.4;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dialog-actions .v-spacer {
+    display: none;
+  }
+
+  .dialog-actions .v-btn {
+    flex: 1 1 120px;
+    margin: 0 !important;
+  }
+}
+</style>

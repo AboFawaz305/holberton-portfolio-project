@@ -71,7 +71,7 @@ export default {
       class="px-8 py-10 gradient-bg d-flex align-center justify-space-between header-section"
       rounded="0"
     >
-      <div class="d-flex flex-column align-start" style="min-width: 320px">
+      <div class="d-flex flex-column align-start header-details" style="min-width: 320px">
         <v-btn
           icon
           variant="text"
@@ -86,12 +86,12 @@ export default {
         </h1>
       </div>
 
-      <div class="d-flex flex-column align-center flex-grow-1">
+      <div class="d-flex flex-column align-center flex-grow-1 header-action">
         <v-icon color="white" size="70" class="opacity-90 mb-4">mdi-school-outline</v-icon>
         <JoinGroupButton :isOrg="isOrg" :id="id" />
       </div>
 
-      <div style="min-width: 320px"></div>
+      <div class="header-spacer" style="min-width: 320px"></div>
     </v-card>
 
     <v-layout class="flex-grow-1 page-background overflow-hidden" style="min-height: 0">
@@ -192,5 +192,85 @@ export default {
 
 .sidebar-scroll-container:hover {
   scrollbar-color: #cbd5e1 transparent;
+}
+
+@media (max-width: 959px) {
+  .main-dashboard-wrapper {
+    height: auto;
+    min-height: calc(100svh - 72px);
+    overflow: visible;
+  }
+
+  .header-section {
+    flex: 0 0 auto;
+    flex-direction: column !important;
+    min-height: 280px;
+    gap: 16px;
+    padding: 24px 16px !important;
+  }
+
+  .header-details {
+    width: 100%;
+    min-width: 0 !important;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .header-details h1 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 2rem !important;
+    line-height: 1.3;
+  }
+
+  .header-action {
+    width: 100%;
+  }
+
+  .header-action > .v-icon {
+    font-size: 56px !important;
+  }
+
+  .header-spacer {
+    display: none;
+  }
+
+  .page-background {
+    flex-direction: column;
+    overflow: visible !important;
+  }
+
+  .sidebar-border {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: 320px !important;
+    flex: 0 0 320px;
+    transform: none !important;
+    border-inline-end: 0 !important;
+    border-bottom: 1px solid #edf2f7 !important;
+  }
+
+  .page-background :deep(.v-main) {
+    width: 100%;
+    padding: 0 !important;
+  }
+
+  .page-background :deep(.v-navigation-drawer__content) {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .page-background :deep(.v-main > .v-container) {
+    min-height: 560px !important;
+    padding: 12px !important;
+  }
+
+  .chat-outer-box {
+    min-height: 536px;
+  }
 }
 </style>

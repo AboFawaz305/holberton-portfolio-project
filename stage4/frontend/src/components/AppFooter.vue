@@ -119,4 +119,19 @@ const socialIcons = ['mdi-twitter', 'mdi-instagram', 'mdi-linkedin', 'mdi-github
 .gap-8 {
   gap: 40px;
 }
+
+@media (max-width: 600px) {
+  .v-container {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+
+  .logo-text {
+    font-size: 2.25rem;
+  }
+
+  .footer-nav {
+    gap: 16px;
+  }
+}
 </style>

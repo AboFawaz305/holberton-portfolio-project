@@ -199,8 +199,8 @@ export default {
   <div class="main-dashboard-wrapper page-background">
     <v-card flat height="280" class="gradient-bg d-flex align-center header-section" rounded="0">
       <v-container class="max-width-container">
-        <div class="d-flex align-center">
-          <v-avatar size="120" color="white" class="elevation-4 ms-6">
+        <div class="d-flex align-center profile-header-content">
+          <v-avatar size="120" color="white" class="elevation-4 ms-6 profile-avatar">
             <v-icon size="80" color="primary">mdi-account-circle-outline</v-icon>
           </v-avatar>
 
@@ -231,7 +231,7 @@ export default {
               >
                 رجوع
               </v-btn>
-              <h1 class="text-h3 font-weight-bold text-white mb-1">
+              <h1 class="text-h3 font-weight-bold text-white mb-1 profile-heading">
                 {{ form.firstname }} {{ form.lastname }}
               </h1>
               <span class="text-h6 text-white opacity-70">إعدادات الحساب الشخصي</span>
@@ -306,7 +306,12 @@ export default {
                     />
                   </v-col>
                 </v-row>
-                <v-btn color="primary" type="submit" rounded="lg" size="large" class="px-8 mt-2"
+                <v-btn
+                  color="primary"
+                  type="submit"
+                  rounded="lg"
+                  size="large"
+                  class="px-8 mt-2 profile-action"
                   >تحديث المعلومات</v-btn
                 >
               </v-form>
@@ -364,7 +369,12 @@ export default {
                     />
                   </v-col>
                 </v-row>
-                <v-btn color="primary" type="submit" rounded="lg" size="large" class="px-8 mt-2"
+                <v-btn
+                  color="primary"
+                  type="submit"
+                  rounded="lg"
+                  size="large"
+                  class="px-8 mt-2 profile-action"
                   >تحديث كلمة السر</v-btn
                 >
               </v-form>
@@ -508,5 +518,69 @@ export default {
 
 :deep(.v-skeleton-loader) {
   background: transparent !important;
+}
+
+@media (max-width: 600px) {
+  .header-section {
+    height: 240px !important;
+    flex-basis: 240px;
+  }
+
+  .profile-header-content {
+    min-width: 0;
+  }
+
+  .profile-header-content > div {
+    min-width: 0;
+  }
+
+  .profile-avatar {
+    width: 84px !important;
+    height: 84px !important;
+    min-width: 84px !important;
+    margin-inline-start: 12px !important;
+  }
+
+  .profile-avatar :deep(.v-icon) {
+    font-size: 56px !important;
+  }
+
+  .profile-heading {
+    overflow-wrap: anywhere;
+    font-size: 1.75rem !important;
+    line-height: 1.3;
+  }
+
+  .header-section .text-h6 {
+    font-size: 1rem !important;
+  }
+
+  .max-width-container {
+    padding-inline: 12px !important;
+  }
+
+  :deep(.v-toolbar-title) {
+    min-width: 0;
+    white-space: normal;
+    font-size: 1rem;
+  }
+
+  .profile-action {
+    width: 100%;
+  }
+
+  :deep(.email-item .v-list-item__content) {
+    min-width: 0;
+  }
+
+  :deep(.email-item .v-list-item__append) {
+    margin-inline-start: 8px;
+  }
+
+  .email-display-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 </style>

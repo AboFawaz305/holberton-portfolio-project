@@ -82,4 +82,25 @@ const steps = [
   transform: scale(1.15) rotate(5deg);
   transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+@media (max-width: 600px) {
+  h2 {
+    margin-bottom: 32px !important;
+    font-size: 2rem !important;
+    line-height: 1.35;
+  }
+
+  .step-item {
+    margin-bottom: 32px !important;
+  }
+
+  .step-item .ms-10 {
+    margin-inline-start: 16px !important;
+    padding-inline-start: 0 !important;
+  }
+
+  .step-item h3 {
+    font-size: 1.2rem !important;
+  }
+}
 </style>

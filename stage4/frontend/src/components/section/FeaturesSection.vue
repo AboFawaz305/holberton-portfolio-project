@@ -217,4 +217,46 @@
   transform: rotate(0) scale(1.1);
   transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+@media (max-width: 600px) {
+  h2 {
+    font-size: 2rem !important;
+    line-height: 1.35;
+  }
+
+  h3 {
+    font-size: 1.55rem !important;
+    line-height: 1.4;
+  }
+
+  p {
+    font-size: 1.05rem !important;
+  }
+
+  .v-row.mb-16 {
+    margin-bottom: 32px !important;
+    padding-bottom: 24px !important;
+  }
+
+  .feature-visual-wrapper {
+    height: 240px;
+    margin-bottom: 16px;
+  }
+
+  .feature-blob {
+    width: 200px;
+    height: 200px;
+  }
+
+  .feature-mockup {
+    width: calc(100% - 32px);
+    max-width: 320px;
+    height: 200px;
+  }
+
+  .vote-badge {
+    top: -16px;
+    right: -8px;
+  }
+}
 </style>

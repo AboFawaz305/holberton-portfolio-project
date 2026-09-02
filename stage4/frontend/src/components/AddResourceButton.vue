@@ -166,7 +166,7 @@ export default {
 
     <!-- Upload Dialog -->
     <v-dialog v-model="dialog" max-width="500px" persistent>
-      <v-card rounded="xl" class="pa-6">
+      <v-card rounded="xl" class="pa-6 resource-dialog-card">
         <v-card-title class="text-h5 font-weight-bold px-0 d-flex align-center">
           <v-icon start color="primary" class="me-2">mdi-file-upload</v-icon>
           إضافة مصدر جديد
@@ -260,7 +260,7 @@ export default {
           </v-progress-linear>
         </v-card-text>
 
-        <v-card-actions class="px-0 mt-4">
+        <v-card-actions class="px-0 mt-4 dialog-actions">
           <v-spacer></v-spacer>
           <v-btn variant="text" color="grey-darken-1" :disabled="isUploading" @click="closeDialog">
             إلغاء
@@ -300,5 +300,31 @@ export default {
 
 .shadow-sm {
   box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+@media (max-width: 600px) {
+  .resource-dialog-card {
+    padding: 16px !important;
+  }
+
+  .resource-dialog-card .v-card-title {
+    overflow: visible;
+    white-space: normal;
+    font-size: 1.25rem !important;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dialog-actions .v-spacer {
+    display: none;
+  }
+
+  .dialog-actions .v-btn {
+    flex: 1 1 120px;
+    margin: 0 !important;
+  }
 }
 </style>

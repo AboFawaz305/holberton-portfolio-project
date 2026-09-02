@@ -100,12 +100,12 @@ export default {
     >
       <v-card-text class="pa-4">
         <!-- Header Section -->
-        <div class="d-flex align-start mb-3">
+        <div class="d-flex align-start mb-3 resource-header">
           <v-avatar color="primary" size="56" rounded="lg" class="elevation-2">
             <v-icon color="white" size="32">mdi-file-document</v-icon>
           </v-avatar>
 
-          <div class="flex-grow-1 mr-4">
+          <div class="flex-grow-1 mr-4 resource-header-copy">
             <h3 class="text-h6 font-weight-bold mb-1 text-right">
               {{ resource.name }}
             </h3>
@@ -122,7 +122,7 @@ export default {
         <v-divider class="my-3"></v-divider>
 
         <!-- Actions Section -->
-        <div class="d-flex align-center justify-space-between">
+        <div class="d-flex align-center justify-space-between resource-actions">
           <!-- Vote Section -->
           <div class="d-flex align-center gap-2">
             <v-btn
@@ -193,5 +193,29 @@ export default {
 
 .gap-2 {
   gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .resource-header-copy {
+    min-width: 0;
+  }
+
+  .resource-header-copy h3,
+  .resource-header-copy p {
+    overflow-wrap: anywhere;
+  }
+
+  .resource-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .resource-actions > a {
+    width: 100%;
+  }
+
+  .resource-actions .download-btn {
+    width: 100%;
+  }
 }
 </style>

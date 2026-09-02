@@ -130,4 +130,33 @@
     transform: translateY(-20px);
   }
 }
+
+@media (max-width: 600px) {
+  .hero-wrapper h1 {
+    font-size: 2.35rem !important;
+    line-height: 1.25;
+  }
+
+  .hero-wrapper p {
+    font-size: 1.05rem !important;
+    line-height: 1.8;
+  }
+
+  .hero-wrapper :deep(.v-chip) {
+    max-width: 100%;
+    height: auto !important;
+  }
+
+  .hero-wrapper :deep(.v-chip__content) {
+    padding-block: 4px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .brand-btn {
+    width: 100%;
+    max-width: 260px;
+    padding-inline: 24px !important;
+  }
+}
 </style>
