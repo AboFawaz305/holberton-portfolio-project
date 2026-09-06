@@ -82,7 +82,7 @@ export default {
     </v-overlay>
     <v-row justify="center">
       <v-col cols="12" sm="8" md="6" lg="4">
-        <v-card rounded="xl" elevation="8" class="pa-8 shadow-card">
+        <v-card rounded="xl" elevation="8" class="pa-8 shadow-card auth-card">
           <div class="text-center mb-10">
             <v-avatar color="primary-lighten-5" size="80" class="mb-4">
               <v-icon color="primary" size="40">mdi-login</v-icon>
@@ -194,5 +194,20 @@ export default {
 }
 .mb-6 {
   margin-bottom: 24px !important;
+}
+
+@media (max-width: 600px) {
+  .auth-bg {
+    padding: 24px 12px !important;
+  }
+
+  .auth-card {
+    padding: 20px !important;
+  }
+
+  .auth-card h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.35;
+  }
 }
 </style>

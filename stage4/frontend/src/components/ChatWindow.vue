@@ -175,10 +175,10 @@ export default {
 
 <template>
   <v-card class="chat-window-card d-flex flex-column h-100 pa-0" flat>
-    <v-card-title class="flex-shrink-0 px-4 py-3 border-b">
+    <v-card-title class="flex-shrink-0 px-4 py-3 border-b chat-title">
       <v-icon color="primary" start>mdi-message-text-outline</v-icon>
-      <span class="ml-3 font-weight-bold">المحادثة العامة</span>
-      <v-chip class="ml-auto" :color="statusColor" label size="small" variant="tonal">
+      <span class="ml-3 font-weight-bold chat-title-text">المحادثة العامة</span>
+      <v-chip class="ml-auto status-chip" :color="statusColor" label size="small" variant="tonal">
         {{ statusLabel }}
       </v-chip>
     </v-card-title>
@@ -280,7 +280,7 @@ export default {
               class="me-1"
             />
           </template>
-          <v-sheet rounded="lg" elevation="12" width="300">
+          <v-sheet rounded="lg" elevation="12" width="300" class="emoji-sheet">
             <EmojiPicker
               :native="true"
               :hide-group-names="true"
@@ -434,5 +434,46 @@ export default {
 .messages-container::-webkit-scrollbar-thumb {
   background: #eee;
   border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .chat-title {
+    padding-inline: 12px !important;
+    font-size: 1rem;
+  }
+
+  .chat-title-text {
+    min-width: 0;
+    margin-left: 8px !important;
+  }
+
+  .status-chip {
+    flex-shrink: 0;
+  }
+
+  .messages-container {
+    padding: 8px;
+  }
+
+  .message-row {
+    padding-inline: 4px !important;
+  }
+
+  .message-bubble {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .chat-footer {
+    padding: 8px !important;
+  }
+
+  .chat-footer > div {
+    padding-inline: 8px !important;
+  }
+
+  .emoji-sheet {
+    width: min(300px, calc(100vw - 24px)) !important;
+  }
 }
 </style>

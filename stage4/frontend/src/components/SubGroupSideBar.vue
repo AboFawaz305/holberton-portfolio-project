@@ -183,13 +183,15 @@ export default {
                 <v-icon color="indigo-darken-2" size="28">mdi-forum</v-icon>
               </v-avatar>
 
-              <div class="flex-grow-1 text-center">
+              <div class="flex-grow-1 text-center group-title-wrapper">
                 <span class="text-subtitle-1 font-weight-bold">
                   {{ group.title }}
                 </span>
               </div>
 
-              <span class="text-body-2 text-grey-darken-1"> {{ group.members_count }} عضو </span>
+              <span class="text-body-2 text-grey-darken-1 member-count">
+                {{ group.members_count }} عضو
+              </span>
             </div>
 
             <v-divider class="mb-3 opacity-20"></v-divider>
@@ -287,5 +289,29 @@ export default {
 
 :deep(.v-skeleton-loader) {
   background: transparent !important;
+}
+
+@media (max-width: 600px) {
+  .sidebar-main-wrapper {
+    padding-inline: 0;
+  }
+
+  .college-card :deep(.v-list-item) {
+    padding: 12px !important;
+  }
+
+  .group-title-wrapper {
+    min-width: 0;
+    padding-inline: 4px;
+  }
+
+  .group-title-wrapper span {
+    overflow-wrap: anywhere;
+  }
+
+  .member-count {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 }
 </style>

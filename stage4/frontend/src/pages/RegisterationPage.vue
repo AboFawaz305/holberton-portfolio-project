@@ -95,7 +95,7 @@ export default {
   <v-container fluid class="fill-height auth-bg py-10">
     <v-row justify="center">
       <v-col cols="12" sm="10" md="8" lg="5">
-        <v-card rounded="xl" elevation="8" class="pa-8">
+        <v-card rounded="xl" elevation="8" class="pa-8 auth-card">
           <div class="text-center mb-10">
             <v-avatar color="primary-lighten-5" size="80" class="mb-4">
               <v-icon color="primary" size="40">mdi-account-plus-outline</v-icon>
@@ -272,7 +272,7 @@ export default {
     </v-row>
 
     <v-dialog v-model="showVerificationDialog" max-width="450" persistent>
-      <v-card class="pa-8 text-center" rounded="xl">
+      <v-card class="pa-8 text-center verification-card" rounded="xl">
         <v-avatar color="success-lighten-5" size="90" class="mb-6">
           <v-icon color="success" size="50">mdi-email-check-outline</v-icon>
         </v-avatar>
@@ -298,5 +298,21 @@ export default {
 
 .v-card {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+@media (max-width: 600px) {
+  .auth-bg {
+    padding: 24px 12px !important;
+  }
+
+  .auth-card,
+  .verification-card {
+    padding: 20px !important;
+  }
+
+  .auth-card h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.35;
+  }
 }
 </style>

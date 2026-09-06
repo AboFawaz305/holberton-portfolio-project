@@ -37,7 +37,7 @@ export default {
 
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-card class="pa-8 text-center" max-width="400">
+    <v-card class="pa-8 text-center verification-card" max-width="400">
       <!-- Loading -->
       <template v-if="isLoading">
         <v-progress-circular indeterminate color="primary" size="64" />
@@ -61,3 +61,15 @@ export default {
     </v-card>
   </v-container>
 </template>
+
+<style scoped>
+.verification-card {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .verification-card {
+    padding: 20px !important;
+  }
+}
+</style>

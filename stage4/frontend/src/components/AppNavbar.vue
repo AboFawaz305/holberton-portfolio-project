@@ -221,4 +221,41 @@ const isActive = (item) => {
   font-weight: 700;
   color: #0f172a;
 }
+
+@media (max-width: 600px) {
+  .nav-container {
+    gap: 4px;
+    padding-inline: 12px !important;
+  }
+
+  .logo {
+    height: 24px;
+  }
+
+  .nav-center {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .nav-item {
+    gap: 0;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .nav-icon {
+    display: none;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .account-card {
+    width: min(260px, calc(100vw - 24px));
+    min-width: 0;
+  }
+}
 </style>

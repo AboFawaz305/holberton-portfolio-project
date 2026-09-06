@@ -43,4 +43,11 @@ import CTASection from '@/components/section/CTASection.vue'
   /* Shadow uses a dark version of your teal for depth */
   box-shadow: 0 30px 60px -12px rgba(4, 128, 159, 0.12) !important;
 }
+
+@media (max-width: 600px) {
+  .section-padding {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+}
 </style>

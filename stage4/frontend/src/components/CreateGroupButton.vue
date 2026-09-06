@@ -92,7 +92,7 @@ export default {
 
     <v-dialog v-model="dialog" max-width="450px" persistent>
       <v-form ref="createForm" v-model="isFormValid" @submit.prevent="submitForm">
-        <v-card rounded="xl" class="pa-6">
+        <v-card rounded="xl" class="pa-6 group-dialog-card">
           <v-card-title class="text-h5 font-weight-bold px-0 d-flex align-center">
             <v-icon start color="primary" class="me-2">mdi-plus-circle-outline</v-icon>
             إنشاء مجموعة
@@ -129,7 +129,7 @@ export default {
             </v-expand-transition>
           </v-card-text>
 
-          <v-card-actions class="px-0 mt-4">
+          <v-card-actions class="px-0 mt-4 dialog-actions">
             <v-spacer />
             <v-btn variant="text" color="grey-darken-1" @click="closeDialog" :disabled="isCreating">
               إلغاء
@@ -174,5 +174,31 @@ export default {
 
 .shadow-sm {
   box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+@media (max-width: 600px) {
+  .group-dialog-card {
+    padding: 16px !important;
+  }
+
+  .group-dialog-card .v-card-title {
+    overflow: visible;
+    white-space: normal;
+    font-size: 1.25rem !important;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dialog-actions .v-spacer {
+    display: none;
+  }
+
+  .dialog-actions .v-btn {
+    flex: 1 1 110px;
+    margin: 0 !important;
+  }
 }
 </style>

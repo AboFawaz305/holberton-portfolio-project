@@ -125,4 +125,26 @@
   position: absolute;
   right: -20px;
 }
+
+@media (max-width: 600px) {
+  .terms-page > .v-container:first-child {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
+  .terms-page h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.3;
+  }
+
+  .glass-card {
+    padding: 20px !important;
+    border-radius: 24px !important;
+  }
+
+  .glass-card h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.4;
+  }
+}
 </style>

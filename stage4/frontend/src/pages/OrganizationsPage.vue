@@ -76,15 +76,15 @@ export default {
 </script>
 
 <template>
-  <v-card flat class="pa-10 text-center gradient-bg" rounded="0">
+  <v-card flat class="pa-10 text-center gradient-bg organizations-header" rounded="0">
     <div class="mx-auto mb-4">
       <v-icon color="white" size="64" class="opacity-90">mdi-school-outline</v-icon>
     </div>
 
-    <v-card-title class="text-h4 font-weight-bold mb-1 text-white"
+    <v-card-title class="text-h4 font-weight-bold mb-1 text-white header-title"
       >اختر مؤسستك التعليمية</v-card-title
     >
-    <v-card-subtitle class="text-body-2 text-white opacity-80"
+    <v-card-subtitle class="text-body-2 text-white opacity-80 header-subtitle"
       >ابدأ بتحديد جامعتك للوصول الى مجتمعك وزملائك</v-card-subtitle
     >
 
@@ -154,7 +154,7 @@ export default {
 
             <v-divider class="mx-5 my-1"></v-divider>
 
-            <v-card-subtitle class="pa-5 d-flex justify-space-between align-center">
+            <v-card-subtitle class="pa-5 d-flex justify-space-between align-center org-meta">
               <v-chip
                 color="orange-lighten-4"
                 class="font-weight-bold text-orange-darken-4"
@@ -165,7 +165,9 @@ export default {
                 {{ org.members_count }} طالب
               </v-chip>
 
-              <div class="text-grey-darken-2 d-flex align-center text-caption">
+              <div
+                class="text-grey-darken-2 d-flex align-center text-caption organization-location"
+              >
                 <v-icon size="18" class="me-1">mdi-map-marker-outline</v-icon>
                 <span class="text-truncate" style="max-width: 140px">{{ org.location }}</span>
               </div>
@@ -176,7 +178,7 @@ export default {
     </v-container>
 
     <v-dialog v-model="showLoginModal" max-width="450px" persistent>
-      <v-card rounded="xl" class="pa-6 text-center">
+      <v-card rounded="xl" class="pa-6 text-center login-dialog-card">
         <v-avatar color="error-lighten-5" size="70" class="mb-4">
           <v-icon color="error" size="36">mdi-lock-outline</v-icon>
         </v-avatar>
@@ -236,5 +238,54 @@ export default {
 }
 .opacity-80 {
   opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+  .organizations-header {
+    padding: 28px 16px !important;
+  }
+
+  .header-title {
+    padding-inline: 0;
+    overflow: visible;
+    white-space: normal;
+    font-size: 1.75rem !important;
+    line-height: 1.35;
+  }
+
+  .header-subtitle {
+    overflow: visible;
+    white-space: normal;
+    line-height: 1.6;
+  }
+
+  .page-background {
+    padding-block: 24px !important;
+  }
+
+  .org-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .organization-location {
+    min-width: 0;
+    flex: 1 1 120px;
+    justify-content: flex-end;
+  }
+
+  .organization-location span {
+    max-width: 100% !important;
+  }
+
+  .login-dialog-card {
+    padding: 20px !important;
+  }
+
+  .login-dialog-card .v-card-title {
+    overflow: visible;
+    white-space: normal;
+    font-size: 1.35rem !important;
+  }
 }
 </style>

@@ -43,4 +43,22 @@
   position: relative;
   z-index: 2;
 }
+
+@media (max-width: 600px) {
+  h2 {
+    font-size: 2rem !important;
+    line-height: 1.35;
+  }
+
+  p {
+    font-size: 1.05rem !important;
+    line-height: 1.7;
+  }
+
+  .v-btn {
+    width: calc(100% - 24px);
+    max-width: 260px;
+    padding-inline: 24px !important;
+  }
+}
 </style>
